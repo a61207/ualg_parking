@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load group_tags %}
+{% load crispy_forms_filters %}
+
+{% block title %}
+    Zone {{ object.name }}
+{% endblock %}
+
+{% block main %}
+
+    <div class="container">
+        <h1 class="mt-5">Zone {{ object.name }}</h1>
+        <p>Park: {{ object.park }}</p>
+        <div id="canvas_container" style="overflow: scroll; height: 500px">
+            <canvas id="canvas"></canvas>
+        </div>
+        <label for="rangeInput" class="col-6 form-label">Zoom</label>
+        <input type="range" class="form-range" min="1" max="3" step="0.25" value="1"
+               id="rangeInput">
+        {% if request.user|is_admin %}
+            <a type="button" href="{% url 'update_zone' object.park.id object.id %}" class="btn btn-success mt-2">Update
+                Zone</a>
+            <a type="button" href="{% url 'delete_zone' object.park.id object.id %}" class="btn btn-success mt-2">Delete
+                Zone</a>
+        {% endif %}
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script>
+
+        window.addEventListener('load', () => {
+            const canvas = document.querySelector("#canvas");
+            const zoomButton = document.getElementById('rangeInput')
+            const height = document.getElementById('canvas_container').clientHeight;
+            const width = document.getElementById('canvas_container').clientWidth;
+            canvas.height = height;
+            canvas.width = width;
+            let ctx = canvas.getContext('2d');
+            const size = 10;
+            let zoom = 1, spots = [];
+
+            {% for spot in object.spots %}
+                if ('{{ spot.direction }}' === 'HO')
+                    spots.push([Number({{ spot.x }}), Number({{ spot.y }}), 2, 1, Number({{ spot.number }})]);
+                else spots.push([Number({{ spot.x }}), Number({{ spot.y }}), 1, 2, Number({{ spot.number }})]);
+            {% endfor %}
+
+            drawCanvas(size);
+
+            function drawCanvas() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const realSize = size * zoom;
+                ctx.strokeStyle = "#eeeeee";
+                for (let i = 0; i < spots.length; i++) {
+                    roundRect((spots[i][0] * realSize), (spots[i][1] * realSize), realSize * spots[i][2], realSize * spots[i][3], 50, "#000000");
+                    roundRect((spots[i][0] * realSize) + (realSize / 6), (spots[i][1] * realSize) + (realSize / 6), (realSize * spots[i][2]) - (realSize * 2 / 6), (realSize * spots[i][3]) - (realSize * 2 / 6), 50, "#35c942");
+
+                    ctx.font = "bold " + (realSize * 2 / 3) + "px Arial";
+                    ctx.fillStyle = "#000000";
+                    ctx.textAlign = "center";
+                    if (spots[i][2] > spots[i][3])
+                        ctx.fillText(String(spots[i][4]), (spots[i][0] * realSize) + (spots[i][2] * realSize * 2 / 4), (spots[i][1] * realSize) + (spots[i][3] * realSize * 3 / 4));
+                    else {
+                        ctx.save();
+                        ctx.translate((spots[i][0] * realSize) + (spots[i][2] * realSize * 3 / 4), (spots[i][1] * realSize) + (spots[i][3] * realSize * 2 / 4));
+                        ctx.rotate(-0.5 * Math.PI);
+                        ctx.fillText(String(spots[i][4]), 0, 0);
+                        ctx.restore();
+                    }
+                }
+            }
+
+            function roundRect(x, y, width, height, radius, color) {
+                if (width < 2 * radius) radius = width / 2;
+                if (height < 2 * radius) radius = height / 2;
+                ctx.beginPath();
+                ctx.moveTo(x + radius, y);
+                ctx.arcTo(x + width, y, x + width, y + height, radius);
+                ctx.arcTo(x + width, y + height, x, y + height, radius);
+                ctx.arcTo(x, y + height, x, y, radius);
+                ctx.arcTo(x, y, x + width, y, radius);
+                ctx.closePath();
+                ctx.fillStyle = color;
+                ctx.fill();
+            }
+
+            function resize() {
+                zoom = zoomButton.value;
+                canvas.height = height * zoom;
+                canvas.width = width * zoom;
+                drawCanvas();
+            }
+
+            zoomButton.addEventListener("click", resize)
+
+        })
+
+    </script>
+
+{% endblock main %}

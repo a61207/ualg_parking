@@ -1,0 +1,8 @@
+{% load group_tags %}
+
+<a class="btn btn-info btn-sm" href="{% url 'zone_detail' record.park.id record.id %}">View Zone</a>
+
+{% if request.user|is_admin %}
+    <a class="btn btn-info btn-sm" href="{% url 'update_zone' record.park.id record.id %}">Edit Zone</a>
+    <a class="btn btn-info btn-sm" href="{% url 'delete_zone' record.park.id record.id %}">Delete Zone</a>
+{% endif %}

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load group_tags %}
+{% load crispy_forms_filters %}
+
+{% block title %}
+    Park {{ object.name }}
+{% endblock %}
+
+{% block main %}
+
+    <div class="container">
+        <h1 class="mt-5">Park {{ object.name }}</h1>
+        <p>Address: {{ object.address }}</p>
+        <p>Postal Code: {{ object.postal_code }}</p>
+        <p>Typology: {{ object.get_typology_display }}</p>
+        <p>Admin: {{ object.admin.user.first_name }} {{ object.admin.user.last_name }}</p>
+        <p>Created: {{ object.created }}</p>
+        <p>Updated: {{ object.updated }}</p>
+        <a type="button" class="btn btn-success mt-2" href="{% url 'list_zones' park.id %}">View Zones</a>
+        {% if request.user|is_admin %}
+            <a type="button" href="{% url 'update_park' object.id %}" class="btn btn-success mt-2">Update Park</a>
+            <a type="button" href="{% url 'delete_park' object.id %}" class="btn btn-success mt-2">Delete Park</a>
+        {% endif %}
+    </div>
+
+{% endblock main %}

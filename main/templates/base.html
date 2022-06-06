@@ -1,0 +1,34 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html class="h-100" lang="en">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{% static 'dist/css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'dist/css/bootstrap.min.css' %}">
+
+    <title>
+        {% block title %}
+        {% endblock %}
+    </title>
+
+</head>
+
+<body class="d-flex flex-column h-100">
+
+{% include 'header.html' %}
+
+<main class="mt-5">
+    {% block main %}
+    {% endblock %}
+</main>
+
+
+<script src="{% static 'dist/js/bootstrap.bundle.js' %}"></script>
+<script src="{% static 'dist/js/bootstrap.bundle.min.js' %}"></script>
+
+</body>
+
+</html>

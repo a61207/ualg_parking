@@ -4,7 +4,7 @@ from parks.models import Park
 
 
 class ParkTable(tables.Table):
-    view = TemplateColumn(template_name='tables/park_buttons.html')
+    view = TemplateColumn(template_name='tables/park_buttons.html', verbose_name="")
 
     class Meta:
         model = Park
@@ -12,7 +12,7 @@ class ParkTable(tables.Table):
 
 
 class ZoneTable(tables.Table):
-    view = TemplateColumn(template_name='tables/zone_buttons.html')
+    view = TemplateColumn(template_name='tables/zone_buttons.html', verbose_name="")
 
     class Meta:
         model = Park

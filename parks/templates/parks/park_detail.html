@@ -8,19 +8,33 @@
 
 {% block main %}
 
-    <div class="container">
-        <h1 class="mt-5">Park {{ object.name }}</h1>
-        <p>Address: {{ object.address }}</p>
-        <p>Postal Code: {{ object.postal_code }}</p>
-        <p>Typology: {{ object.get_typology_display }}</p>
-        <p>Admin: {{ object.admin.user.first_name }} {{ object.admin.user.last_name }}</p>
-        <p>Created: {{ object.created }}</p>
-        <p>Updated: {{ object.updated }}</p>
-        <a type="button" class="btn btn-success mt-2" href="{% url 'list_zones' park.id %}">View Zones</a>
-        {% if request.user|is_admin %}
-            <a type="button" href="{% url 'update_park' object.id %}" class="btn btn-success mt-2">Update Park</a>
-            <a type="button" href="{% url 'delete_park' object.id %}" class="btn btn-success mt-2">Delete Park</a>
-        {% endif %}
+        <div class="container">
+            <h1 class="mt-5">Park {{ object.name }}</h1>
+        <div class="row">
+            <div class="col-4">
+                <p>Address: {{ object.address }}</p>
+                <p>Postal Code: {{ object.postal_code }} {{ object.city }}</p>
+                <p>Typology: {{ object.get_typology_display }}</p>
+                <p>Admin: {{ object.admin.user.first_name }} {{ object.admin.user.last_name }}</p>
+                <p>Created: {{ object.created }}</p>
+                <p>Updated: {{ object.updated }}</p>
+                <a type="button" class="btn btn-success mt-2" href="{% url 'list_parks'  %}">Back</a>
+                <a type="button" class="btn btn-success mt-2" href="{% url 'list_zones' park.id %}">View Zones</a>
+                {% if request.user|is_admin %}
+                    <a type="button" href="{% url 'update_park' object.id %}" class="btn btn-success mt-2">Update
+                        Park</a>
+                    <a type="button" href="{% url 'delete_park' object.id %}" class="btn btn-success mt-2">Delete
+                        Park</a>
+                {% endif %}
+            </div>
+            <div class="col-8">
+                <div class="position-sticky" style="top: 2rem; height: 60vh">
+                    <iframe src="{{ park.map_src }}" width="100%" style="border:0;" allowfullscreen=""
+                            class="border rounded-3 border border-dark shadow h-100"
+                            referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+        </div>
     </div>
 
 {% endblock main %}

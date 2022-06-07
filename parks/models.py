@@ -3,7 +3,13 @@ from django.utils import timezone
 from djmoney.models.fields import MoneyField
 from main.models import Administrator
 
+
 # Create your models here.
+
+class PostalCodeCity(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)
+    name = models.CharField(db_column='Name', verbose_name='Name', max_length=50, unique=True)
+    postal_code = models.IntegerField(db_column='PostalCode', verbose_name='Postal Code', max_length=4, unique=True)
 
 
 class Park(models.Model):
@@ -12,6 +18,30 @@ class Park(models.Model):
     TYPOLOGYS = [
         (STRUCTURE, 'Structure'),
         (SURFACE, 'Surface'),
+    ]
+
+    LISBON1 = '11'
+    LISBON2 = '12'
+    LISBON3 = '13'
+    LISBON4 = '14'
+    LISBON5 = '15'
+    LISBON6 = '16'
+    LISBON7 = '17'
+    LISBON8 = '18'
+    LISBON9 = '19'
+    FARO = '80'
+    ALBUFEIRA = '82'
+    CITY = [
+        (LISBON1, 'Lisbon'),
+        (LISBON2, 'Lisbon'),
+        (LISBON3, 'Lisbon'),
+        (LISBON4, 'Lisbon'),
+        (LISBON5, 'Lisbon'),
+        (LISBON6, 'Lisbon'),
+        (LISBON8, 'Lisbon'),
+        (LISBON9, 'Lisbon'),
+        (FARO, 'Faro'),
+        (ALBUFEIRA, 'Albufeira'),
     ]
 
     id = models.AutoField(db_column='ID', primary_key=True)
@@ -48,6 +78,12 @@ class Park(models.Model):
 
     def map_src(self):
         return self.map_html.split('"')[1]
+
+    def city(self):
+        for x in Park.CITY:
+            if x[0] == self.postal_code[:2]:
+                return x[1]
+        return ''
 
     def spots(self):
         i = 0

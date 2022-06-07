@@ -100,12 +100,6 @@ class ParkForm(forms.ModelForm):
         return cleaned_data
 
 
-class ParkFilter(django_filters.FilterSet):
-    class Meta:
-        model = Park
-        fields = ['name', 'address', 'postal_code', 'typology']
-
-
 class ZoneForm(forms.ModelForm):
     class Meta:
         model = Zone

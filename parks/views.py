@@ -5,13 +5,13 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.utils import timezone
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView
 from django.views.generic.edit import DeleteView, UpdateView, CreateView
 from django_filters.views import FilterView
 from django_tables2 import SingleTableView, SingleTableMixin
-
 from main.models import Administrator
-from parks.forms import ParkForm, ZoneForm, SpotForm, ParkFilter
+from parks.filters import ParkFilter, ZoneFilter
+from parks.forms import ParkForm, ZoneForm, SpotForm
 from parks.functions import check_empty_spots, check_overlaping_spots
 from parks.models import Park, Zone, ParkingSpot
 from parks.tables import ParkTable, ZoneTable
@@ -21,6 +21,7 @@ from parks.tables import ParkTable, ZoneTable
 class AddPark(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Park
     form_class = ParkForm
+    template_name = 'parks/park_add.html'
 
     def test_func(self):
         return not (Administrator.objects.filter(user=self.request.user) is None)
@@ -43,6 +44,7 @@ class ViewParkDetail(DetailView):
 class UpdatePark(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Park
     form_class = ParkForm
+    template_name = 'parks/park_update.html'
 
     def test_func(self):
         return not (Administrator.objects.filter(user=self.request.user) is None)
@@ -101,9 +103,14 @@ class AddZone(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return render(request, "parks/zone_form.html", {"form": form, "formset": formset})
 
 
-class ViewZoneList(ListView):
+class ViewZoneList(SingleTableMixin, FilterView):
     model = Zone
     table_class = ZoneTable
+    filterset_class = ZoneFilter
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(park=Park.objects.get(id=self.kwargs['park']))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

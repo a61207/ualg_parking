@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}
+    View Reserves {{ reserva.userid }}
+{% endblock %}
+
+{% block main %}
+    <div class="container my-4">
+        <div class="row rounded bg-light pt-3">
+            <div class="col">
+                <div class="jumbotron border p-3 mb-3">
+                    <h1 class="text-center">Reserves</h1>
+                    <hr>
+                    <div class="p-3 mb-2 bg-light text-dark">
+                        <div class="row">
+                            <div class="col">
+                                <p><b>User: </b>{{ reserva.userid.username }}</p>
+                            </div>
+                            <div class="col">
+                                <p><b>Matricula: </b>{{ reserva.matricula }}</p>
+                            </div>
+                            <div class="col">
+                                <p><b>Lugar: </b>{{ reserva.lugarid.number }}</p>
+                            </div>
+                            <div class="col">
+                                <p><b>Hora de Inicio: </b>{{ reserva.periocidadeid.start.date }}</p>
+                            </div>
+                            <div class="col">
+                                <p><b>Hora de fim: </b>{{ reserva.periocidadeid.end.date }}</p>
+                            </div>
+                            <div class="col">
+                                <p><b>Estado: </b>{{ reserva.estadoreservaid.nome }}</p>
+                            </div>
+                            <div class="col">
+                                <p><b>Update: </b>{{ reserva.editadoem }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+
+                        <!-- Botão de Editar -->
+                        <div class="col">
+                            <div class="d-flex justify-content-center">
+                                <a class="btn btn-secondary">Edit Reserve</a>
+                            </div>
+                        </div>
+
+                        <!-- Botão de Apagar -->
+                        <div class="col">
+                            <div class="d-flex justify-content-center">
+                                <a class="btn btn-secondary" href="{% url 'apagarReserva' reserva.id %}">Cancelar
+                                    Reserva</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

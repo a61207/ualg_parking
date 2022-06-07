@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}
+    Ver Fatura
+{% endblock %}
+
+{% block main %}
+    <div class="container my-4">
+        <div class="row rounded bg-light pt-3">
+            <div class="col">
+                <div class="jumbotron border p-3 mb-3">
+                    <h1 class="text-center">Faturas</h1>
+                    <hr>
+                    {% if not faturas %}
+                        <h4 class="text-center">Nenhuma fatura criada</h4>
+                    {% else %}
+
+                        <!-- Tabela de Parques -->
+                        <table class="table table-light table-hover">
+                            <thead>
+                            <tr>
+
+                                <th scope="col">Ínicio do Contrato</th>
+                                <th scope="col">Fim do Contrato</th>
+                                <th scope="col">Multa</th>
+                                <th scope="col">Emissão</th>
+                                <th scope="col">Total</th>
+                                <th scope="col">Estado</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for fatura in faturas %}
+                                <tr>
+                                    <td>{{ fatura.periocidadeid.start }}</td>
+                                    <td>{{ fatura.periocidadeid.end }}</td>
+                                    <td>{{ fatura.multa }}</td>
+                                    <td>{{ fatura.emitidaem }}</td>
+                                    <td>{{ fatura.precores }} €</td>
+                                    <td>{{ fatura.estadofaturaid.nome }}</td>
+
+                                    <td>
+                                        <div class="d-flex justify-content-center">
+                                            <a class="btn btn-secondary"
+                                               href="{% url 'consultar_fatura_especifica' fatura.id %}">Consultar
+                                                Fatura</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+
+                    <hr>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+<!--  http://127.0.0.1:8000/consultarfatura/{{contrato.id}}-->
+<!--{% url 'consultar_fatura_especifica' fatura.id %}-->

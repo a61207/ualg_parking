@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}
+    Fatura específica
+{% endblock %}
+
+{% block main %}
+    <div class="container my-4">
+        <div class="row rounded bg-light pt-3">
+            <div class="col">
+                <div class="jumbotron border p-3 mb-3">
+                    <h1 class="text-center">Detalhes da fatura</h1>
+                    <hr>
+                    {% if not fatura %}
+                        <h4 class="text-center">Nenhuma fatura criada</h4>
+                    {% else %}
+
+                        <!-- Tabela de Parques -->
+                        <table class="table table-light table-hover">
+                            <thead>
+                            <tr>
+                                <th scope="col">Início do Contrato</th>
+                                <th scope="col">Fim do Contrato</th>
+                                <th scope="col">Multa</th>
+                                <th scope="col">Emissão</th>
+                                <th scope="col">Método de pagamento</th>
+                                <th scope="col">Total</th>
+                                <th scope="col">Estado</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>{{ fatura.periocidadeid.start }}</td>
+                                <td>{{ fatura.periocidadeid.end }}</td>
+                                <td>{{ fatura.multa }}</td>
+                                <td>{{ fatura.emitidaem }}</td>
+                                <td>{{ fatura.contratoid.modalidadepagamentoid.nome }}</td>
+                                <td>{{ fatura.precores }} €</td>
+                                <td>{{ fatura.estadofaturaid.nome }}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    {% endif %}
+
+                    <hr>
+                    <div class="row justify-content-center text-center">
+                        <!-- Botão de Criar -->
+                        <div class="col ">
+                            <a class="btn btn-secondary" href="">Reclamar Fatura </a>
+                        </div>
+                        {% if fatura.estadofaturaid.nome == "Aguardar comprovativo" %}
+                        <div class="col ">
+                            <a class="btn btn-secondary" href="{% url 'comprovativo_pagamento' fatura.contratoid.id %}">Anexar Comprovativo</a>
+                        </div>
+                        {% endif %}
+                        <div class=" col ">
+                            <a class="btn btn-secondary" href="">Cancelar Fatura</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+<!--{% url 'fazer_reclamacao_especifica' id %}-->

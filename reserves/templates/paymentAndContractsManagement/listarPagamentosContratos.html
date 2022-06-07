@@ -1,0 +1,58 @@
+{% extends "baseContainer.html" %}
+
+{% load static %}
+
+    {% block title %}
+        Ver Contratos
+    {% endblock %}
+
+    {% block containerTitle %}
+       Contratos
+    {% endblock %}
+
+    {% block containerContent %}
+        {% if not faturas %}
+            <h4 class="text-center">No Contracts Created</h4>
+        {% else %}
+
+        <!-- Tabela de Parques -->
+        <table class="table table-light table-hover">
+          <thead>
+            <tr>
+              <th scope="col">ID Fatura</th>
+              <th scope="col">Contrato ID</th>
+              <th scope="col">Total</th>
+              <th scope="col">Método Pagamento</th>
+              <th></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for fatura in faturas %}
+            <tr>
+              <th scope="row">{{ fatura.id }}</th>
+              <td>{{ fatura.contratoid.id }}</td>
+              <td>{{ fatura.precores}} €</td>
+              {% for modalidade in modalidades %}
+              <td>{{ modalidade.nome}}</td>
+              {% endfor %}
+              <td> <div class="d-flex justify-content-center">
+                      <a class="btn btn-secondary" href="http://127.0.0.1:8000/modalidadepagamento/">Pagar</a>
+                    </div>
+              </td>
+              <td> <div class="d-flex justify-content-center">
+                <a class="btn btn-secondary" href="http://127.0.0.1:8000/fazerreclamacao/">Fazer Reclamação</a>
+              </div>
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+        <hr>
+
+        <!-- Botão de Criar -->
+        <div class="d-flex justify-content-center">
+            <a class="btn btn-secondary" href="">Criar Contrato</a>
+        </div>
+    {% endblock %}

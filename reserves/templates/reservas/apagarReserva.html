@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+    {% block title %}
+       Delete Reserve
+    {% endblock %}
+
+    {% block main %}
+        <div class="container my-4">
+            <form action="{% url 'apagarReserva' reserva.id%}" method="post">
+                {% csrf_token %}
+
+
+                <!-- Div de Alerta -->
+                <div class="form-group">
+                    <div class="alert alert-danger" role="alert">
+                        <h4 class="alert-heading text-center">Tem a certeza que pretende Cancelar a seguinte Reserva com o Lugar <b>'{{ reserva.lugarid.nome }}'</b> ?</h4>
+                    </div>
+                </div>
+
+                <div class="row">
+                
+                <!-- Botão para go back -->
+                <div class="col">
+                <div class="d-flex justify-content-center">
+                    <a type="button" class="btn btn-secondary" href="{% url 'visualizarReserva' reserva.id %}">Go Back</a>
+                </div>
+            </div>
+                
+            <div class="col">
+                <!-- Botão para apagar -->
+                <div class="d-flex justify-content-center">
+                    <button type="submit" class="btn btn-secondary">Cancelar Reserva</button>
+                </div>
+            </div>
+           
+            </div>
+            </form>
+        </div>
+    {% endblock %}

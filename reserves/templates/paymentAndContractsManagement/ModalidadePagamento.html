@@ -1,0 +1,60 @@
+{% extends "baseContainer.html" %}
+
+{% load static %}
+
+    {% block title %}
+        Escolher Modalidade
+    {% endblock %}
+
+    {% block containerTitle %}
+       Pagamento do Contrato
+    {% endblock %}
+
+    {% block containerContent %}
+        <!-- Tabela de Parques -->
+        <table class="table table-light table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Cliente</th>
+              <th scope="col">Contrato ID</th>
+              <th scope="col">Modalidade de Pagamento</th>
+              <th scope="col">Data de Validade</th>
+              <th scope="col">Valor Total</th>
+              <th scope="col">Data de Incício</th>
+              <th scope="col">Criado em:</th>
+              <th scope="col">Editado em:</th>
+              <th scope="col">Estado</th>
+              <th></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for contrato in contratos %}
+            <tr>
+              {% if contrato.estadocontratoid.nome == "Aguardar Pagamento" %}
+              <th scope="row"><a href=""></a>{{ contrato.userid.username }}</th>
+              <td>{{ contrato.id }}</td>
+              <td>{{ contrato.modalidadepagamentoid.nome }}</td>
+              <td>{{ contrato.datavalidade }}</td>
+              <td>{{ contrato.valorcontrato }}€</td>
+              <td>{{ contrato.datainicio }}</td>
+              <td>{{ contrato.criadoem }}</td>
+              <td>{{ contrato.editadoem }}</td>
+              <td>{{ contrato.estadocontratoid.nome }}</td>
+              <td>
+                    <!-- Botão de Criar -->
+        <div class="d-flex justify-content-center">
+          <a class="btn btn-secondary" href="http://127.0.0.1:8000/fatura/{{contrato.id}}">Listar Pagamentos do Contrato</a>
+        </div>
+              </td>
+            {% endif %}
+            {% endfor %}
+          <th>
+          </th>
+          </tbody>
+        </table>
+
+        <hr>
+
+        
+    {% endblock %}

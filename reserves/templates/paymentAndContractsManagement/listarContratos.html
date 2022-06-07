@@ -1,0 +1,75 @@
+{% extends "baseContainer.html" %}
+
+{% load static %}
+
+    {% block title %}
+        View Contracts
+    {% endblock %}
+
+    {% block containerTitle %}
+        Contracts
+    {% endblock %}
+
+    {% block containerContent %}
+        {% if not contratos %}
+            <h4 class="text-center">No Contracts Created</h4>
+        {% else %}
+
+        <!-- Tabela de Reservas -->
+        <table class="table table-light table-hover">
+          <thead>
+            <tr>
+              <th scope="col">User</th>
+              <th scope="col">Payment Method</th>
+              <th scope="col">Expiration Date</th>
+              <th scope="col">Contract Value</th>
+              <th scope="col">Start Date</th>
+              <th scope="col">Start Time</th>
+              <th scope="col">Updated</th>
+              <th scope="col">State</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for contrato in contratos %}
+            <tr>
+              <th scope="row"><a href="http://127.0.0.1:8000/modalidadepagamento/{{contrato.userid.id}}">{{ contrato.userid.username }}</a></th>
+              <td>{{ contrato.modalidadepagamentoid.nome }}</td>
+              <td>{{ contrato.datavalidade }}</td>
+              <td>{{ contrato.valorcontrato }}</td>
+              <td>{{ contrato.datainicio }}</td>
+              <td>{{ contrato.criadoem }}</td>
+              <td>{{ contrato.editadoem }}</td>
+              <td>{{ contrato.estadocontratoid.nome }}</td>
+              <td> <div class="d-flex justify-content-center">
+                <a class="btn btn-secondary" href="{% url 'listarContratos' contrato.id %}">Listar Faturas</a>
+              </div>
+              </td>
+              <!-- {% if contrato.estadocontratoid.nome == "Aguardar comprovativo" %}
+              <td> <div class="d-flex justify-content-center">
+                <a class="btn btn-secondary" href="http://127.0.0.1:8000/comprovativopagamento/{{contrato.id}}">Anexar Comprovativo</a>
+              </div>
+              </td>
+              {% endif %}
+              {% if contrato.estadocontratoid.nome == "Aguardar Pagamento" %}
+              <td> <div class="d-flex justify-content-center">
+                <a class="btn btn-secondary" href="http://127.0.0.1:8000/fatura/{{contrato.id}}">Consultar Fatura</a>
+              </div>
+              </td>
+              {% endif %}
+              <td> <div class="d-flex justify-content-center">
+              <a class="btn btn-secondary" href="http://127.0.0.1:8000/fazerreclamacao/">Reclamar Fatura</a>
+              </div>
+              </td>
+            </tr>-->
+          {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+
+        <hr>
+
+        <!-- Botão de Criar -->
+        <div class="d-flex justify-content-center">
+            <a class="btn btn-secondary" href="{% url 'criarParque' %}">Create Contract</a>
+        </div>
+    {% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}
+    Comprovar Pagamento
+{% endblock %}
+
+{% block main %}
+    <div class="container my-4">
+        <div class="row rounded bg-light pt-3">
+            <div class="col">
+                <div class="jumbotron border p-3 mb-3">
+                    <h1 class="text-center">Comprovar Pagamentos</h1>
+                    <hr>
+                    {% if not contratos %}
+                        <h4 class="text-center">Pagamento em falta</h4>
+                    {% else %}
+
+                        <h3>Anexe o seu Comprovativo</h3>
+
+                        <form>
+                            <label for="myfile">Select a file:</label>
+                            <input type="file" id="myfile" name="myfile"><br><br>
+                            <input type="submit">
+                        </form>
+
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

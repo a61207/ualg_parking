@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+    {% block title %}
+       Cancelar Contrato
+    {% endblock %}
+
+    {% block content %}
+        <div class="container my-4">
+            <form action="{% url 'cancelarContrato' contrato.id%}" method="post">
+                {% csrf_token %}
+
+
+                <!-- Div de Alerta -->
+                <div class="form-group">
+                    <div class="alert alert-danger" role="alert">
+                        <h4 class="alert-heading text-center">De certeza que quer cancelar o Contrato?</h4>
+                    </div>
+                </div>
+
+                <div class="row">
+                
+                <!-- Botão para go back -->
+                <div class="col">
+                <div class="d-flex justify-content-center">
+                    <button class="btn btn-secondary" href="{% url 'visualizarContrato' contrato.id %}">Go Back</button>
+                </div>
+            </div>
+                
+            <div class="col">
+                <!-- Botão para apagar -->
+                <div class="d-flex justify-content-center">
+                    <button type="submit" class="btn btn-secondary">Cancelar Contrato</button>
+                </div>
+            </div>
+           
+            </div>
+            </form>
+        </div>
+    {% endblock %}

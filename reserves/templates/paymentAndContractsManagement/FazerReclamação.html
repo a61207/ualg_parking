@@ -1,0 +1,43 @@
+{% extends "baseContainer.html" %}
+
+{% load static %}
+
+    {% block title %}
+        Fazer Reclamação
+    {% endblock %}
+
+    {% block containerTitle %}
+       Reclamação da Fatura
+    {% endblock %}
+
+    {% block containerContent %}
+    <div class="container my-4" style="text-align:center">
+        <form id="fs-frm" name="complaint-form" accept-charset="utf-8" action="" method="post">
+            <fieldset id="fs-frm-inputs">
+              <label for="full-name"><strong> Name</strong></label>
+              <br>
+              <input type="text" name="name" id="full-name" placeholder="First and Last" required="">
+              <br>
+              <label for="email-address"><strong>Email Address</strong></label>
+              <br>
+              <input type="email" name="_replyto" id="email-address" placeholder="email@domain.com" required="">
+              <br>
+              <label for="telephone"><strong> Number (Optional)</strong></label>
+              <br>
+              <input type="telephone" name="telephone" id="telephone" placeholder="(+351) 967******">
+              <br>
+              <label for="complaint"><strong>Descrição</strong></label>
+              <br>
+              <textarea cols="100" rows="4" name="complaint" id="complaint" placeholder="Se Prentende reclamar algo, escreva aqui." required=""></textarea>
+              <input type="hidden" name="_subject" id="email-subject" value="Complaint Form Submission">
+            </fieldset>
+          </form>
+          </div>
+
+        <hr>
+
+        <!-- Botão de Criar -->
+        <div class="d-flex justify-content-center">
+            <button type="submit" class="btn btn-secondary" >Confirmar Reclamação</button>
+        </div>
+    {% endblock %}

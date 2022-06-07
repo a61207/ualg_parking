@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load group_tags %}
+{% load django_tables2 %}
+{% load crispy_forms_filters %}
+
+{% block title %}
+    {{ park.name }} Zones
+{% endblock %}
+
+{% block main %}
+
+    <div class="container">
+        <h1 class="mt-5">Park {{ park.name }} Zones</h1>
+        {% if filter %}
+            <form method="get" class="form form-inline">
+                <div class="row">
+                    <div class="col-auto">
+                        {{ filter.form.name | as_crispy_field }}
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-success mt-4">Filter</button>
+                    </div>
+                </div>
+            </form>
+        {% endif %}
+        {% render_table table %}
+        <a type="button" href="{% url 'park_detail' park.id %}" class="btn btn-success mt-2">Back</a>
+        {% if request.user|is_admin %}
+            <a type="button" href="{% url 'add_zone' park.id %}" class="btn btn-success mt-2">Add Zone</a>
+        {% endif %}
+    </div>
+
+{% endblock main %}

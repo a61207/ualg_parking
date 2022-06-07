@@ -101,7 +101,7 @@ class AddZone(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return render(request, "parks/zone_form.html", {"form": form, "formset": formset})
 
 
-class ViewZoneList(ListView):
+class ViewZoneList(SingleTableView):
     model = Zone
     table_class = ZoneTable
 

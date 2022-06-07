@@ -1,4 +1,4 @@
-from django.views.generic import TemplateView, CreateView, DetailView
+from django.views.generic import TemplateView, CreateView
 from main.forms import UserForm
 from main.models import User
 

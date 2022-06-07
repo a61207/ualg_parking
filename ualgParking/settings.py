@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'bootstrap3',
     'main',
     'parks',
+    'reserves',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'

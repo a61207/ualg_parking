@@ -25,6 +25,7 @@
       <list>
         <option value="$MODULE_DIR$/main/templates" />
         <option value="$MODULE_DIR$/parks/templates" />
+        <option value="$MODULE_DIR$/reserves/templates" />
       </list>
     </option>
   </component>

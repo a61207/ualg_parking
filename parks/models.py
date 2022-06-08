@@ -6,12 +6,6 @@ from main.models import Administrator
 
 # Create your models here.
 
-class PostalCodeCity(models.Model):
-    id = models.AutoField(db_column='ID', primary_key=True)
-    name = models.CharField(db_column='Name', verbose_name='Name', max_length=50, unique=True)
-    postal_code = models.IntegerField(db_column='PostalCode', verbose_name='Postal Code', max_length=4, unique=True)
-
-
 class Park(models.Model):
     STRUCTURE = 'ST'
     SURFACE = 'SF'
@@ -85,6 +79,9 @@ class Park(models.Model):
                 return x[1]
         return ''
 
+    def posta_city(self):
+        return self.postal_code + " " + self.city()
+
     def spots(self):
         i = 0
         for zone in self.zones():
@@ -97,12 +94,13 @@ class Park(models.Model):
 
 class PriceType(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)
-    time = models.DurationField(db_column='TypeTime', verbose_name='Type Time')
+    minutes = models.DurationField(db_column='MinutesTime', verbose_name='Minutes Time')
+    hours = models.DurationField(db_column='HoursTime', verbose_name='Hours Time')
     total = MoneyField(max_digits=14, decimal_places=2, default_currency='EUR')
     park = models.ForeignKey(Park, models.CASCADE, db_column='Parque', verbose_name='Park')
 
     class Meta:
-        unique_together = ('time', 'park')
+        unique_together = ('minutes', 'hours', 'park')
 
 
 class ContractType(models.Model):

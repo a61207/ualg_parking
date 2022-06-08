@@ -1,7 +1,6 @@
-import django_filters
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import Park, Zone, ParkingSpot
+from .models import Park, Zone, ParkingSpot, PriceType
 import re
 
 
@@ -115,3 +114,13 @@ class SpotForm(forms.ModelForm):
     class Meta:
         model = ParkingSpot
         fields = ('number', 'x', 'y', 'direction')
+
+
+class PriceTypeForm(forms.ModelForm):
+    minutes = forms.IntegerField()
+    hours = forms.IntegerField()
+    total = forms.IntegerField()
+
+    class Meta:
+        model = PriceType
+        fields = ('total', 'minutes', 'hours')

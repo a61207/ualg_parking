@@ -10,19 +10,30 @@
 
     <div class="container">
         <h1 class="mt-5">Zone {{ object.name }}</h1>
-        <p>Park: {{ object.park }}</p>
-        <div id="canvas_container" style="overflow: scroll; height: 500px">
-            <canvas id="canvas"></canvas>
+        <div class="row">
+            <div class="col-4">
+                <p>Park: {{ object.park }}</p>
+                <a type="button" href="{% url 'list_zones' object.park.id %}" class="btn btn-success mt-2">Back</a>
+                {% if request.user|is_admin %}
+                    <a type="button" href="{% url 'update_zone' object.park.id object.id %}"
+                       class="btn btn-success mt-2">Update
+                        Zone</a>
+                    <a type="button" href="{% url 'delete_zone' object.park.id object.id %}"
+                       class="btn btn-success mt-2">Delete
+                        Zone</a>
+                {% endif %}
+            </div>
+            <div class="col-8">
+                <div class="position-sticky" style="top: 2rem;">
+                    <div id="canvas_container" class="border border-2" style="overflow: scroll; height: 60vh">
+                        <canvas id="canvas"></canvas>
+                    </div>
+                    <label for="rangeInput" class="col-6 form-label">Zoom</label>
+                    <input type="range" class="form-range" min="1" max="3" step="0.25" value="1"
+                           id="rangeInput">
+                </div>
+            </div>
         </div>
-        <label for="rangeInput" class="col-6 form-label">Zoom</label>
-        <input type="range" class="form-range" min="1" max="3" step="0.25" value="1"
-               id="rangeInput">
-        {% if request.user|is_admin %}
-            <a type="button" href="{% url 'update_zone' object.park.id object.id %}" class="btn btn-success mt-2">Update
-                Zone</a>
-            <a type="button" href="{% url 'delete_zone' object.park.id object.id %}" class="btn btn-success mt-2">Delete
-                Zone</a>
-        {% endif %}
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
@@ -30,7 +41,7 @@
 
         window.addEventListener('load', () => {
             const canvas = document.querySelector("#canvas");
-            const zoomButton = document.getElementById('rangeInput')
+            const zoomButton = document.getElementById('rangeInput');
             const height = document.getElementById('canvas_container').clientHeight;
             const width = document.getElementById('canvas_container').clientWidth;
             canvas.height = height;
@@ -45,24 +56,34 @@
                 else spots.push([Number({{ spot.x }}), Number({{ spot.y }}), 1, 2, Number({{ spot.number }})]);
             {% endfor %}
 
+            let xAcert = get_lowest_x();
+            let yAcert = get_lowest_y();
+            let h = get_max_y() - yAcert;
+            let w = get_max_x() - xAcert;
+            let hAcert = height / h;
+
             drawCanvas(size);
 
             function drawCanvas() {
+                let realSize;
+                if (w * hAcert > width) realSize = width * zoom / w;
+                else realSize = hAcert * zoom;
+                let realXAcert = ((width / 2) - ((w * realSize) / 2))
+                let realYAcert = ((height / 2) - ((h * realSize) / 2))
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                const realSize = size * zoom;
                 ctx.strokeStyle = "#eeeeee";
                 for (let i = 0; i < spots.length; i++) {
-                    roundRect((spots[i][0] * realSize), (spots[i][1] * realSize), realSize * spots[i][2], realSize * spots[i][3], 50, "#000000");
-                    roundRect((spots[i][0] * realSize) + (realSize / 6), (spots[i][1] * realSize) + (realSize / 6), (realSize * spots[i][2]) - (realSize * 2 / 6), (realSize * spots[i][3]) - (realSize * 2 / 6), 50, "#35c942");
+                    roundRect(((spots[i][0] - xAcert) * realSize) + realXAcert, ((spots[i][1] - yAcert) * realSize)+realYAcert, realSize * spots[i][2], realSize * spots[i][3], 50, "#000000");
+                    roundRect(((spots[i][0] - xAcert) * realSize) + realXAcert + (realSize / 6), ((spots[i][1] - yAcert) * realSize) + (realSize / 6)+realYAcert, (realSize * spots[i][2]) - (realSize * 2 / 6), (realSize * spots[i][3]) - (realSize * 2 / 6), 50, "#35c942");
 
                     ctx.font = "bold " + (realSize * 2 / 3) + "px Arial";
                     ctx.fillStyle = "#000000";
                     ctx.textAlign = "center";
                     if (spots[i][2] > spots[i][3])
-                        ctx.fillText(String(spots[i][4]), (spots[i][0] * realSize) + (spots[i][2] * realSize * 2 / 4), (spots[i][1] * realSize) + (spots[i][3] * realSize * 3 / 4));
+                        ctx.fillText(String(spots[i][4]), ((spots[i][0] - xAcert) * realSize) + realXAcert + (spots[i][2] * realSize * 2 / 4), ((spots[i][1] - yAcert) * realSize) +realYAcert + (spots[i][3] * realSize * 3 / 4));
                     else {
                         ctx.save();
-                        ctx.translate((spots[i][0] * realSize) + (spots[i][2] * realSize * 3 / 4), (spots[i][1] * realSize) + (spots[i][3] * realSize * 2 / 4));
+                        ctx.translate(((spots[i][0] - xAcert) * realSize) + realXAcert + (spots[i][2] * realSize * 3 / 4), ((spots[i][1] - yAcert) * realSize) +realYAcert+ (spots[i][3] * realSize * 2 / 4));
                         ctx.rotate(-0.5 * Math.PI);
                         ctx.fillText(String(spots[i][4]), 0, 0);
                         ctx.restore();
@@ -89,6 +110,34 @@
                 canvas.height = height * zoom;
                 canvas.width = width * zoom;
                 drawCanvas();
+            }
+
+            function get_lowest_x() {
+                let x = 9999;
+                for (const spot in spots)
+                    if (parseInt(spots[spot][0]) < x) x = parseInt(spots[spot][0])
+                return x - 1;
+            }
+
+            function get_lowest_y() {
+                let y = 9999;
+                for (const spot in spots)
+                    if (parseInt(spots[spot][1]) < y) y = parseInt(spots[spot][1])
+                return y - 1;
+            }
+
+            function get_max_x() {
+                let x = 0;
+                for (const spot in spots)
+                    if (parseInt(spots[spot][0]) > x) x = parseInt(spots[spot][0]) + parseInt(spots[spot][2])
+                return x + 1;
+            }
+
+            function get_max_y() {
+                let y = 0;
+                for (const spot in spots)
+                    if (parseInt(spots[spot][1]) > y) y = parseInt(spots[spot][1]) + parseInt(spots[spot][3])
+                return y + 1;
             }
 
             zoomButton.addEventListener("click", resize)

@@ -18,6 +18,7 @@ from . import views
 
 urlpatterns = [
     path('parks/add/', views.AddPark.as_view(), name='add_park'),
+    path('parks/<park>/price/add/', views.AddPriceType.as_view(), name='add_price'),
     path('parks/', views.ViewParkList.as_view(), name='list_parks'),
     path('parks/<pk>/', views.ViewParkDetail.as_view(), name='park_detail'),
     path('parks/<pk>/update/', views.UpdatePark.as_view(), name='update_park'),

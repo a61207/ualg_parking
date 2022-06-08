@@ -8,12 +8,12 @@ from django.utils import timezone
 from django.views.generic import DetailView
 from django.views.generic.edit import DeleteView, UpdateView, CreateView
 from django_filters.views import FilterView
-from django_tables2 import SingleTableView, SingleTableMixin
+from django_tables2 import SingleTableMixin
 from main.models import Administrator
 from parks.filters import ParkFilter, ZoneFilter
-from parks.forms import ParkForm, ZoneForm, SpotForm
+from parks.forms import ParkForm, ZoneForm, SpotForm, PriceTypeForm
 from parks.functions import check_empty_spots, check_overlaping_spots
-from parks.models import Park, Zone, ParkingSpot
+from parks.models import Park, Zone, ParkingSpot, PriceType
 from parks.tables import ParkTable, ZoneTable
 
 
@@ -29,6 +29,45 @@ class AddPark(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     def form_valid(self, form):
         form.instance.admin = Administrator.objects.get(user=self.request.user)
         return super().form_valid(form)
+
+
+# noinspection PyArgumentList
+class AddPriceType(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = PriceType
+    form_class = PriceTypeForm
+    template_name = 'parks/price_type_add.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        PriceTypeFormset = modelformset_factory(PriceType, form=PriceTypeForm, extra=1, can_delete=True)
+        context['formset'] = PriceTypeFormset(None, queryset=PriceType.objects.none())
+        return context
+
+    def test_func(self):
+        return not (Administrator.objects.filter(user=self.request.user) is None)
+
+    def form_valid(self, form):
+        form.instance.park = Park.objects.get(id=self.kwargs['park'])
+        return super().form_valid(form)
+
+    def post(self, request, *args, **kwargs):
+        PriceTypeFormset = modelformset_factory(PriceType, form=PriceTypeForm, extra=0, can_delete=True)
+        formset = PriceTypeFormset(request.POST)
+        if formset.is_valid():
+            if check_empty_spots(formset):
+                errors = formset.errors.setdefault("__all__", ErrorList())
+                errors.append("At Least one Spot must be incerted.")
+            else:
+                for form in formset:
+                    print(form.cleaned_data)
+                    if len(form.cleaned_data) == 5 and form.cleaned_data['DELETE'] is False:
+                        total = form.cleaned_data['total']
+                        minutes = form.cleaned_data['minutes']
+                        hours = form.cleaned_data['hours']
+                        PriceType.objects.create(total)
+            return render(request, "parks/park_filter.html")
+
+        return render(request, "parks/zone_add.html", {"formset": formset})
 
 
 class ViewParkList(SingleTableMixin, FilterView):
@@ -65,11 +104,13 @@ class DeletePark(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 class AddZone(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Zone
     form_class = ZoneForm
+    template_name = 'parks/zone_add.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         SpotFormset = modelformset_factory(ParkingSpot, form=SpotForm, extra=0, can_delete=True)
         context['formset'] = SpotFormset(None, queryset=ParkingSpot.objects.none())
+        context['park'] = Park.objects.get(id=self.kwargs['park'])
         return context
 
     def test_func(self):
@@ -100,7 +141,7 @@ class AddZone(LoginRequiredMixin, UserPassesTestMixin, CreateView):
                         child.save()
                 return HttpResponseRedirect(parent.get_absolute_url())
 
-        return render(request, "parks/zone_form.html", {"form": form, "formset": formset})
+        return render(request, "parks/zone_add.html", {"form": form, "formset": formset})
 
 
 class ViewZoneList(SingleTableMixin, FilterView):
@@ -125,6 +166,7 @@ class ViewZoneDetail(DetailView):
 class UpdateZone(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Zone
     form_class = ZoneForm
+    template_name = 'parks/zone_update.html'
 
     def test_func(self):
         return not (Administrator.objects.filter(user=self.request.user) is None)
@@ -138,6 +180,7 @@ class UpdateZone(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         SpotFormset = modelformset_factory(ParkingSpot, form=SpotForm, extra=0, can_delete=True)
         context['formset'] = SpotFormset(None, queryset=ParkingSpot.objects.filter(
             zone=Zone.objects.get(id=self.kwargs['pk'])))
+        context['zone'] = Zone.objects.get(id=self.kwargs['pk'])
         return context
 
     # noinspection PyArgumentList
@@ -168,7 +211,7 @@ class UpdateZone(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
                             filterSpot.delete()
                 return HttpResponseRedirect(parent.get_absolute_url())
 
-        return render(request, "parks/zone_form.html", {"form": form, "formset": formset})
+        return render(request, "parks/zone_update.html", {"form": form, "formset": formset})
 
 
 class DeleteZone(LoginRequiredMixin, UserPassesTestMixin, DeleteView):

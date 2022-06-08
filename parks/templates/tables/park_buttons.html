@@ -1,9 +1,14 @@
 {% load group_tags %}
 
 <a class="btn btn-info btn-sm" href="{% url 'park_detail' record.id %}">View Park</a>
-<a class="btn btn-info btn-sm" href="{% url 'list_zones' record.id %}">View Zones</a>
+{% if record.zones %}
+    <a class="btn btn-info btn-sm" href="{% url 'list_zones' record.id %}">View Zones</a>
+{% endif %}
 
 {% if request.user|is_admin %}
+    {% if not record.zones %}
+        <a class="btn btn-info btn-sm" href="{% url 'add_zone' record.id %}">Add Zone</a>
+    {% endif %}
     <a class="btn btn-info btn-sm" href="{% url 'update_park' record.id %}">Edit Park</a>
     <a class="btn btn-info btn-sm" href="{% url 'delete_park' record.id %}">Delete Park</a>
 {% endif %}

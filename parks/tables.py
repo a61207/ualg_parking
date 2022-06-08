@@ -1,4 +1,4 @@
-from django_tables2 import tables, TemplateColumn, A
+from django_tables2 import tables, TemplateColumn
 
 from parks.models import Park
 

@@ -3,7 +3,7 @@ from django.forms import modelformset_factory
 from django.forms.utils import ErrorList
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.utils import timezone
 from django.views.generic import DetailView
 from django.views.generic.edit import DeleteView, UpdateView, CreateView
@@ -11,9 +11,9 @@ from django_filters.views import FilterView
 from django_tables2 import SingleTableMixin
 from main.models import Administrator
 from parks.filters import ParkFilter, ZoneFilter
-from parks.forms import ParkForm, ZoneForm, SpotForm, PriceTypeForm
-from parks.functions import check_empty_spots, check_overlaping_spots
-from parks.models import Park, Zone, ParkingSpot, PriceType
+from parks.forms import ParkForm, ZoneForm, SpotForm, PriceTypeForm, ContractTypeForm
+from parks.functions import check_empty_spots, check_overlaping_spots, validate_price_type, validate_contract_type
+from parks.models import Park, Zone, ParkingSpot, PriceType, ContractType
 from parks.tables import ParkTable, ZoneTable
 
 
@@ -31,7 +31,7 @@ class AddPark(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return super().form_valid(form)
 
 
-# noinspection PyArgumentList
+# noinspection PyArgumentList,PyUnresolvedReferences
 class AddPriceType(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = PriceType
     form_class = PriceTypeForm
@@ -39,35 +39,63 @@ class AddPriceType(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        PriceTypeFormset = modelformset_factory(PriceType, form=PriceTypeForm, extra=1, can_delete=True)
+        PriceTypeFormset = modelformset_factory(PriceType, form=PriceTypeForm, extra=1, can_delete_extra=True,
+                                                can_delete=True)
         context['formset'] = PriceTypeFormset(None, queryset=PriceType.objects.none())
         return context
 
     def test_func(self):
         return not (Administrator.objects.filter(user=self.request.user) is None)
 
-    def form_valid(self, form):
-        form.instance.park = Park.objects.get(id=self.kwargs['park'])
-        return super().form_valid(form)
-
     def post(self, request, *args, **kwargs):
-        PriceTypeFormset = modelformset_factory(PriceType, form=PriceTypeForm, extra=0, can_delete=True)
+        PriceTypeFormset = modelformset_factory(PriceType, form=PriceTypeForm, extra=0, can_delete=True,
+                                                can_delete_extra=True)
         formset = PriceTypeFormset(request.POST)
         if formset.is_valid():
-            if check_empty_spots(formset):
-                errors = formset.errors.setdefault("__all__", ErrorList())
-                errors.append("At Least one Spot must be incerted.")
-            else:
+            park = Park.objects.get(id=self.kwargs['pk'])
+            if validate_price_type(formset):
                 for form in formset:
-                    print(form.cleaned_data)
-                    if len(form.cleaned_data) == 5 and form.cleaned_data['DELETE'] is False:
+                    if form.cleaned_data['DELETE'] is False:
                         total = form.cleaned_data['total']
                         minutes = form.cleaned_data['minutes']
                         hours = form.cleaned_data['hours']
-                        PriceType.objects.create(total)
-            return render(request, "parks/park_filter.html")
+                        PriceType.objects.create(park=park, total=total, minutes=minutes, hours=hours)
+                return HttpResponseRedirect(reverse('park_detail', kwargs={'pk': park.id}))
+        return render(request, "parks/price_type_add.html", {"formset": formset})
 
-        return render(request, "parks/zone_add.html", {"formset": formset})
+
+# noinspection PyArgumentList,PyUnresolvedReferences
+class AddContractType(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = ContractType
+    form_class = ContractTypeForm
+    template_name = 'parks/contract_type_add.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        ContractTypeFormset = modelformset_factory(ContractType, form=ContractTypeForm, extra=1, can_delete_extra=True,
+                                                   can_delete=True)
+        context['formset'] = ContractTypeFormset(None, queryset=ContractType.objects.none())
+        return context
+
+    def test_func(self):
+        return not (Administrator.objects.filter(user=self.request.user) is None)
+
+    def post(self, request, *args, **kwargs):
+        ContractTypeFormset = modelformset_factory(ContractType, form=ContractTypeForm, extra=0, can_delete=True,
+                                                   can_delete_extra=True)
+        formset = ContractTypeFormset(request.POST)
+        if formset.is_valid():
+            park = Park.objects.get(id=self.kwargs['pk'])
+            if validate_contract_type(formset):
+                for form in formset:
+                    if form.cleaned_data['DELETE'] is False:
+                        total = form.cleaned_data['total']
+                        years = form.cleaned_data['years']
+                        months = form.cleaned_data['months']
+                        name = form.cleaned_data['name']
+                        ContractType.objects.create(park=park, total=total, years=years, months=months, name=name)
+                return HttpResponseRedirect(reverse('park_detail', kwargs={'pk': park.id}))
+        return render(request, "parks/contract_type_add.html", {"formset": formset})
 
 
 class ViewParkList(SingleTableMixin, FilterView):
@@ -91,6 +119,83 @@ class UpdatePark(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def form_valid(self, form):
         form.instance.updated = timezone.now()
         return super().form_valid(form)
+
+
+# noinspection PyUnresolvedReferences,PyArgumentList
+class UpdatePriceType(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Park
+    form_class = ParkForm
+    template_name = 'parks/price_type_update.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        PriceTypeFormset = modelformset_factory(PriceType, form=PriceTypeForm, extra=0, can_delete_extra=True,
+                                                can_delete=True)
+        context['formset'] = PriceTypeFormset(None, queryset=PriceType.objects.filter(
+            park=Park.objects.get(id=self.kwargs['pk'])))
+        return context
+
+    def test_func(self):
+        return not (Administrator.objects.filter(user=self.request.user) is None)
+
+    def post(self, request, *args, **kwargs):
+        PriceTypeFormset = modelformset_factory(PriceType, form=PriceTypeForm, extra=0, can_delete=True,
+                                                can_delete_extra=True)
+        park = Park.objects.get(id=self.kwargs['pk'])
+        formset = PriceTypeFormset(request.POST)
+        if formset.is_valid():
+            if validate_price_type(formset):
+                for form in formset:
+                    filterType = PriceType.objects.filter(park=park, total=form.cleaned_data['total'],
+                                                          minutes=form.cleaned_data['minutes'],
+                                                          hours=form.cleaned_data['hours'])
+                    if form.cleaned_data['DELETE'] is False:
+                        child = form.save(commit=False)
+                        child.park = park
+                        child.save()
+                    elif form.cleaned_data['DELETE'] is True and filterType is not None:
+                        filterType.delete()
+                return HttpResponseRedirect(reverse('park_detail', kwargs={'pk': park.id}))
+        return render(request, "parks/price_type_add.html", {"formset": formset})
+
+
+# noinspection PyUnresolvedReferences,PyArgumentList
+class UpdateContractType(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Park
+    form_class = ParkForm
+    template_name = 'parks/contract_type_update.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        ContractTypeFormset = modelformset_factory(ContractType, form=ContractTypeForm, extra=0, can_delete_extra=True,
+                                                   can_delete=True)
+        context['formset'] = ContractTypeFormset(None, queryset=ContractType.objects.filter(
+            park=Park.objects.get(id=self.kwargs['pk'])))
+        return context
+
+    def test_func(self):
+        return not (Administrator.objects.filter(user=self.request.user) is None)
+
+    def post(self, request, *args, **kwargs):
+        ContractTypeFormset = modelformset_factory(ContractType, form=ContractTypeForm, extra=0, can_delete=True,
+                                                   can_delete_extra=True)
+        park = Park.objects.get(id=self.kwargs['pk'])
+        formset = ContractTypeFormset(request.POST)
+        if formset.is_valid():
+            if validate_contract_type(formset):
+                for form in formset:
+                    filterContract = ContractType.objects.filter(park=park, total=form.cleaned_data['total'],
+                                                                 years=form.cleaned_data['years'],
+                                                                 months=form.cleaned_data['months']
+                                                                 , name=form.cleaned_data['name'])
+                    if form.cleaned_data['DELETE'] is False:
+                        child = form.save(commit=False)
+                        child.park = park
+                        child.save()
+                    elif form.cleaned_data['DELETE'] is True and filterContract is not None:
+                        filterContract.delete()
+                return HttpResponseRedirect(reverse('park_detail', kwargs={'pk': park.id}))
+        return render(request, "parks/contract_type_update.html", {"formset": formset})
 
 
 class DeletePark(LoginRequiredMixin, UserPassesTestMixin, DeleteView):

@@ -91,23 +91,40 @@ class Park(models.Model):
     def zones(self):
         return Zone.objects.filter(park=self.id)
 
+    def price_types(self):
+        return PriceType.objects.filter(park=self.id)
+
+    def contract_types(self):
+        return ContractType.objects.filter(park=self.id)
+
 
 class PriceType(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)
-    minutes = models.DurationField(db_column='MinutesTime', verbose_name='Minutes Time')
-    hours = models.DurationField(db_column='HoursTime', verbose_name='Hours Time')
-    total = MoneyField(max_digits=14, decimal_places=2, default_currency='EUR')
+    minutes = models.IntegerField(db_column='MinutesTime', verbose_name='Minutes Time', default=0)
+    hours = models.IntegerField(db_column='HoursTime', verbose_name='Hours Time', default=0)
+    total = models.DecimalField(db_column='TotalValue', verbose_name='Total Value', max_digits=6, decimal_places=2,
+                                default=0)
     park = models.ForeignKey(Park, models.CASCADE, db_column='Parque', verbose_name='Park')
 
     class Meta:
         unique_together = ('minutes', 'hours', 'park')
 
+    def total_time(self):
+        if self.minutes and self.hours:
+            return str(self.hours) + "h:" + str(self.minutes) + "m"
+        elif self.hours:
+            return str(self.hours) + "h"
+        else:
+            return str(self.minutes) + "m"
+
 
 class ContractType(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)
     name = models.CharField(db_column='Name', verbose_name='Name', max_length=50, unique=True)
-    time = models.DurationField(db_column='TypeTime', verbose_name='Type Time')
-    total = MoneyField(max_digits=14, decimal_places=2, default_currency='EUR')
+    years = models.IntegerField(db_column='YearsTime', verbose_name='Years Time', default=0)
+    months = models.IntegerField(db_column='MonthsTime', verbose_name='Months Time', default=0)
+    total = models.DecimalField(db_column='TotalValue', verbose_name='Total Value', max_digits=6, decimal_places=2,
+                                default=0)
     park = models.ForeignKey(Park, models.CASCADE, db_column='Parque', verbose_name='Park')
 
     class Meta:
@@ -129,6 +146,15 @@ class Zone(models.Model):
 
     def spots(self):
         return ParkingSpot.objects.filter(zone=self.id)
+
+    def n_spots(self):
+        return self.spots().count()
+
+    def available_spots(self):
+        return ParkingSpot.objects.filter(zone=self.id, state='AV')
+
+    def n_available_spots(self):
+        return self.spots().count()
 
     def get_absolute_url(self):
         return "/parks/%i/zones/%i/" % (self.park.id, self.id)

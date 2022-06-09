@@ -13,9 +13,9 @@
 </style>
 
 <div class="row">
-    <div id="price-list">
+    <div id="contract-list">
         {% for form in formset %}
-            <div id="form-{{ forloop.counter0 }}" class='row mb-4 price-form {% if form.DELETE.value == True %}hidden{% endif %}'>
+            <div id="form-{{ forloop.counter0 }}" class='row mb-4 contract-form {% if form.DELETE.value == True %}hidden{% endif %}'>
                 {{ form | crispy }}
                 <div class="col-auto mt-3">
                     <div type="button" id="deleteButton-{{ forloop.counter0 }}-"
@@ -29,7 +29,7 @@
     {{ formset.management_form }}
     <div id="empty-form" class="hidden">{{ formset.empty_form | crispy }}</div>
 </div>
-<button type="button" class="btn btn-success mt-2" id="addButton">Add Price Type</button>
+<button type="button" class="btn btn-success mt-2" id="addButton">Add Contract Type</button>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <!--suppress JSUnusedLocalSymbols -->
@@ -38,7 +38,7 @@
     function delete_click(clicked_id) {
         document.getElementById(`id_form-${clicked_id}-DELETE`).checked = true;
         const copyForm = document.getElementById(`form-${clicked_id}`)
-        copyForm.setAttribute('class', 'row price-form hidden')
+        copyForm.setAttribute('class', 'row contract-form hidden')
     }
 
     window.addEventListener('load', () => {
@@ -57,11 +57,11 @@
         const totalNewForms = document.getElementById('id_form-TOTAL_FORMS')
 
         function add_spot_form() {
-            const currentForms = document.getElementsByClassName('row price-form')
+            const currentForms = document.getElementsByClassName('row contract-form')
             const formCount = currentForms.length
-            const copyForm = document.getElementById('price-list')
+            const copyForm = document.getElementById('contract-list')
             const emptyForm = document.getElementById('empty-form').cloneNode(true)
-            emptyForm.setAttribute('class', 'row mb-4 price-form')
+            emptyForm.setAttribute('class', 'row mb-4 contract-form')
             emptyForm.setAttribute('id', `form-${formCount}`)
             const regex = new RegExp('__prefix__', 'g')
             emptyForm.innerHTML = emptyForm.innerHTML.replace(regex, formCount)

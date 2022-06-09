@@ -10,36 +10,198 @@
 
     <div class="container">
         <h1 class="mt-5">Park {{ object.name }}</h1>
-        <div class="row">
-                <div class="col-4">
-                    <p>Address: {{ object.address }}</p>
-                    <p>Postal Code: {{ object.posta_city }}</p>
-                    <p>Typology: {{ object.get_typology_display }}</p>
-                    <p>Zones: {{ object.zones.count }}</p>
-                    <p>Admin: {{ object.admin.user.first_name }} {{ object.admin.user.last_name }}</p>
-                    <p>Created: {{ object.created }}</p>
-                    <p>Updated: {{ object.updated }}</p>
-                    <a type="button" class="btn btn-success mt-2" href="{% url 'list_parks' %}">Back</a>
-                    {% if record.zones %}
-                        <a type="button" class="btn btn-success mt-2" href="{% url 'list_zones' park.id %}">View Zones</a>
-                    {% endif %}
-                    {% if request.user|is_admin %}
-                        {% if not record.zones %}
-                            <a class="btn btn-success mt-2" href="{% url 'add_zone' park.id %}">Add Zone</a>
+        <div class="row mb-4">
+            <div class="col-4">
+                <p>Address: {{ object.address }}</p>
+                <p>Postal Code: {{ object.posta_city }}</p>
+                <p>Typology: {{ object.get_typology_display }}</p>
+                <p>Zones: {{ object.zones.count }}</p>
+                <p>Admin: {{ object.admin.user.first_name }} {{ object.admin.user.last_name }}</p>
+                <p>Created: {{ object.created }}</p>
+                <p>Updated: {{ object.updated }}</p>
+                <h4>Schedule</h4>
+                <table class="table">
+                    <tbody>
+                    <tr>
+                        <th scope="row">Monday</th>
+                        {% if object.monday_start %}
+                            {% if object.monday_start == object.monday_end %}
+                                <td colspan="3">All Day</td>
+                            {% else %}
+                                <td>{{ object.monday_start }}</td>
+                                <td>to</td>
+                                <td>{{ object.monday_end }}</td>
+                            {% endif %}
+                        {% else %}
+                            <td colspan="3">Closed</td>
                         {% endif %}
-                        <a type="button" href="{% url 'update_park' object.id %}" class="btn btn-success mt-2">Update
-                            Park</a>
-                        <a type="button" href="{% url 'delete_park' object.id %}" class="btn btn-success mt-2">Delete
-                            Park</a>
+                    </tr>
+                    <tr>
+                        <th scope="row">Tuesday</th>
+                        {% if object.tuesday_start %}
+                            {% if object.tuesday_start == object.sunday_end %}
+                                <td colspan="3">All Day</td>
+                            {% else %}
+                                <td>{{ object.tuesday_start }}</td>
+                                <td>to</td>
+                                <td>{{ object.tuesday_end }}</td>
+                            {% endif %}
+                        {% else %}
+                            <td colspan="3">Closed</td>
+                        {% endif %}
+                    </tr>
+                    <tr>
+                        <th scope="row">Wednesday</th>
+                        {% if object.wednesday_start %}
+                            {% if object.wednesday_start == object.wednesday_end %}
+                                <td colspan="3">All Day</td>
+                            {% else %}
+                                <td>{{ object.wednesday_start }}</td>
+                                <td>to</td>
+                                <td>{{ object.wednesday_end }}</td>
+                            {% endif %}
+                        {% else %}
+                            <td colspan="3">Closed</td>
+                        {% endif %}
+                    </tr>
+                    <tr>
+                        <th scope="row">Thursday</th>
+                        {% if object.thursday_start %}
+                            {% if object.thursday_start == object.thursday_end %}
+                                <td colspan="3">All Day</td>
+                            {% else %}
+                                <td>{{ object.thursday_start }}</td>
+                                <td>to</td>
+                                <td>{{ object.thursday_end }}</td>
+                            {% endif %}
+                        {% else %}
+                            <td colspan="3">Closed</td>
+                        {% endif %}
+                    </tr>
+                    <tr>
+                        <th scope="row">Friday</th>
+                        {% if object.friday_start %}
+                            {% if object.friday_start == object.friday_end %}
+                                <td colspan="3">All Day</td>
+                            {% else %}
+                                <td>{{ object.friday_start }}</td>
+                                <td>to</td>
+                                <td>{{ object.friday_end }}</td>
+                            {% endif %}
+                        {% else %}
+                            <td colspan="3">Closed</td>
+                        {% endif %}
+                    </tr>
+                    <tr>
+                        <th scope="row">Saturday</th>
+                        {% if object.saturday_start %}
+                            {% if object.saturday_start == object.saturday_end %}
+                                <td colspan="3">All Day</td>
+                            {% else %}
+                                <td>{{ object.saturday_start }}</td>
+                                <td>to</td>
+                                <td>{{ object.saturday_end }}</td>
+                            {% endif %}
+                        {% else %}
+                            <td colspan="3">Closed</td>
+                        {% endif %}
+                    </tr>
+                    <tr>
+                        <th scope="row">Sunday</th>
+                        {% if object.sunday_start %}
+                            {% if object.sunday_start == object.sunday_end %}
+                                <td colspan="3">All Day</td>
+                            {% else %}
+                                <td>{{ object.sunday_start }}</td>
+                                <td>to</td>
+                                <td>{{ object.saturday_end }}</td>
+                            {% endif %}
+                        {% else %}
+                            <td colspan="3">Closed</td>
+                        {% endif %}
+                    </tr>
+                    </tbody>
+                </table>
+
+                {% if object.price_types %}
+                    <h4>Price Table</h4>
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th scope="col">Time</th>
+                            <th scope="col">Price</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in object.price_types %}
+                            <tr>
+                                <th scope="row">{{ row.total_time }}</th>
+                                {% if row.total == 0 %}
+                                    <td>Free</td>
+                                {% else %}
+                                    <td>{{ row.total }} €</td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+
+                {% if object.contract_types %}
+                    <h4>Contract Types</h4>
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th scope="col">Type</th>
+                            <th scope="col">Price</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in object.contract_types %}
+                            <tr>
+                                <th scope="row">{{ row.name }}</th>
+                                {% if row.total == 0 %}
+                                    <td>Free</td>
+                                {% else %}
+                                    <td>{{ row.total }} €</td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+
+                <a type="button" class="btn btn-success mt-2" href="{% url 'list_parks' %}">Back</a>
+                {% if object.zones %}
+                    <a type="button" class="btn btn-success mt-2" href="{% url 'list_zones' object.id %}">View Zones</a>
+                {% endif %}
+                {% if request.user|is_admin %}
+                    {% if object.price_types %}
+                        <a type="button" class="btn btn-success mt-2" href="{% url 'update_price' object.id %}">Update Prices</a>
+                    {% else %}
+                        <a type="button" class="btn btn-success mt-2" href="{% url 'add_price' object.id %}">Add Prices</a>
                     {% endif %}
+                    {% if object.contract_types %}
+                        <a type="button" class="btn btn-success mt-2" href="{% url 'update_contract' object.id %}">Update Contracts</a>
+                    {% else %}
+                        <a type="button" class="btn btn-success mt-2" href="{% url 'add_contract' object.id %}">Add Contracts</a>
+                    {% endif %}
+                    {% if not object.zones %}
+                        <a class="btn btn-success mt-2" href="{% url 'add_zone' object.id %}">Add Zone</a>
+                    {% endif %}
+                    <a type="button" href="{% url 'update_park' object.id %}" class="btn btn-success mt-2">Update
+                        Park</a>
+                    <a type="button" href="{% url 'delete_park' object.id %}" class="btn btn-success mt-2">Delete
+                        Park</a>
+                {% endif %}
+            </div>
+            <div class="col-8">
+                <div class="position-sticky" style="top: 2rem; height: 60vh">
+                    <iframe src="{{ park.map_src }}" width="100%" style="border:0;" allowfullscreen=""
+                            class="border rounded-3 border border-dark shadow h-100"
+                            referrerpolicy="no-referrer-when-downgrade"></iframe>
                 </div>
-                <div class="col-8">
-                    <div class="position-sticky" style="top: 2rem; height: 60vh">
-                        <iframe src="{{ park.map_src }}" width="100%" style="border:0;" allowfullscreen=""
-                                class="border rounded-3 border border-dark shadow h-100"
-                                referrerpolicy="no-referrer-when-downgrade"></iframe>
-                    </div>
-                </div>
+            </div>
         </div>
     </div>
 

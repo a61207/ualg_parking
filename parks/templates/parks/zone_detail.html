@@ -127,17 +127,23 @@
             }
 
             function get_max_x() {
-                let x = 0;
+                let x = 0, w=0;
                 for (const spot in spots)
-                    if (parseInt(spots[spot][0]) > x) x = parseInt(spots[spot][0]) + parseInt(spots[spot][2])
-                return x + 1;
+                    if (parseInt(spots[spot][0]) > x) {
+                        w = parseInt(spots[spot][2]);
+                        x = parseInt((spots[spot][0]) + w);
+                    }
+                return x + w +1;
             }
 
             function get_max_y() {
-                let y = 0;
+                let y = 0, h=0;
                 for (const spot in spots)
-                    if (parseInt(spots[spot][1]) > y) y = parseInt(spots[spot][1]) + parseInt(spots[spot][3])
-                return y + 1;
+                    if (parseInt(spots[spot][1]) > y) {
+                        h = parseInt(spots[spot][3]);
+                        y = parseInt((spots[spot][1]) + h)
+                    }
+                return y + h;
             }
 
             zoomButton.addEventListener("click", resize)

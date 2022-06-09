@@ -1,3 +1,6 @@
+from django.forms.utils import ErrorList
+
+
 def check_empty_spots(formset):
     i = 0
     for form in formset:
@@ -5,6 +8,68 @@ def check_empty_spots(formset):
             i += 1
     if len(formset) == 0 or i == len(formset):
         return True
+
+
+def duplicated_time(form, formset):
+    count = -1
+    for formP in formset:
+        if formP.cleaned_data['DELETE'] is False and formP.cleaned_data['hours'] == form.cleaned_data['hours'] and \
+                formP.cleaned_data['minutes'] == form.cleaned_data['minutes']:
+            count += 1
+    if count > 0:
+        return True
+    else:
+        return False
+
+
+def duplicated_contract(form, formset):
+    count = -1
+    for formP in formset:
+        if formP.cleaned_data['DELETE'] is False and formP.cleaned_data['years'] == form.cleaned_data['years'] and \
+                formP.cleaned_data['months'] == form.cleaned_data['months'] and \
+                formP.cleaned_data['name'] == form.cleaned_data['name']:
+            count += 1
+    if count > 0:
+        return True
+    else:
+        return False
+
+
+def validate_price_type(formset):
+    nerrors = 0
+    count = 0
+    for form in formset:
+        if form.is_valid() and form.cleaned_data:
+            if form.cleaned_data and form.cleaned_data['DELETE'] is False:
+                count += 1
+                if form.cleaned_data['hours'] == 0 and form.cleaned_data['minutes'] == 0:
+                    errors = form.errors.setdefault("__all__", ErrorList())
+                    errors.append("Time Values can't have null values.")
+                    nerrors += 1
+                elif duplicated_time(form, formset):
+                    errors = form.errors.setdefault("__all__", ErrorList())
+                    errors.append("Price Type Duration already defined.")
+                    nerrors += 1
+    return not nerrors and count != 0
+
+
+def validate_contract_type(formset):
+    nerrors = 0
+    count = 0
+    for form in formset:
+        if form.is_valid() and form.cleaned_data:
+            if form.cleaned_data and form.cleaned_data['DELETE'] is False:
+                count += 1
+                if form.cleaned_data['years'] == 0 and form.cleaned_data['months'] == 0 \
+                        and not form.cleaned_data['name']:
+                    errors = form.errors.setdefault("__all__", ErrorList())
+                    errors.append("Time Values can't have null values.")
+                    nerrors += 1
+                elif duplicated_contract(form, formset):
+                    errors = form.errors.setdefault("__all__", ErrorList())
+                    errors.append("Contract Type Duration and name already defined.")
+                    nerrors += 1
+    return not nerrors and count != 0
 
 
 def spot_name_exists(number, spots):

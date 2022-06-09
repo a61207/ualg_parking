@@ -1,269 +1,259 @@
-{% extends 'base.html' %}
 {% load crispy_forms_filters %}
 
-{% block title %}
-    Add Zone
-{% endblock %}
+<style>
+    .spot-form {
+        display: none;
+    }
 
-{% block main %}
-    <style>
-        .spot-form{
-            display: none;
-        }
-        .hidden { display: none; }
-    </style>
-    <div class="container">
-        <h1 class="mt-5">Add Zone</h1>
-        <form method="post">
-            {% csrf_token %}
+    .hidden {
+        display: none;
+    }
+</style>
+
+{{ form | crispy }}
+{{ formset.management_form }}
+<div id="spots-list">
+    {% for form in formset %}
+        <div id="form-{{ form.number.value }}" class='spot-form'>
             {{ form | crispy }}
-            {{ formset.management_form }}
-            <div id="spots-list">
-                {% for form in formset %}
-                    <div id="form-{{form.number.value}}" class='spot-form'>
-                        {{ form | crispy }}
-                    </div>
-                {% endfor %}
-            </div>
-            <div id="canvas_container" style="overflow: scroll; height: 500px">
-                <canvas id="canvas"></canvas>
-            </div>
-            <label for="rangeInput" class="col-6 form-label">Zoom</label>
-            <input type="range" class="form-range" min="1" max="3" step="0.25" value="1"
-                   id="rangeInput">
-            <button type="button" class="btn btn-success mt-2" id="turnSpot">Turn Parking Sopt</button>
-            <button type="button" class="btn btn-success mt-2" id="eraseSpot">Erase Parking Sopt</button>
-            <button type="submit" class="btn btn-success mt-2">Add Zone</button>
-        </form>
-        <div id="empty-form" class="hidden">{{ formset.empty_form | crispy }}</div>
-    </div>
+        </div>
+    {% endfor %}
+</div>
+<div id="canvas_container" class="border border-2" style="overflow: scroll; height: 300px">
+    <canvas id="canvas"></canvas>
+</div>
+<label for="rangeInput" class="col-6 form-label">Zoom</label>
+<input type="range" class="form-range" min="1" max="3" step="0.25" value="1"
+       id="rangeInput">
+<button type="button" class="btn btn-success mt-2" id="turnSpot">Turn Parking Spot</button>
+<button type="button" class="btn btn-success mt-2" id="eraseSpot">Erase Parking Sopt</button>
+<div id="empty-form" class="hidden">{{ formset.empty_form | crispy }}</div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script>
 
-        window.addEventListener('load', () => {
-            const canvas = document.querySelector("#canvas");
-            const zoomButton = document.getElementById('rangeInput')
-            const turnButton = document.getElementById('turnSpot')
-            const eraseButton = document.getElementById('eraseSpot')
-            const height = document.getElementById('canvas_container').clientHeight;
-            const width = document.getElementById('canvas_container').clientWidth;
-            canvas.height = height;
-            canvas.width = width;
-            let ctx = canvas.getContext('2d');
-            const size = 10;
-            let zoom = 1, x = 0, y = 0, wm = 2, hm = 1, spots = [], erasing = false, on_spot = "", count=0;
+    window.addEventListener('load', () => {
+        const canvas = document.querySelector("#canvas");
+        const zoomButton = document.getElementById('rangeInput')
+        const turnButton = document.getElementById('turnSpot')
+        const eraseButton = document.getElementById('eraseSpot')
+        const height = document.getElementById('canvas_container').clientHeight;
+        const width = document.getElementById('canvas_container').clientWidth;
+        canvas.height = height;
+        canvas.width = width;
+        let ctx = canvas.getContext('2d');
+        const size = 10;
+        let zoom = 1, x = 0, y = 0, wm = 2, hm = 1, spots = [], erasing = false, on_spot = "", count = 0;
 
-            {% for form in formset %}
-                {% if not form.DELETE.value %}
-                    if('{{ form.direction.value }}'==='HO')
-                        spots.push([ Number({{ form.x.value }}), Number({{ form.y.value }}), 2, 1, Number({{ form.number.value }}), count]);
-                    else spots.push([Number({{ form.x.value }}), Number({{ form.y.value }}), 1, 2, Number({{ form.number.value }}), count]);
-                {% endif %}
-                count++;
-            {% endfor %}
+        {% for form in formset %}
+            {% if not form.DELETE.value %}
+                if ('{{ form.direction.value }}' === 'HO')
+                    spots.push([Number({{ form.x.value }}), Number({{ form.y.value }}), 2, 1, Number({{ form.number.value }}), count]);
+                else spots.push([Number({{ form.x.value }}), Number({{ form.y.value }}), 1, 2, Number({{ form.number.value }}), count]);
+            {% endif %}
+            count++;
+        {% endfor %}
 
-            drawCanvas(size);
+        drawCanvas(size);
 
-            function drawCanvas() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                const realSize = size * zoom;
-                ctx.strokeStyle = "#eeeeee";
-                for (let i = 0; i < canvas.width; i += realSize) {
-                    ctx.beginPath();
-                    ctx.moveTo(i, 0);
-                    ctx.lineTo(i, canvas.height);
-                    ctx.stroke();
-                }
-                for (let i = 0; i < canvas.height; i += realSize) {
-                    ctx.beginPath();
-                    ctx.moveTo(0, i);
-                    ctx.lineTo(canvas.width, i);
-                    ctx.stroke();
-                }
-                if (!erasing) {
-                    roundRect((x * realSize), (y * realSize), realSize * wm, realSize * hm, 50, "#000000");
-                    roundRect((x * realSize) + (realSize / 6), (y * realSize) + (realSize / 6), (realSize * wm) - (realSize * 2 / 6), (realSize * hm) - (realSize * 2 / 6), 50, "#ffffff");
-                }
-                for (let i = 0; i < spots.length; i++) {
-                    roundRect((spots[i][0] * realSize), (spots[i][1] * realSize), realSize * spots[i][2], realSize * spots[i][3], 50, "#000000");
-                    roundRect((spots[i][0] * realSize) + (realSize / 6), (spots[i][1] * realSize) + (realSize / 6), (realSize * spots[i][2]) - (realSize * 2 / 6), (realSize * spots[i][3]) - (realSize * 2 / 6), 50, "#35c942");
+        function drawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const realSize = size * zoom;
+            ctx.strokeStyle = "#98a3aa";
+            for (let i = 0; i < canvas.width; i += realSize) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, canvas.height);
+                ctx.stroke();
+            }
+            for (let i = 0; i < canvas.height; i += realSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(canvas.width, i);
+                ctx.stroke();
+            }
+            if (!erasing) {
+                roundRect((x * realSize), (y * realSize), realSize * wm, realSize * hm, 50, "#000000");
+                roundRect((x * realSize) + (realSize / 6), (y * realSize) + (realSize / 6), (realSize * wm) - (realSize * 2 / 6), (realSize * hm) - (realSize * 2 / 6), 50, "#ffffff");
+            }
+            for (let i = 0; i < spots.length; i++) {
+                roundRect((spots[i][0] * realSize), (spots[i][1] * realSize), realSize * spots[i][2], realSize * spots[i][3], 50, "#000000");
+                roundRect((spots[i][0] * realSize) + (realSize / 6), (spots[i][1] * realSize) + (realSize / 6), (realSize * spots[i][2]) - (realSize * 2 / 6), (realSize * spots[i][3]) - (realSize * 2 / 6), 50, "#35c942");
 
-                    ctx.font = "bold " + (realSize * 2 / 3) + "px Arial";
-                    ctx.fillStyle = "#000000";
-                    ctx.textAlign = "center";
-                    if (spots[i][2] > spots[i][3])
-                        ctx.fillText(String(spots[i][4]), (spots[i][0] * realSize) + (spots[i][2] * realSize * 2 / 4), (spots[i][1] * realSize) + (spots[i][3] * realSize * 3 / 4));
-                    else {
-                        ctx.save();
-                        ctx.translate((spots[i][0] * realSize) + (spots[i][2] * realSize * 3 / 4), (spots[i][1] * realSize) + (spots[i][3] * realSize * 2 / 4));
-                        ctx.rotate(-0.5 * Math.PI);
-                        ctx.fillText(String(spots[i][4]), 0, 0);
-                        ctx.restore();
-                    }
-                }
-                if (erasing && on_spot !== "") {
+                ctx.font = "bold " + (realSize * 2 / 3) + "px Arial";
+                ctx.fillStyle = "#000000";
+                ctx.textAlign = "center";
+                if (spots[i][2] > spots[i][3])
+                    ctx.fillText(String(spots[i][4]), (spots[i][0] * realSize) + (spots[i][2] * realSize * 2 / 4), (spots[i][1] * realSize) + (spots[i][3] * realSize * 3 / 4));
+                else {
                     ctx.save();
-                    ctx.strokeStyle = '#ff0000';
-                    ctx.lineWidth = realSize / 5;
-                    ctx.beginPath();
-                    ctx.moveTo((on_spot[0] * realSize), (on_spot[1] * realSize));
-                    ctx.lineTo((on_spot[0] * realSize) + (realSize * on_spot[2]), (on_spot[1] * realSize) + (realSize * on_spot[3]));
-                    ctx.stroke();
-                    ctx.beginPath();
-                    ctx.moveTo((on_spot[0] * realSize) + (realSize * on_spot[2]), (on_spot[1] * realSize));
-                    ctx.lineTo((on_spot[0] * realSize), (on_spot[1] * realSize) + (realSize * on_spot[3]));
-                    ctx.stroke();
+                    ctx.translate((spots[i][0] * realSize) + (spots[i][2] * realSize * 3 / 4), (spots[i][1] * realSize) + (spots[i][3] * realSize * 2 / 4));
+                    ctx.rotate(-0.5 * Math.PI);
+                    ctx.fillText(String(spots[i][4]), 0, 0);
                     ctx.restore();
                 }
             }
-
-            function roundRect(x, y, width, height, radius, color) {
-                if (width < 2 * radius) radius = width / 2;
-                if (height < 2 * radius) radius = height / 2;
+            if (erasing && on_spot !== "") {
+                ctx.save();
+                ctx.strokeStyle = '#ff0000';
+                ctx.lineWidth = realSize / 5;
                 ctx.beginPath();
-                ctx.moveTo(x + radius, y);
-                ctx.arcTo(x + width, y, x + width, y + height, radius);
-                ctx.arcTo(x + width, y + height, x, y + height, radius);
-                ctx.arcTo(x, y + height, x, y, radius);
-                ctx.arcTo(x, y, x + width, y, radius);
-                ctx.closePath();
-                ctx.fillStyle = color;
-                ctx.fill();
+                ctx.moveTo((on_spot[0] * realSize), (on_spot[1] * realSize));
+                ctx.lineTo((on_spot[0] * realSize) + (realSize * on_spot[2]), (on_spot[1] * realSize) + (realSize * on_spot[3]));
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo((on_spot[0] * realSize) + (realSize * on_spot[2]), (on_spot[1] * realSize));
+                ctx.lineTo((on_spot[0] * realSize), (on_spot[1] * realSize) + (realSize * on_spot[3]));
+                ctx.stroke();
+                ctx.restore();
             }
+        }
 
-            function inSpots(x, y, wm, hm, spots) {
-                for (let i = 0; i < spots.length; i++) {
-                    if (spots[i][2] === 2 && wm === 2 && spots[i][1] === y && Math.abs(spots[i][0] - x) <= 1) return true;
-                    if (spots[i][3] === 2 && hm === 2 && spots[i][0] === x && Math.abs(spots[i][1] - y) <= 1) return true;
-                    if (spots[i][2] === 1 && wm === 2 &&
-                        ((spots[i][0] === x && (spots[i][1] === y || spots[i][1] + 1 === y)) ||
-                            (spots[i][0] - 1 === x && (spots[i][1] === y || spots[i][1] + 1 === y))))
-                        return true;
-                    if (spots[i][2] === 2 && wm === 1 &&
-                        ((spots[i][1] === y && (spots[i][0] === x || spots[i][0] + 1 === x)) ||
-                            (spots[i][1] - 1 === y && (spots[i][0] === x || spots[i][0] + 1 === x))))
-                        return true;
+        function roundRect(x, y, width, height, radius, color) {
+            if (width < 2 * radius) radius = width / 2;
+            if (height < 2 * radius) radius = height / 2;
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.arcTo(x + width, y, x + width, y + height, radius);
+            ctx.arcTo(x + width, y + height, x, y + height, radius);
+            ctx.arcTo(x, y + height, x, y, radius);
+            ctx.arcTo(x, y, x + width, y, radius);
+            ctx.closePath();
+            ctx.fillStyle = color;
+            ctx.fill();
+        }
+
+        function inSpots(x, y, wm, hm, spots) {
+            for (let i = 0; i < spots.length; i++) {
+                if (spots[i][2] === 2 && wm === 2 && spots[i][1] === y && Math.abs(spots[i][0] - x) <= 1) return true;
+                if (spots[i][3] === 2 && hm === 2 && spots[i][0] === x && Math.abs(spots[i][1] - y) <= 1) return true;
+                if (spots[i][2] === 1 && wm === 2 &&
+                    ((spots[i][0] === x && (spots[i][1] === y || spots[i][1] + 1 === y)) ||
+                        (spots[i][0] - 1 === x && (spots[i][1] === y || spots[i][1] + 1 === y))))
+                    return true;
+                if (spots[i][2] === 2 && wm === 1 &&
+                    ((spots[i][1] === y && (spots[i][0] === x || spots[i][0] + 1 === x)) ||
+                        (spots[i][1] - 1 === y && (spots[i][0] === x || spots[i][0] + 1 === x))))
+                    return true;
+            }
+            return false;
+        }
+
+        const totalNewForms = document.getElementById('id_form-TOTAL_FORMS')
+
+        function add_spot_form(x, y, dir, num) {
+            const currentForms = document.getElementsByClassName('spot-form')
+            const formCount = currentForms.length
+            const copyForm = document.getElementById('spots-list')
+            const emptyForm = document.getElementById('empty-form').cloneNode(true)
+            emptyForm.setAttribute('class', 'spot-form')
+            emptyForm.setAttribute('id', `form-${formCount}`)
+            const regex = new RegExp('__prefix__', 'g')
+            emptyForm.innerHTML = emptyForm.innerHTML.replace(regex, formCount)
+            copyForm.append(emptyForm)
+            document.getElementById(`id_form-${formCount}-x`).setAttribute('value', x)
+            document.getElementById(`id_form-${formCount}-y`).setAttribute('value', y)
+            document.getElementById(`id_form-${formCount}-number`).setAttribute('value', num)
+            document.querySelector(`#id_form-${formCount}-direction`).value = dir
+            totalNewForms.setAttribute('value', (formCount + 1).toString())
+            return formCount;
+        }
+
+        function spots_has_number(i) {
+            for (let j = 0; j < spots.length; j++)
+                if (spots[j][4] === i) return true;
+            return false;
+        }
+
+        function get_next_number() {
+            let i = 1;
+            while (spots_has_number(i))
+                i++;
+            return i;
+        }
+
+        function get_spot(x, y, spots) {
+            for (let i = 0; i < spots.length; i++) {
+                if (spots[i][2] === 2 && (spots[i][1] === y && (spots[i][0] === x || spots[i][0] + 1 === x))) return i;
+                if (spots[i][3] === 2 && (spots[i][0] === x && (spots[i][1] === y || spots[i][1] + 1 === y))) return i;
+            }
+            return -1;
+        }
+
+        function delete_spot_form(spotElement) {
+            document.getElementById(`id_form-${spotElement}-DELETE`).checked = true;
+        }
+
+        function blockEvent() {
+            if (erasing) {
+                let mouseSpot = get_spot(x, y, spots);
+                console.log(mouseSpot)
+                if (mouseSpot !== -1) {
+                    delete_spot_form(spots[mouseSpot][5]);
+                    spots.splice(mouseSpot, 1)
+                    on_spot = ""
+                    drawCanvas();
                 }
-                return false;
-            }
-
-            const totalNewForms = document.getElementById('id_form-TOTAL_FORMS')
-
-            function add_spot_form(x, y, dir, num) {
-                const currentForms = document.getElementsByClassName('spot-form')
-                const formCount = currentForms.length
-                const copyForm = document.getElementById('spots-list')
-                const emptyForm = document.getElementById('empty-form').cloneNode(true)
-                emptyForm.setAttribute('class', 'spot-form')
-                emptyForm.setAttribute('id', `form-${formCount}`)
-                const regex = new RegExp('__prefix__', 'g')
-                emptyForm.innerHTML = emptyForm.innerHTML.replace(regex, formCount)
-                copyForm.append(emptyForm)
-                document.getElementById(`id_form-${formCount}-x`).setAttribute('value', x)
-                document.getElementById(`id_form-${formCount}-y`).setAttribute('value', y)
-                document.getElementById(`id_form-${formCount}-number`).setAttribute('value', num)
-                document.querySelector(`#id_form-${formCount}-direction`).value = dir
-                totalNewForms.setAttribute('value', (formCount + 1).toString())
-                return formCount;
-            }
-
-            function spots_has_number(i) {
-                for (let j = 0; j < spots.length; j++)
-                    if (spots[j][4] === i) return true;
-                return false;
-            }
-
-            function get_next_number() {
-                let i = 1;
-                while (spots_has_number(i))
-                    i++;
-                return i;
-            }
-
-            function get_spot(x, y, spots) {
-                for (let i = 0; i < spots.length; i++) {
-                    if (spots[i][2] === 2 && (spots[i][1] === y && (spots[i][0] === x || spots[i][0] + 1 === x))) return i;
-                    if (spots[i][3] === 2 && (spots[i][0] === x && (spots[i][1] === y || spots[i][1] + 1 === y))) return i;
-                }
-                return -1;
-            }
-
-            function delete_spot_form(spotElement) {
-                document.getElementById(`id_form-${spotElement}-DELETE`).checked = true;
-            }
-
-            function blockEvent() {
-                if (erasing) {
-                    let mouseSpot = get_spot(x, y, spots);
-                    console.log(mouseSpot)
-                    if (mouseSpot !== -1) {
-                        delete_spot_form(spots[mouseSpot][5]);
-                        spots.splice(mouseSpot, 1)
-                        on_spot = ""
-                        drawCanvas();
-                    }
-                } else {
-                    if (!inSpots(x, y, wm, hm, spots)) {
-                        let id;
-                        const num = get_next_number();
-                        if (wm === 2) id = add_spot_form(x, y, 'HO', num);
-                        else id = add_spot_form(x, y, 'VE', num);
-                        console.log(id,num)
-                        spots.push([x, y, wm, hm, num, id]);
-                        drawCanvas();
-                    }
+            } else {
+                if (!inSpots(x, y, wm, hm, spots)) {
+                    let id;
+                    const num = get_next_number();
+                    if (wm === 2) id = add_spot_form(x, y, 'HO', num);
+                    else id = add_spot_form(x, y, 'VE', num);
+                    console.log(id, num)
+                    spots.push([x, y, wm, hm, num, id]);
+                    drawCanvas();
                 }
             }
+        }
 
-            function moveSpotEvent(event) {
-                const pos = getMousePos(canvas, event);
-                x = Math.trunc(pos.x / (size * zoom));
-                y = Math.trunc(pos.y / (size * zoom));
-                const spot = get_spot(x, y, spots)
-                if (spot === -1)
-                    on_spot = "";
-                else on_spot = spots[spot];
-                drawCanvas()
+        function moveSpotEvent(event) {
+            const pos = getMousePos(canvas, event);
+            x = Math.trunc(pos.x / (size * zoom));
+            y = Math.trunc(pos.y / (size * zoom));
+            const spot = get_spot(x, y, spots)
+            if (spot === -1)
+                on_spot = "";
+            else on_spot = spots[spot];
+            drawCanvas()
+        }
+
+        function getMousePos(canvas, evt) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: (evt.clientX - rect.left),
+                y: (evt.clientY - rect.top)
+            };
+        }
+
+        function resize() {
+            zoom = zoomButton.value;
+            canvas.height = height * zoom;
+            canvas.width = width * zoom;
+            drawCanvas();
+        }
+
+        function turnSpot() {
+            if (wm === 1) {
+                wm = 2;
+                hm = 1;
+            } else {
+                wm = 1;
+                hm = 2;
             }
+            drawCanvas()
+        }
 
-            function getMousePos(canvas, evt) {
-                const rect = canvas.getBoundingClientRect();
-                return {
-                    x: (evt.clientX - rect.left),
-                    y: (evt.clientY - rect.top)
-                };
-            }
+        function switchErasing() {
+            erasing = !erasing
+        }
 
-            function resize() {
-                zoom = zoomButton.value;
-                canvas.height = height * zoom;
-                canvas.width = width * zoom;
-                drawCanvas();
-            }
+        zoomButton.addEventListener("click", resize)
+        canvas.addEventListener("mousemove", moveSpotEvent)
+        canvas.addEventListener("click", blockEvent)
+        turnButton.addEventListener("click", turnSpot)
+        eraseButton.addEventListener("click", switchErasing)
 
-            function turnSpot() {
-                if (wm === 1) {
-                    wm = 2;
-                    hm = 1;
-                } else {
-                    wm = 1;
-                    hm = 2;
-                }
-                drawCanvas()
-            }
+    })
 
-            function switchErasing() {
-                erasing = !erasing
-            }
-
-            zoomButton.addEventListener("click", resize)
-            canvas.addEventListener("mousemove", moveSpotEvent)
-            canvas.addEventListener("click", blockEvent)
-            turnButton.addEventListener("click", turnSpot)
-            eraseButton.addEventListener("click", switchErasing)
-
-        })
-
-    </script>
-{% endblock main %}
+</script>

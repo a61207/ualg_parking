@@ -3,8 +3,8 @@ from django.utils import timezone
 from djmoney.models.fields import MoneyField
 from main.models import Administrator
 
-# Create your models here.
 
+# Create your models here.
 
 class Park(models.Model):
     STRUCTURE = 'ST'
@@ -12,6 +12,30 @@ class Park(models.Model):
     TYPOLOGYS = [
         (STRUCTURE, 'Structure'),
         (SURFACE, 'Surface'),
+    ]
+
+    LISBON1 = '11'
+    LISBON2 = '12'
+    LISBON3 = '13'
+    LISBON4 = '14'
+    LISBON5 = '15'
+    LISBON6 = '16'
+    LISBON7 = '17'
+    LISBON8 = '18'
+    LISBON9 = '19'
+    FARO = '80'
+    ALBUFEIRA = '82'
+    CITY = [
+        (LISBON1, 'Lisbon'),
+        (LISBON2, 'Lisbon'),
+        (LISBON3, 'Lisbon'),
+        (LISBON4, 'Lisbon'),
+        (LISBON5, 'Lisbon'),
+        (LISBON6, 'Lisbon'),
+        (LISBON8, 'Lisbon'),
+        (LISBON9, 'Lisbon'),
+        (FARO, 'Faro'),
+        (ALBUFEIRA, 'Albufeira'),
     ]
 
     id = models.AutoField(db_column='ID', primary_key=True)
@@ -49,6 +73,15 @@ class Park(models.Model):
     def map_src(self):
         return self.map_html.split('"')[1]
 
+    def city(self):
+        for x in Park.CITY:
+            if x[0] == self.postal_code[:2]:
+                return x[1]
+        return ''
+
+    def posta_city(self):
+        return self.postal_code + " " + self.city()
+
     def spots(self):
         i = 0
         for zone in self.zones():
@@ -58,22 +91,40 @@ class Park(models.Model):
     def zones(self):
         return Zone.objects.filter(park=self.id)
 
+    def price_types(self):
+        return PriceType.objects.filter(park=self.id)
+
+    def contract_types(self):
+        return ContractType.objects.filter(park=self.id)
+
 
 class PriceType(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)
-    time = models.DurationField(db_column='TypeTime', verbose_name='Type Time')
-    total = MoneyField(max_digits=14, decimal_places=2, default_currency='EUR')
+    minutes = models.IntegerField(db_column='MinutesTime', verbose_name='Minutes Time', default=0)
+    hours = models.IntegerField(db_column='HoursTime', verbose_name='Hours Time', default=0)
+    total = models.DecimalField(db_column='TotalValue', verbose_name='Total Value', max_digits=6, decimal_places=2,
+                                default=0)
     park = models.ForeignKey(Park, models.CASCADE, db_column='Parque', verbose_name='Park')
 
     class Meta:
-        unique_together = ('time', 'park')
+        unique_together = ('minutes', 'hours', 'park')
+
+    def total_time(self):
+        if self.minutes and self.hours:
+            return str(self.hours) + "h:" + str(self.minutes) + "m"
+        elif self.hours:
+            return str(self.hours) + "h"
+        else:
+            return str(self.minutes) + "m"
 
 
 class ContractType(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)
     name = models.CharField(db_column='Name', verbose_name='Name', max_length=50, unique=True)
-    time = models.DurationField(db_column='TypeTime', verbose_name='Type Time')
-    total = MoneyField(max_digits=14, decimal_places=2, default_currency='EUR')
+    years = models.IntegerField(db_column='YearsTime', verbose_name='Years Time', default=0)
+    months = models.IntegerField(db_column='MonthsTime', verbose_name='Months Time', default=0)
+    total = models.DecimalField(db_column='TotalValue', verbose_name='Total Value', max_digits=6, decimal_places=2,
+                                default=0)
     park = models.ForeignKey(Park, models.CASCADE, db_column='Parque', verbose_name='Park')
 
     class Meta:
@@ -95,6 +146,15 @@ class Zone(models.Model):
 
     def spots(self):
         return ParkingSpot.objects.filter(zone=self.id)
+
+    def n_spots(self):
+        return self.spots().count()
+
+    def available_spots(self):
+        return ParkingSpot.objects.filter(zone=self.id, state='AV')
+
+    def n_available_spots(self):
+        return self.spots().count()
 
     def get_absolute_url(self):
         return "/parks/%i/zones/%i/" % (self.park.id, self.id)

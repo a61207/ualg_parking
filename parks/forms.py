@@ -1,7 +1,6 @@
-import django_filters
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import Park, Zone, ParkingSpot
+from .models import Park, Zone, ParkingSpot, PriceType, ContractType
 import re
 
 
@@ -100,12 +99,6 @@ class ParkForm(forms.ModelForm):
         return cleaned_data
 
 
-class ParkFilter(django_filters.FilterSet):
-    class Meta:
-        model = Park
-        fields = ['name', 'address', 'postal_code', 'typology']
-
-
 class ZoneForm(forms.ModelForm):
     class Meta:
         model = Zone
@@ -121,3 +114,27 @@ class SpotForm(forms.ModelForm):
     class Meta:
         model = ParkingSpot
         fields = ('number', 'x', 'y', 'direction')
+
+
+class PriceTypeForm(forms.ModelForm):
+    minutes = forms.IntegerField(required=True, initial=0, min_value=0, max_value=59,
+                                 widget=forms.NumberInput(attrs={'value': 0}))
+    hours = forms.IntegerField(required=True, initial=0, min_value=0, widget=forms.NumberInput(attrs={'value': 0}))
+    total = forms.DecimalField(required=True, initial=0, min_value=0, decimal_places=2, max_digits=14,
+                               widget=forms.NumberInput(attrs={'value': 0}))
+
+    class Meta:
+        model = PriceType
+        fields = ('total', 'minutes', 'hours')
+
+
+class ContractTypeForm(forms.ModelForm):
+    months = forms.IntegerField(required=True, initial=0, min_value=0, max_value=11,
+                                widget=forms.NumberInput(attrs={'value': 0}))
+    years = forms.IntegerField(required=True, initial=0, min_value=0, widget=forms.NumberInput(attrs={'value': 0}))
+    total = forms.DecimalField(required=True, initial=0, min_value=0, decimal_places=2, max_digits=14,
+                               widget=forms.NumberInput(attrs={'value': 0}))
+
+    class Meta:
+        model = ContractType
+        fields = ('name', 'years', 'months', 'total')

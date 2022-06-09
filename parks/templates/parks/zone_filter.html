@@ -4,27 +4,18 @@
 {% load crispy_forms_filters %}
 
 {% block title %}
-    Parks
+    {{ park.name }} Zones
 {% endblock %}
 
 {% block main %}
 
     <div class="container">
-        <h1 class="mt-5">Parks</h1>
+        <h1 class="mt-5">Park {{ park.name }} Zones</h1>
         {% if filter %}
             <form method="get" class="form form-inline">
                 <div class="row">
                     <div class="col-auto">
                         {{ filter.form.name | as_crispy_field }}
-                    </div>
-                    <div class="col-auto">
-                        {{ filter.form.address | as_crispy_field }}
-                    </div>
-                    <div class="col-auto">
-                        {{ filter.form.postal_code | as_crispy_field }}
-                    </div>
-                    <div class="col-auto">
-                        {{ filter.form.typology | as_crispy_field }}
                     </div>
                     <div class="col-auto">
                         <button type="submit" class="btn btn-success mt-4">Filter</button>
@@ -33,8 +24,9 @@
             </form>
         {% endif %}
         {% render_table table %}
+        <a type="button" href="{% url 'park_detail' park.id %}" class="btn btn-success mt-2">Back</a>
         {% if request.user|is_admin %}
-            <a type="button" href="{% url 'add_park' %}" class="btn btn-success mt-2">Add Park</a>
+            <a type="button" href="{% url 'add_zone' park.id %}" class="btn btn-success mt-2">Add Zone</a>
         {% endif %}
     </div>
 

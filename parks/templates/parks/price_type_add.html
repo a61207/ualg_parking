@@ -1,19 +1,18 @@
 {% extends 'base.html' %}
-{% load crispy_forms_filters %}
 
 {% block title %}
-    Delete Park
+    Add Price Type
 {% endblock %}
 
 {% block main %}
 
     <div class="container">
-        <h1 class="mt-5">Delete Park</h1>
+        <h1 class="mt-5">Add Price Type</h1>
         <form method="post">
             {% csrf_token %}
-            <p>Are you sure you want to delete park "{{ object.name }}"?</p>
+            {% include 'parks/price_type_form.html' %}
             <a type="button" href="{% url 'park_detail' object.id %}" class="btn btn-success mt-2">Back</a>
-            <button type="submit" class="btn btn-success mt-2">Delete Park</button>
+            <button type="submit" class="btn btn-success mt-2">Add Price</button>
         </form>
     </div>
 

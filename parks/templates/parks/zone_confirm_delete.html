@@ -12,8 +12,9 @@
         <form method="post">
             {% csrf_token %}
             <p>Are you sure you want to delete zone "{{ object.name }}"?</p>
+            <a type="button" href="{% url 'zone_detail' object.park.id object.id %}" class="btn btn-success mt-2">Back</a>
             <button type="submit" class="btn btn-success mt-2">Delete Zone</button>
         </form>
-    </div>a
+    </div>
 
 {% endblock main %}

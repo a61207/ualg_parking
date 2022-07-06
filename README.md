@@ -20,7 +20,7 @@ foi utilizada a framework Django.
 ```source venv/bin/activate```
 ```. venv/Scripts/activate```
 
-4. Enable Settings File by Renaming from "__settings.py" to "settings.py":
+4. Enable Settings File by Decompressing "settings.zip":
 
 5. Instalar Requirements:
 

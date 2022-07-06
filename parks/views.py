@@ -87,6 +87,7 @@ class AddWeekDaySchedule(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
             else:
                 errors = deadlineform.errors.setdefault("__all__", ErrorList())
                 errors.append("Must choose on of the week days option.")
+        print(deadlineform.errors, formset.errors)
         return render(request, "schedule/weekschedule_add.html", {"deadline": deadlineform, "formset": formset,
                                                                   "park_id": kwargs['pk']})
 

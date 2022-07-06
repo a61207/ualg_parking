@@ -97,6 +97,14 @@ class TimePeriodForm(forms.ModelForm):
         model = TimePeriod
         fields = ('start', 'end')
 
+    def clean(self):
+        cleaned_data = super(TimePeriodForm, self).clean()
+        time1 = self.cleaned_data['start']
+        time2 = self.cleaned_data['end']
+        if time1 >= time2:
+            raise ValidationError("Invalid Schedule")
+        return cleaned_data
+
 
 class DatePeriodForm(forms.ModelForm):
     date1 = timezone.now()

@@ -12,10 +12,9 @@
         <form method="post">
             {% csrf_token %}
             {% include 'schedule/weekschedule_form.html' %}
+            <a type="button" href="{% url 'list_schedules' park_id %}" class="btn btn-success mt-2">Back</a>
+            <button type="submit" class="btn btn-success mt-2">Add Schedule</button>
         </form>
-        <a type="button" href="{% url 'list_schedules' park_id %}" class="btn btn-success mt-2">Back</a>
-        <a onclick="enableTimes()" class="btn btn-success mt-2">Submit Schedule</a>
-        <button type="submit" id="sub" class="btn btn-success mt-2" hidden>Submit Schedule</button>
     </div>
 
 {% endblock main %}

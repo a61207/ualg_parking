@@ -1,0 +1,17 @@
+{% extends 'main/account_settings.html' %}
+{% load group_tags %}
+{% load django_tables2 %}
+{% load crispy_forms_filters %}
+
+{% block account_section %}
+
+    <div class="container">
+        <form method="post">
+            {% csrf_token %}
+            <p>Are you sure you want to delete car "{{ car.registration }}"?</p>
+            <a type="button" href="{% url 'cars' request.user.id %}" class="btn btn-success mt-2">Back</a>
+            <button type="submit" class="btn btn-success mt-2">Delete Park</button>
+        </form>
+    </div>
+
+{% endblock account_section %}

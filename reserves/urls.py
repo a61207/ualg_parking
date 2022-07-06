@@ -19,7 +19,7 @@ from . import views
 urlpatterns = [
 
     # CRUD Reservas
-    path('reserves/add/', views.criar_reserva, name='criarReserva'),
+    path('reserves/add/<int:id>/', views.criar_reserva, name='criarReserva'),
     path('reserves/', views.listar_reservas, name='listarReservas'),
     path('reserves/<int:id>', views.visualizar_reserva, name='visualizarReserva'),
     path('reserves/delete/<int:id>', views.apagar_reserva, name='apagarReserva'),
@@ -35,4 +35,12 @@ urlpatterns = [
          name='consultar_fatura_especifica'),
     path('comprovativopagamento/<int:id>', views.comprovativo_pagamento,
          name='comprovativo_pagamento'),
+    path('fazerreclamacao/<int:id>', views.fazer_reclamacao,
+         name='fazer_reclamacao_especifica'),
+    path('modalidadepagamento/<int:id>', views.modalidade_pagamento,
+         name='modalidade_pagamento'),
+    path('recibo/<int:contrato_id>', views.emitir_recibo,
+         name='emitir_recibo'),
+    path('cancelarfatura/<int:id>', views.cancelar_fatura,
+         name='cancelar_fatura'),
 ]

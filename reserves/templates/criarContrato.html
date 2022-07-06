@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% block title %}
+    Criar Contrato
+{% endblock %}
+
+{% block main %}
+
+
+    <div class="container my-4">
+        <div class="row rounded bg-light pt-3">
+            <div class="col">
+                <div class="jumbotron border p-3 mb-3">
+                    <h1 class="text-center">Criar Contrato</h1>
+                    <hr>
+                    <form action="{% url 'criarContrato' %}" method="post">
+                        {% csrf_token %}
+
+
+                        <!-- Parque Input -->
+                        <div class="form-group col">
+                            <label for="parqueid">Park</label>
+                            <select id="parqueid" name="parqueid" class="form-control">
+                                {% for parque in parques %}
+                                    <option {% if parque_old == parque.id %} selected {% endif %}
+                                                                             value="{{ parque.id }}">{{ parque.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Zone Input -->
+                        <div class="form-group">
+                            <label for="zonaid">Zone</label>
+                            <select id="zonaid" name="zonaid" class="form-control selectpicker">
+                                {% for parque in parques %}
+                                    {% if parque.zones %}
+                                        <optgroup label="{{ parque.name }}">
+                                            {% for zone in parque.zones %}
+                                                <option {% if zona_old == zone.id %} selected {% endif %}
+                                                                                     value="{{ zone.id }}">
+                                                    Zone {{ zone.name }}</option>
+                                            {% endfor %}
+                                        </optgroup>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Lugar
+                             Input -->
+                        <div class="form-group">
+                            <label for="lugarid">Lugar</label>
+                            <select id="lugarid" name="lugarid" class="form-control selectpicker">
+                                {% for parque in parques %}
+                                    {% if parque.zones %}
+                                        {% for zone in parque.zones %}
+                                            <optgroup label="{{ zone.name }}">
+                                                {% for lugar in zone.spots %}
+                                                    <option {% if lugar_old == lugar.id %} selected {% endif %}
+                                                                                           value="{{ lugar.id }}">
+                                                        Lugar {{ lugar.number }}</option>
+                                                {% endfor %}
+                                            </optgroup>
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Matricula Input -->
+                        <div class="form-group col">
+                            <label for="nome">Matricula</label>
+                            <input type="text" class="form-control {% if erros %}is-invalid{% endif %}"
+                                   id="matricula" name="matricula" placeholder="Enter matricula"
+                                   {% if matricula %}value="{{ matricula }}"{% endif %}>
+                            <div class="invalid-feedback">
+                                {{ erros }}
+                            </div>
+                        </div>
+
+                        <!-- Data inicio Input -->
+                        <div class="form-group col">
+                            <label for="date">Data Inicio</label>
+                            <input type="text" class="form-control {% if erros %}is-invalid{% endif %}"
+                                   id="datainicio" name="datainicio" placeholder="(YYYY/MM/DD)"
+                                   {% if datainicio %}value="{{ datainicio }}"{% endif %}>
+                            <div class="invalid-feedback">
+                                {{ erros }}
+                            </div>
+                        </div>
+
+                        <!-- Data fim Input -->
+                        <div class="form-group col">
+                            <label for="date">Data Inicio</label>
+                            <input type="text" class="form-control {% if erros %}is-invalid{% endif %}"
+                                   id="datafim" name="datafim" placeholder="(YYYY/MM/DD)"
+                                   {% if datafim %}value="{{ datafim }}"{% endif %}>
+                            <div class="invalid-feedback">
+                                {{ erros }}
+                            </div>
+                        </div>
+
+
+                        <!-- Estado Input -->
+                        <div class="form-group col">
+                            <label for="estadoreservaid">State</label>
+                            <select id="estadoreservaid" name="estadoreservaid" class="form-control">
+                                {% for estado in estados %}
+                                    <option {% if estado_old == estado.id %} selected {% endif %}
+                                                                             value="{{ estado.id }}">{{ estado.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Botão Submit -->
+                        <div class="d-flex justify-content-center">
+                            <button type="submit" class="btn btn-secondary">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

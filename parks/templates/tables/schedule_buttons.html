@@ -1,0 +1,7 @@
+{% load group_tags %}
+{% if not record.arquived and not record.park|get_park_not_free:record.deadline %}
+    <div class="row g-1">
+        <a class="btn btn-info btn-sm col mx-1" href="{% url "update_schedule" record.park.id record.id %}">Update</a>
+        <a class="btn btn-info btn-sm col mx-1" href="{% url "arquive_schedule" record.park.id record.id %}">Arquive</a>
+    </div>
+{% endif %}

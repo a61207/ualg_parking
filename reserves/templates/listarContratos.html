@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}
+    Contratos
+{% endblock %}
+
+{% block main %}
+    <div class="container my-4">
+        <div class="row rounded bg-light pt-3">
+            <div class="col">
+                <div class="jumbotron border p-3 mb-3">
+                    <h1 class="text-center">Contratos</h1>
+                    <hr>
+                    {% if not contratos %}
+                        <h4 class="text-center">Não existem contratos criados</h4>
+                    {% else %}
+
+                        <!-- Tabela de Reservas -->
+                        <table class="table table-light table-hover">
+                            <thead>
+                            <tr>
+                                <th scope="col">User</th>
+                                <th scope="col">Matricula</th>
+                                <th scope="col">Parque</th>
+                                <th scope="col">Lugar</th>
+                                <th scope="col">Data Inicio</th>
+                                <th scope="col">Data Fim</th>
+                                <th scope="col">Updated</th>
+                                <th scope="col"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            {% for contrato in contratos %}
+
+                                <tr>
+                                    <th scope="row">{{ contrato.userid.username }}
+                                    </th>
+                                    <td>{{ contrato.matricula }}</td>
+                                    <td>{{ contrato.lugarid.zone.park.name }}</td>
+                                    <td>{{ contrato.lugarid.number }}</td>
+                                    <td>{{ contrato.datainicio }}</td>
+                                    <td>{{ contrato.datafim }}</td>
+                                    <td>{{ contrato.editadoem }}</td>
+                                    <td>{{ contrato.editadoem }}</td>
+                                    <td>
+                                        <a class="btn btn-info btn-sm" href="{% url 'visualizarContrato' contrato.id %}">View</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+
+                            </tbody>
+                        </table>
+                    {% endif %}
+
+                    <hr>
+
+                    <!-- Botão de Criar -->
+                    <div class="d-flex justify-content-center">
+                        <a class="btn btn-secondary" href="{% url 'criarContrato' %}">Criar contrato</a>
+                    </div>
+
+                    <hr>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

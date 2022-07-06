@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load group_tags %}
+{% load django_tables2 %}
+{% load crispy_forms_filters %}
+
+{% block title %}
+    Account Settings
+{% endblock %}
+
+{% block main %}
+
+    <div class="container">
+        <h1 class="mt-5">Account Settings</h1>
+        <div class="row mb-4">
+            <div class="col-4">
+                <a type="button" class="btn btn-success mt-2" href="{% url 'account' request.user.id %}">Account
+                    Information</a>
+                {% if not request.user|is_staff %}
+                    <a type="button" class="btn btn-success mt-2" href="{% url 'cars' request.user.id %}">Associated
+                        Cars</a>
+                {% elif request.user|is_admin %}
+                    <a type="button" class="btn btn-success mt-2" href="{% url 'employees' request.user.id %}">Employee</a>
+                    <a type="button" class="btn btn-success mt-2" href="{% url 'roles' request.user.id %}">Role
+                        Requests</a>
+                {% endif %}
+            </div>
+            <div class="col-8">
+                <div class="position-sticky" style="top: 2rem; height: 60vh">
+                    {% block account_section %}
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock main %}

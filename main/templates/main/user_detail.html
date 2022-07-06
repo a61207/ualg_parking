@@ -1,0 +1,23 @@
+{% extends 'main/account_settings.html' %}
+{% load group_tags %}
+{% load crispy_forms_filters %}
+
+{% block account_section %}
+
+    <p>First Name: {{ object.first_name }}</p>
+    <p>Last Name: {{ object.last_name }}</p>
+    <p>Email Name: {{ object.email }}</p>
+    <p>Role:
+        {% if user|is_admin %}
+            Admin
+        {% elif user|is_employee %}
+            Employee
+        {% else %}
+            Client
+        {% endif %}
+    </p>
+    <p>Last Login: {{ object.last_login }}</p>
+    <p>Joined: {{ object.date_joined }}</p>
+
+
+{% endblock account_section %}

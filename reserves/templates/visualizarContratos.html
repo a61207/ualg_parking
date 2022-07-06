@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}
+    Contratos
+{% endblock %}
+
+{% block main %}
+
+
+    <div class="container my-4">
+        <div class="row rounded bg-light pt-3">
+            <div class="col">
+                <div class="jumbotron border p-3 mb-3">
+                    <h1 class="text-center">Contract</h1>
+                    <hr>
+                    <div class="p-3 mb-2 bg-light text-dark">
+                        <div class="row">
+                            <div class="col">
+                                <p><b>User: </b>{{ contrato.userid.username }}</p>
+                            </div>
+                            <div class="col">
+                                <p><b>Matricula: </b>{{ contrato.matricula }}</p>
+                            </div>
+                            <div class="col">
+                                <p><b>Parque: </b>{{ contrato.lugarid.zone.park.name }}</p>
+                            </div>
+                            <div class="col">
+                                <p><b>Lugar: </b>{{ contrato.lugarid.number }}</p>
+                            </div>
+                            <div class="col">
+                                <p><b>Data de inicio: </b>{{ contrato.datainicio }}</p>
+                            </div>
+                            <div class="col">
+                                <p><b>Data de fim: </b>{{ contrato.datafim }}</p>
+                            </div>
+                            <div class="col">
+                                <p><b>Updated: </b>{{ contrato.editadoem }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+
+                        <!-- Botão de Apagar -->
+                        <div class="col">
+                            <div class="d-flex justify-content-center">
+                                <a class="btn btn-secondary" href="{% url 'cancelarContrato' contrato.id %}">Cancelar
+                                    Contrato</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

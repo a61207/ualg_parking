@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Add Price Type
+{% endblock %}
+
+{% block main %}
+
+    <div class="container">
+        <h1 class="mt-5">Add Price Type</h1>
+        <form method="post">
+            {% csrf_token %}
+            {% include 'price/price_type_form.html' %}
+            <a type="button" href="{% url 'list_parks' %}" class="btn btn-success mt-2">Back</a>
+            <button type="submit" class="btn btn-success mt-2">Add Price</button>
+        </form>
+    </div>
+
+{% endblock main %}

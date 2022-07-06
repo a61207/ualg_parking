@@ -10,5 +10,7 @@
         <a class="btn btn-info btn-sm" href="{% url 'add_zone' record.id %}">Add Zone</a>
     {% endif %}
     <a class="btn btn-info btn-sm" href="{% url 'update_park' record.id %}">Edit Park</a>
-    <a class="btn btn-info btn-sm" href="{% url 'delete_park' record.id %}">Delete Park</a>
+    {% if not record|get_park_all_not_free %}
+        <a class="btn btn-info btn-sm" href="{% url 'delete_park' record.id %}">Delete Park</a>
+    {% endif %}
 {% endif %}

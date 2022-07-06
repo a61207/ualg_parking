@@ -1,0 +1,4 @@
+{% load group_tags %}
+
+<a class="btn btn-info btn-sm" href="{% url 'update_car' request.user.id record.id %}">Edit Car</a>
+<a class="btn btn-info btn-sm" href="{% url 'delete_car' request.user.id record.id %}">Delete Car</a>

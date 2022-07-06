@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}
+    Create Reserva
+{% endblock %}
+
+{% block main %}
+
+    <div class="container my-4">
+        <div class="row rounded bg-light pt-3">
+            <div class="col">
+                <div class="jumbotron border p-3 mb-3">
+                    <h1 class="text-center">Criar Reserva</h1>
+                    <hr>
+                    <form action="{% url 'criarReserva' id %}" method="post">
+                        {% csrf_token %}
+
+                        <!-- Matricula Input -->
+                        <div class="form-group col">
+                            <label for="nome">Matricula</label>
+                            <input type="text" class="form-control {% if erros %}is-invalid{% endif %}"
+                                   id="matricula" name="matricula" placeholder="Enter matricula"
+                                   {% if matricula %}value="{{ matricula }}"{% endif %}>
+                            <div class="invalid-feedback">
+                                {{ erros }}
+                            </div>
+                        </div>
+
+                        <!-- Data inicio Input -->
+                        <div class="form-group col">
+                            <label for="date">Data Inicio</label>
+                            <input type="date" class="form-control {% if erros %}is-invalid{% endif %}"
+                                   id="datastart" name="datastart" placeholder="Enter date"
+                                   {% if datainicio %}value="{{ datastart }}"{% endif %}>
+                            <div class="invalid-feedback">
+                                {{ erros }}
+                            </div>
+                        </div>
+
+                        <!-- Data fim Input -->
+                        <div class="form-group col">
+                            <label for="date">Data Fim</label>
+                            <input type="date" class="form-control {% if erros %}is-invalid{% endif %}"
+                                   id="dataend" name="dataend" placeholder="Enter date"
+                                   {% if datafim %}value="{{ dataend }}"{% endif %}>
+                            <div class="invalid-feedback">
+                                {{ erros }}
+                            </div>
+                        </div>
+
+                        <!-- Botão Submit -->
+                        <div class="d-flex justify-content-center">
+                            <button type="submit" class="btn btn-secondary">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

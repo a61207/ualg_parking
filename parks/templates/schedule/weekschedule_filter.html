@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load group_tags %}
+{% load django_tables2 %}
+{% load crispy_forms_filters %}
+
+{% block title %}
+    Parks
+{% endblock %}
+
+{% block main %}
+
+    <div class="container">
+        <h1 class="mt-5">Park {{ park.name }} Schedules</h1>
+        {% if filter %}
+            <form method="get" class="form form-inline">
+                <div class="row">
+                    <div class="col-auto">
+                        {{ filter.form.deadline__start_date | as_crispy_field }}
+                    </div>
+                    <div class="col-auto">
+                        {{ filter.form.deadline__end_date | as_crispy_field }}
+                    </div>
+                    <div class="col-auto">
+                        {{ filter.form.arquived | as_crispy_field }}
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-success mt-4">Filter</button>
+                    </div>
+                </div>
+            </form>
+        {% endif %}
+        {% render_table table %}
+        <a type="button" href="{% url 'park_detail' park.id %}" class="btn btn-success mt-2">Back</a>
+        <a type="button" href="{% url 'add_schedule' park.id %}" class="btn btn-success mt-2">Add Schedule</a>
+    </div>
+
+{% endblock main %}

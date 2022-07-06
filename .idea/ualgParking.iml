@@ -15,9 +15,12 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/venv" />
+      <excludeFolder url="file://$MODULE_DIR$/.idea/dataSources" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="timepicker" level="application" />
+    <orderEntry type="library" name="Chart.js" level="application" />
   </component>
   <component name="TemplatesService">
     <option name="TEMPLATE_CONFIGURATION" value="Django" />
@@ -26,6 +29,7 @@
         <option value="$MODULE_DIR$/main/templates" />
         <option value="$MODULE_DIR$/parks/templates" />
         <option value="$MODULE_DIR$/reserves/templates" />
+        <option value="$MODULE_DIR$/stats/templates" />
       </list>
     </option>
   </component>

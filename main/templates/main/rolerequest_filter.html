@@ -1,0 +1,18 @@
+{% extends 'main/account_settings.html' %}
+{% load group_tags %}
+{% load django_tables2 %}
+{% load crispy_forms_filters %}
+
+{% block account_section %}
+
+    {% if filter %}
+        <form method="get" class="form form-inline">
+            <div class="row">
+                <div class="col-auto">
+                </div>
+            </div>
+        </form>
+    {% endif %}
+    {% render_table table %}
+
+{% endblock account_section %}

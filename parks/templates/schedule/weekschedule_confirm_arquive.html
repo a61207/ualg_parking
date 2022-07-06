@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load crispy_forms_filters %}
+
+{% block title %}
+    Arquive Schedule
+{% endblock %}
+
+{% block main %}
+
+    <div class="container">
+        <h1 class="mt-5">Arquive Schedule</h1>
+        <form method="post">
+            {% csrf_token %}
+            <p>Are you sure you want to arquive schedule?</p>
+            <a type="button" href="{% url 'list_schedules' schedule_id %}" class="btn btn-success mt-2">Back</a>
+            <button type="submit" class="btn btn-success mt-2" name="arquive">Arquive</button>
+        </form>
+    </div>
+
+{% endblock main %}

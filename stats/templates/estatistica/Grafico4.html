@@ -1,0 +1,611 @@
+{% load static %}
+    
+    
+    
+  {% load static %}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
+    <title>{% block title %}{% endblock %}</title>
+    {% block head %}
+    {% endblock %}
+</head>
+<body>
+
+{% include 'navbar.html' %}
+     
+    <div class="container-fluid">
+            <div class="row rounded bg-light pt-3">
+                <div class="col">
+                    <div class="jumbotron border p-3 mb-3">
+                        <br> 
+                            <h1 class="text-center">Clientes visitantes com reserva ou com contrato por período</h1>
+                            <h5 class="text-center">Visualização do número de clientes por intervalo de tempo selecionado de um parque em especifico</h5>
+                            <hr>
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="row rounded bg-light pt-3">
+                <div class="col-sm-4">
+                    <div class="jumbotron border p-3 mb-3">
+                        <br> 
+                            <h1 class="text-center">Filtros</h1>
+                            <br> 
+                            <center> 
+                            <h4 style="color:red;"> {{mensagem2}}</h4>
+                            <h4 style="color:red;"> {{mensagem}}</h4>
+                            </center><br> 
+                            
+                            <h5 class="text-center">Selecione o parque e o intervalo de tempo que pretende visualizar</h5>
+                            <br> 
+                            <center>
+                            
+                            <form action="" method='POST'>
+                                {% csrf_token %}
+                                
+
+                                <table style="width:85%">
+                                <tr>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+
+                                <tr>
+                                    <td><label for="parque_id">Selecione o parque:</label></td>
+                                    <td><select name="parque_id" id="parque_id" style="height: 35px; width: 100%;">
+                                {% for parque in parques %}
+                            
+                                    {% if parque_id == parque.id %}
+                                        <option selected="true" value="{{parque.id}}">{{parque.nome}}</option>
+                                    {% else %}
+                                        <option value="{{parque.id}}">{{parque.nome}}</option>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                </select></td>
+                                </tr>
+
+                                <tr>
+                                    <td><label for="start">Data início:</label></td>
+                                    <td><input type="date" id="start" style="width: 100%;" name="start" value="{{start}}"></td>
+                                </tr>
+                                <tr>
+                                    <td><label for="end">Data fim:</label></td>
+                                    <td><input type="date" id="end" name="end" style="width: 100%;" value="{{end}}"></td>
+                                </tr>
+                                <tr>
+                                    <td><label for="starth">Tempo início:</label></td>
+                                    <td><input type="time" id="starth" name="starth" style="width: 100%;" value="{{starth}}" min="{{min}}" max="{{max}}"></td>
+                                </tr>
+                                <tr>
+                                    <td><label for="endh">Tempo fim:</label></td>
+                                    <td><input type="time" id="endh" name="endh" style="width: 100%;" value="{{endh}}" min="{{min}}" max="{{max}}"></td>
+                                </tr>
+                                </table>
+                                <br>
+                                <input type="submit" value="Visualizar">
+                            </form>
+                            <br> 
+                            <hr>
+                            <h5 class="text-center">
+                                            <a href="menu">
+                                            Voltar para o menu</a>
+                                            </h5>
+                        
+                    </div>
+                </div>
+                <div class="col-sm-8">
+                    <div class="jumbotron border p-3 mb-3">
+                    <h5 class="text-center"></h5>
+                    
+                            <canvas id="mixedChart" width="400" height="220px"></canvas>
+                            <script>
+                            
+                            const ctx = document.getElementById('mixedChart');
+                            const mixedChart = new Chart(ctx, {
+                                type: 'bar', //tipo de grafico
+                                data: {
+                                
+                                    datasets: [
+                                    {
+                                    label: 'Número de clientes que compareceram',
+                                    data: {{data}},
+                                    backgroundColor: [
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        'rgba(0, 255, 0, 0.2)',
+                                                        
+                                                        
+                                                        ], 
+                                            borderColor: [
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        'rgba(0, 255, 0, 1)',
+                                                        
+                                                        ],
+                                                        borderWidth: 1,
+                                    }, 
+                                    {
+                                    label: 'Número de clientes que não compareceram',
+                                    data: {{data2}},
+                                    backgroundColor: [
+                                                       'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        'rgba(255, 0, 0, 0.2)',
+                                                        
+                                                        
+                                                       ], 
+                                            borderColor: [
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        'rgba(255, 0, 0, 1)',
+                                                        
+                                                        
+                                                        ],
+                                            
+                                    borderWidth: 1,
+                                    // Changes this dataset to become a line
+                                    
+                                    type: 'bar'
+                                    },
+                                    {
+                                    label: 'Número de clientes que chegaram tarde',
+                                    data: {{data}},
+                                    backgroundColor: [
+                                                       'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        
+                                                        
+                                                       ], 
+                                            borderColor: [
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        
+                                                        
+                                                        ],
+                                            
+                                    borderWidth: 1,
+                                    // Changes this dataset to become a line
+                                    
+                                    type: 'bar'
+                                    },
+                                    {
+                                    label: 'Número de clientes que sairam do lugar depois do tempo',
+                                    data: {{data2}},
+                                    backgroundColor: [
+                                                       'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        'rgba(255, 124, 0, 0.2)',
+                                                        
+                                                        
+                                                       ], 
+                                            borderColor: [
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        'rgba(255, 124, 0, 1)',
+                                                        
+                                                        
+                                                        ],
+                                            
+                                    borderWidth: 1,
+                                    // Changes this dataset to become a line
+                                    
+                                    type: 'bar'
+                                    }
+                                    ],
+                                labels: {{label | safe}}
+
+                                },
+                                options: {
+                                    legend: {
+                                        display: false
+                                    },
+                                    scales: {
+                                        yAxes: [{
+                                            ticks: {
+                                                beginAtZero: true
+                                            }
+                                        }]
+                                    }
+                                }
+                            });
+                            </script>
+                        
+                    </div>
+                </div>
+            </div>
+    </div>
+
+
+
+
+
+
+                    </div>
+                </div>
+            </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
+</body>
+</html>

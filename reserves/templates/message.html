@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+    {% block title %}
+       {{ title }}
+    {% endblock %}
+
+    {% block head %}
+        <meta http-equiv="refresh" content="3; url={{ url }}" />
+    {% endblock %}
+
+    {% block content %}
+        <div class="container my-4">
+            <div class="alert alert-{{ type }}" role="alert">
+                    <h4 class="alert-heading text-center">{{ message }}</h4>
+            </div>
+        </div>
+    {% endblock %}

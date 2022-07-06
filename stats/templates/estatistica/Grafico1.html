@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+{% load group_tags %}
+{% load crispy_forms_filters %}
+{% load static %}
+
+{% block main %}
+
+    <div class="container-fluid">
+            <div class="row rounded bg-light pt-3">
+                <div class="col">
+                    <div class="jumbotron border p-3 mb-3">
+                        <br>
+                            <h1 class="text-center">Horários de Ponta</h1>
+                            <h5 class="text-center">Visualização de horários de ponta em base da utilização do parque selecionado</h5>
+                            <hr>
+
+                    </div>
+                </div>
+            </div>
+            <div class="row rounded bg-light pt-3">
+                <div class="col-sm-4">
+                    <div class="jumbotron border p-3 mb-3">
+                        <br>
+                            <h1 class="text-center">Filtros</h1>
+                            <br>
+                            <center>
+                            <h4 style="color:red;"> {{mensagem2}}</h4>
+                            <h4 style="color:red;"> {{mensagem}}</h4>
+                            <h5 class="text-center">Selecione o parque e o intervalo de tempo que pretende visualizar</h5>
+                            </center>
+                            <br>
+
+                            <form action="" method='POST'>
+                                {% csrf_token %}
+
+
+                                <table style="width:85%">
+                                <tr>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+
+                                <tr>
+                                    <td><label for="parque_id">Selecione o parque:</label></td>
+                                    <td><select name="parque_id" id="parque_id" style="height: 35px; width: 100%;">
+                                {% for parque in parques %}
+
+                                    {% if parque_id == parque.id %}
+                                        <option selected="true" value="{{parque.id}}">{{parque.name}}</option>
+                                    {% else %}
+                                        <option value="{{parque.id}}">{{parque.name}}</option>
+                                    {% endif %}
+                                {% endfor %}
+
+                                </select></td>
+                                </tr>
+
+                                <tr>
+                                    <td><label for="start">Data início:</label></td>
+                                    <td><input type="date" id="start" style="width: 100%;" name="start" value="{{start}}"></td>
+                                </tr>
+                                <tr>
+                                    <td><label for="end">Data fim:</label></td>
+                                    <td><input type="date" id="end" name="end" style="width: 100%;" value="{{end}}"></td>
+                                </tr>
+                                <tr>
+                                    <td><label for="starth">Tempo início:</label></td>
+                                    <td><input type="time" id="starth" name="starth" style="width: 100%;" value="{{starth}}" min="{{min}}" max="{{max}}"></td>
+                                </tr>
+                                <tr>
+                                    <td><label for="endh">Tempo fim:</label></td>
+                                    <td><input type="time" id="endh" name="endh" style="width: 100%;" value="{{endh}}" min="{{min}}" max="{{max}}"></td>
+                                </tr>
+                                </table>
+                                <br>
+                                <input type="submit" value="Visualizar">
+                            </form>
+                            <br>
+                            <hr>
+                            <h5 class="text-center">
+                                            <a href="menu">
+                                            Voltar para o menu</a>
+                                            </h5>
+
+                    </div>
+                </div>
+                <div class="col-sm-8">
+                    <div class="jumbotron border p-3 mb-3">
+                    <h5 class="text-center">Melhor altura para reservar: {{info}}</h5>
+
+                            <canvas id="myChart" width="400" height="220px"></canvas>
+                            <script>
+
+                            const ctx = document.getElementById('myChart');
+                            const myChart = new Chart(ctx, {
+                                type: '{{type}}', //tipo de grafico
+                                data: {
+
+                                    labels: {{label | safe}}, //meter label como intervalo de tempo
+                                    datasets: [{
+                                        label: 'Número de Reservas',
+                                        data: {{data}}, //valores
+                                        backgroundColor: [
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        'rgba(0, 0, 255, 0.2)',
+                                                        ],
+                                            borderColor: [
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        'rgba(0, 0, 255, 1)',
+                                                        ],
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    legend: {
+                                        display: false
+                                    },
+                                    scales: {
+                                        yAxes: [{
+                                            ticks: {
+                                                beginAtZero: true
+                                            }
+                                        }]
+                                    }
+                                }
+                            });
+                            </script>
+
+                    </div>
+                </div>
+            </div>
+    </div>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
+
+{% endblock main %}

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load crispy_forms_filters %}
+
+{% block title %}
+    Update Park Schedule
+{% endblock %}
+
+{% block main %}
+
+    <div class="container">
+        <h1 class="mt-5">Update Schedule</h1>
+        <form method="post">
+            {% csrf_token %}
+            {% include 'schedule/weekschedule_form.html' %}
+        </form>
+        <a type="button" href="{% url 'list_schedules' park_id %}" class="btn btn-success mt-2">Back</a>
+    </div>
+
+{% endblock main %}

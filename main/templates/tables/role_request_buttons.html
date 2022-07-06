@@ -1,0 +1,16 @@
+{% load group_tags %}
+
+{% if not record.is_erased and not record.is_reviewed %}
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" id="request" name="request" value="{{ record.id }}">
+        <button type="submit" name="response" value="accept" class="btn btn-success mt-2">Accept</button>
+        <button type="submit" name="response" value="deny" class="btn btn-success mt-2">Deny</button>
+    </form>
+{% else %}
+    {% if record.is_accepted %}
+        Request Accepted
+    {% else %}
+        Request Denied
+    {% endif %}
+{% endif %}

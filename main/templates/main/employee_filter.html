@@ -1,0 +1,24 @@
+{% extends 'main/account_settings.html' %}
+{% load group_tags %}
+{% load django_tables2 %}
+{% load crispy_forms_filters %}
+
+{% block account_section %}
+
+    <div class="container">
+        {% if filter %}
+            <form method="get" class="form form-inline">
+                <div class="row">
+                    <div class="col-auto">
+                        {{ filter.form.user__first_name | as_crispy_field }}
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-success mt-4">Filter</button>
+                    </div>
+                </div>
+            </form>
+        {% endif %}
+        {% render_table table %}
+    </div>
+
+{% endblock account_section %}

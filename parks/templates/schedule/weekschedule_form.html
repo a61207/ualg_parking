@@ -1,0 +1,478 @@
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+
+
+<div id='form-errors'>{{ deadline.non_field_errors }}</div>
+
+<div class="row justify-content-start">
+    <div class="col-auto">
+        {{ deadline.start_date | as_crispy_field }}
+    </div>
+    <div class="col-auto">
+        {{ deadline.end_date | as_crispy_field }}
+    </div>
+</div>
+
+
+<div class="row justify-content-start">
+
+    <div class="col-auto">
+        <div class="mt-2 form-check">
+            <label class="form-check-label" for="allweek">All Week</label>
+            <input class="form-check-input" type="checkbox" id="allweek">
+        </div>
+        <div class="input-group" id="allweekperiod">
+            <input type="time" aria-label="allweek" id="allweekstart" class="form-control" disabled>
+            <span class="input-group-text">to</span>
+            <input type="time" aria-label="allweek" id="allweekend" class="form-control" disabled>
+        </div>
+    </div>
+
+    <div class="col-auto">
+        <div class="mt-2 form-check">
+            <label class="form-check-label" for="weekdays">Week Days</label>
+            <input class="form-check-input" type="checkbox" id="weekdays">
+        </div>
+        <div class="input-group" id="weekdaysperiod">
+            <input type="time" aria-label="allweek" id="weekdaysstart" class="form-control" disabled>
+            <span class="input-group-text">to</span>
+            <input type="time" aria-label="allweek" id="weekdaysend" class="form-control" disabled>
+        </div>
+    </div>
+
+    <div class="col-auto">
+        <div class="mt-2 form-check">
+            <label class="form-check-label" for="weekend">Weekend</label>
+            <input class="form-check-input" type="checkbox" id="weekend">
+        </div>
+        <div class="input-group" id="weekendperiod">
+            <input type="time" aria-label="allweek" id="weekendstart" class="form-control" disabled>
+            <span class="input-group-text">to</span>
+            <input type="time" aria-label="allweek" id="weekendend" class="form-control" disabled>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-start">
+    <div class="col-auto">
+        <div class="mt-2 col form-check">
+            <label class="form-check-label" for="id_form-3-check">Monday</label>
+            {{ formset.0.check }}
+        </div>
+        <div class="input-group" id="mondayperiod">
+            {{ formset.0.start }}
+            <span class="input-group-text">to</span>
+            {{ formset.0.end }}
+        </div>
+        <div hidden>
+            {{ formset.0.id }}
+        </div>
+    </div>
+
+    <div class="col-auto">
+        <div class="mt-2 col form-check">
+            <label class="form-check-label" for="id_form-4-check">Tuesday</label>
+            {{ formset.1.check }}
+        </div>
+        <div class="input-group" id="tuesdayperiod">
+            {{ formset.1.start }}
+            <span class="input-group-text">to</span>
+            {{ formset.1.end }}
+        </div>
+        <div hidden>
+            {{ formset.1.id }}
+        </div>
+    </div>
+
+    <div class="col-auto">
+        <div class="mt-2 col form-check">
+            <label class="form-check-label" for="id_form-5-check">Wednesday</label>
+            {{ formset.2.check }}
+        </div>
+        <div class="input-group" id="wednesdayperiod">
+            {{ formset.2.start }}
+            <span class="input-group-text">to</span>
+            {{ formset.2.end }}
+        </div>
+        <div hidden>
+            {{ formset.2.id }}
+        </div>
+    </div>
+
+    <div class="col-auto">
+        <div class="mt-2 col form-check">
+            <label class="form-check-label" for="id_form-6-check">Thursday</label>
+            {{ formset.3.check }}
+        </div>
+        <div class="input-group" id="thursdayperiod">
+            {{ formset.3.start }}
+            <span class="input-group-text">to</span>
+            {{ formset.3.end }}
+        </div>
+        <div hidden>
+            {{ formset.3.id }}
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-start">
+
+    <div class="col-auto">
+        <div class="mt-2 col form-check">
+            <label class="form-check-label" for="id_form-7-check">Friday</label>
+            {{ formset.4.check }}
+        </div>
+        <div class="input-group" id="fridayperiod">
+            {{ formset.4.start }}
+            <span class="input-group-text">to</span>
+            {{ formset.4.end }}
+        </div>
+        <div hidden>
+            {{ formset.4.id }}
+        </div>
+    </div>
+
+    <div class="col-auto">
+        <div class="mt-2 col form-check">
+            <label class="form-check-label" for="id_form-8-check">Saturday</label>
+            {{ formset.5.check }}
+        </div>
+        <div class="input-group" id="saturdayperiod">
+            {{ formset.5.start }}
+            <span class="input-group-text">to</span>
+            {{ formset.5.end }}
+        </div>
+        <div hidden>
+            {{ formset.5.id }}
+        </div>
+    </div>
+
+    <div class="col-auto">
+        <div class="mt-2 col form-check">
+            <label class="form-check-label" for="id_form-9-check">Sunday</label>
+            {{ formset.6.check }}
+        </div>
+        <div class="input-group" id="sundayperiod">
+            {{ formset.6.start }}
+            <span class="input-group-text">to</span>
+            {{ formset.6.end }}
+        </div>
+        <div hidden>
+            {{ formset.6.id }}
+        </div>
+    </div>
+    <small class="form-text text-muted">Required *</small>
+    {{ formset.management_form }}
+</div>
+
+<script>
+
+    function enableTimes() {
+        if (allWeekCheck.checked && allWeekStart.value !== "" && allWeekEnd.value !== "" ||
+            weekdaysCheck.checked && weekdaysStart.value !== "" && weekdaysEnd.value !== "" ||
+            weekendCheck.checked && weekendStart.value !== "" && weekendEnd.value !== "" ||
+            mondayCheck.checked && mondayStart.value !== "" && mondayEnd.value !== ""||
+            tuesdayCheck.checked && tuesdayStart.value !== "" && tuesdayEnd.value !== ""||
+            wednesdayCheck.checked && wednesdayStart.value !== "" && wednesdayEnd.value !== ""||
+            thursdayCheck.checked && thursdayStart.value !== "" && thursdayEnd.value !== ""||
+            fridayCheck.checked && fridayStart.value !== "" && fridayEnd.value !== ""||
+            saturdayCheck.checked && saturdayStart.value !== "" && saturdayEnd.value !== ""||
+            sundayCheck.checked && sundayStart.value !== "" && sundayEnd.value !== "") {
+            for (let i = 0; i < allweekStarts.length; i++) {
+                allweekStarts[i].disabled = false;
+                allweekEnds[i].disabled = false;
+            }
+            document.getElementById("sub").click()
+        }
+    }
+
+    start = document.getElementById('deadline_start_date')
+    end = document.getElementById('deadline_end_date')
+
+    allWeekCheck = document.getElementById('allweek')
+    allWeekPeriod = document.getElementById('allweekperiod')
+    allWeekStart = document.getElementById('allweekstart')
+    allWeekEnd = document.getElementById('allweekend')
+
+    weekdaysCheck = document.getElementById('weekdays')
+    weekdaysPeriod = document.getElementById('weekdaysperiod')
+    weekdaysStart = document.getElementById('weekdaysstart')
+    weekdaysEnd = document.getElementById('weekdaysend')
+
+    weekendCheck = document.getElementById('weekend')
+    weekendPeriod = document.getElementById('weekendperiod')
+    weekendStart = document.getElementById('weekendstart')
+    weekendEnd = document.getElementById('weekendend')
+
+    mondayCheck = document.getElementById('id_form-0-check')
+    mondayPeriod = document.getElementById('mondayperiod')
+    mondayStart = document.getElementById('id_form-0-start')
+    mondayEnd = document.getElementById('id_form-0-end')
+
+    tuesdayCheck = document.getElementById('id_form-1-check')
+    tuesdayPeriod = document.getElementById('tuesdayperiod')
+    tuesdayStart = document.getElementById('id_form-1-start')
+    tuesdayEnd = document.getElementById('id_form-1-end')
+
+    wednesdayCheck = document.getElementById('id_form-2-check')
+    wednesdayPeriod = document.getElementById('wednesdayperiod')
+    wednesdayStart = document.getElementById('id_form-2-start')
+    wednesdayEnd = document.getElementById('id_form-2-end')
+
+    thursdayCheck = document.getElementById('id_form-3-check')
+    thursdayPeriod = document.getElementById('thursdayperiod')
+    thursdayStart = document.getElementById('id_form-3-start')
+    thursdayEnd = document.getElementById('id_form-3-end')
+
+    fridayCheck = document.getElementById('id_form-4-check')
+    fridayPeriod = document.getElementById('fridayperiod')
+    fridayStart = document.getElementById('id_form-4-start')
+    fridayEnd = document.getElementById('id_form-4-end')
+
+    saturdayCheck = document.getElementById('id_form-5-check')
+    saturdayPeriod = document.getElementById('saturdayperiod')
+    saturdayStart = document.getElementById('id_form-5-start')
+    saturdayEnd = document.getElementById('id_form-5-end')
+
+    sundayCheck = document.getElementById('id_form-6-check')
+    sundayPeriod = document.getElementById('sundayperiod')
+    sundayStart = document.getElementById('id_form-6-start')
+    sundayEnd = document.getElementById('id_form-6-end')
+
+    const weekdaysChecks = [mondayCheck, tuesdayCheck, wednesdayCheck, thursdayCheck, fridayCheck]
+    const weekdaysStarts = [mondayStart, tuesdayStart, wednesdayStart, thursdayStart, fridayStart]
+    const weekdaysEnds = [mondayEnd, tuesdayEnd, wednesdayEnd, thursdayEnd, fridayEnd]
+    const weekendChecks = [saturdayCheck, sundayCheck]
+    const weekendStarts = [saturdayStart, sundayStart]
+    const weekendEnds = [saturdayEnd, sundayEnd]
+    allweekChecks = weekdaysChecks.concat(weekendChecks)
+    allweekStarts = weekdaysStarts.concat(weekendStarts)
+    allweekEnds = weekdaysEnds.concat(weekendEnds)
+
+    for (let i = 0; i < allweekStarts.length; i++) {
+        if (!allweekChecks[i].checked) {
+            allweekStarts[i].disabled = true;
+            allweekEnds[i].disabled = true;
+        }
+    }
+
+    tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate())
+    dd = tomorrow.getDate();
+    mm = tomorrow.getMonth() + 1; //January is 0 so need to add 1 to make it 1!
+    yyyy = tomorrow.getFullYear();
+    if (dd < 10)
+        dd = '0' + dd
+    if (mm < 10)
+        mm = '0' + mm
+
+    tomorrow = yyyy + '-' + mm + '-' + dd;
+    document.getElementById("deadline_start_date").setAttribute("min", tomorrow);
+
+    allWeekCheck.addEventListener('click', event => {
+        if (event.target.checked) {
+            allWeekStart.disabled = false;
+            allWeekEnd.disabled = false;
+            allWeekStart.required = true;
+            allWeekEnd.required = true;
+            if (weekdaysCheck.checked) weekdaysCheck.click();
+            if (weekendCheck.checked) weekendCheck.click();
+            if (mondayCheck.checked) mondayCheck.click();
+            if (tuesdayCheck.checked) tuesdayCheck.click();
+            if (wednesdayCheck.checked) wednesdayCheck.click();
+            if (thursdayCheck.checked) thursdayCheck.click();
+            if (fridayCheck.checked) fridayCheck.click();
+            if (saturdayCheck.checked) saturdayCheck.click();
+            if (sundayCheck.checked) sundayCheck.click();
+        } else {
+            allWeekStart.disabled = true;
+            allWeekEnd.disabled = true;
+        }
+    });
+
+    weekdaysCheck.addEventListener('click', event => {
+        if (event.target.checked) {
+            weekdaysStart.disabled = false;
+            weekdaysEnd.disabled = false;
+            weekdaysStart.required = true;
+            weekdaysEnd.required = true;
+            if (allWeekCheck.checked) allWeekCheck.click();
+            if (mondayCheck.checked) mondayCheck.click();
+            if (tuesdayCheck.checked) tuesdayCheck.click();
+            if (wednesdayCheck.checked) wednesdayCheck.click();
+            if (thursdayCheck.checked) thursdayCheck.click();
+            if (fridayCheck.checked) fridayCheck.click();
+        } else {
+            weekdaysStart.disabled = true;
+            weekdaysEnd.disabled = true;
+        }
+    });
+
+    weekendCheck.addEventListener('click', event => {
+        if (event.target.checked) {
+            weekendStart.disabled = false;
+            weekendEnd.disabled = false;
+            weekendStart.required = true;
+            weekendEnd.required = true;
+            if (allWeekCheck.checked) allWeekCheck.click();
+            if (saturdayCheck.checked) saturdayCheck.click();
+            if (sundayCheck.checked) sundayCheck.click();
+        } else {
+            weekendStart.disabled = true;
+            weekendEnd.disabled = true;
+        }
+    });
+
+    mondayCheck.addEventListener('click', event => {
+        if (event.target.checked) {
+            mondayStart.disabled = false;
+            mondayEnd.disabled = false;
+            mondayStart.required = true;
+            mondayEnd.required = true;
+            if (weekdaysCheck.checked) weekdaysCheck.click();
+            if (allWeekCheck.checked) allWeekCheck.click();
+        } else {
+            mondayStart.disabled = true;
+            mondayEnd.disabled = true;
+        }
+    });
+
+    tuesdayCheck.addEventListener('click', event => {
+        if (event.target.checked) {
+            tuesdayStart.disabled = false;
+            tuesdayEnd.disabled = false
+            tuesdayStart.required = true;
+            tuesdayEnd.required = true;
+            if (weekdaysCheck.checked) weekdaysCheck.click();
+            if (allWeekCheck.checked) allWeekCheck.click();
+        } else {
+            tuesdayStart.disabled = true;
+            tuesdayEnd.disabled = true;
+        }
+    });
+
+    wednesdayCheck.addEventListener('click', event => {
+        if (event.target.checked) {
+            wednesdayStart.disabled = false;
+            wednesdayEnd.disabled = false;
+            wednesdayStart.required = true;
+            wednesdayEnd.required = true;
+            if (weekdaysCheck.checked) weekdaysCheck.click();
+            if (allWeekCheck.checked) allWeekCheck.click();
+        } else {
+            wednesdayStart.disabled = true;
+            wednesdayEnd.disabled = true;
+        }
+    });
+
+    thursdayCheck.addEventListener('click', event => {
+        if (event.target.checked) {
+            thursdayStart.disabled = false;
+            thursdayEnd.disabled = false;
+            thursdayStart.required = true;
+            thursdayEnd.required = true;
+            if (weekdaysCheck.checked) weekdaysCheck.click();
+            if (allWeekCheck.checked) allWeekCheck.click();
+        } else {
+            thursdayStart.disabled = true;
+            thursdayEnd.disabled = true;
+        }
+    });
+
+    fridayCheck.addEventListener('click', event => {
+        if (event.target.checked) {
+            fridayStart.disabled = false;
+            fridayEnd.disabled = false;
+            fridayStart.required = true;
+            fridayEnd.required = true;
+            if (weekdaysCheck.checked) weekdaysCheck.click();
+            if (allWeekCheck.checked) allWeekCheck.click();
+        } else {
+            fridayStart.disabled = true;
+            fridayEnd.disabled = true;
+        }
+    });
+
+    saturdayCheck.addEventListener('click', event => {
+        if (event.target.checked) {
+            saturdayStart.disabled = false;
+            saturdayEnd.disabled = false;
+            saturdayStart.required = true;
+            saturdayEnd.required = true;
+            if (weekendCheck.checked) weekendCheck.click();
+            if (allWeekCheck.checked) allWeekCheck.click();
+        } else {
+            saturdayStart.disabled = true;
+            saturdayEnd.disabled = true;
+        }
+    });
+
+    sundayCheck.addEventListener('click', event => {
+        if (event.target.checked) {
+            sundayStart.disabled = false;
+            sundayEnd.disabled = false;
+            sundayStart.required = true;
+            sundayEnd.required = true;
+            if (weekendCheck.checked) weekendCheck.click();
+            if (allWeekCheck.checked) allWeekCheck.click();
+        } else {
+            sundayStart.disabled = true;
+            sundayEnd.disabled = true;
+        }
+    });
+
+    start.addEventListener('change', () => {
+        console.log(new Date(start.value))
+        let tomorrow = new Date(start.value)
+        tomorrow.setDate(tomorrow.getDate())
+        let dd = tomorrow.getDate();
+        let mm = tomorrow.getMonth() + 1; //January is 0 so need to add 1 to make it 1!
+        let yyyy = tomorrow.getFullYear();
+        if (dd < 10)
+            dd = '0' + dd
+        if (mm < 10)
+            mm = '0' + mm
+
+        tomorrow = yyyy + '-' + mm + '-' + dd;
+        console.log(tomorrow)
+        end.min = tomorrow;
+        if (end.value <= start.value) end.value = tomorrow;
+        document.getElementById('sub').disabled = start.value === "";
+    });
+
+    allWeekStart.addEventListener('change', () => {
+        if (allWeekCheck.checked)
+            for (let i = 0; i < allweekStarts.length; i++)
+                allweekStarts[i].value = allWeekStart.value
+    });
+
+    allWeekEnd.addEventListener('change', () => {
+        if (allWeekCheck.checked)
+            for (let i = 0; i < allweekEnds.length; i++)
+                allweekEnds[i].value = allWeekEnd.value
+    });
+
+    weekdaysStart.addEventListener('change', () => {
+        if (weekdaysCheck.checked)
+            for (let i = 0; i < weekdaysStarts.length; i++)
+                weekdaysStarts[i].value = weekdaysStart.value
+    });
+
+    weekdaysEnd.addEventListener('change', () => {
+        if (weekdaysCheck.checked)
+            for (let i = 0; i < weekdaysEnds.length; i++)
+                weekdaysEnds[i].value = weekdaysEnd.value
+    });
+
+    weekendStart.addEventListener('change', () => {
+        if (weekendCheck.checked)
+            for (let i = 0; i < weekendStarts.length; i++)
+                weekendStarts[i].value = weekendStart.value
+    });
+
+    weekendEnd.addEventListener('change', () => {
+        if (weekendCheck.checked)
+            for (let i = 0; i < weekendEnds.length; i++)
+                weekendEnds[i].value = weekendEnd.value
+    });
+</script>

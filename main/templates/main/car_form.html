@@ -1,0 +1,16 @@
+{% load crispy_forms_filters %}
+
+<div class="row">
+    <div class="col-6">
+        {{ form.registration |as_crispy_field }}
+    </div>
+    <div class="col-6">
+        {{ form.foreign |as_crispy_field }}
+    </div>
+    <div class="col-6">
+        {{ form.brand |as_crispy_field }}
+    </div>
+    <div class="col-6">
+        {{ form.model |as_crispy_field }}
+    </div>
+</div>

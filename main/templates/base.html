@@ -6,6 +6,7 @@
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
     <link rel="stylesheet" href="{% static 'dist/css/bootstrap.css' %}">
     <link rel="stylesheet" href="{% static 'dist/css/bootstrap.min.css' %}">
 
@@ -21,10 +22,23 @@
 {% include 'header.html' %}
 
 <main class="mt-5">
+
+    {% if messages %}
+        <div class="col-auto mt-3">
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
     {% block main %}
     {% endblock %}
 </main>
-
 
 <script src="{% static 'dist/js/bootstrap.bundle.js' %}"></script>
 <script src="{% static 'dist/js/bootstrap.bundle.min.js' %}"></script>

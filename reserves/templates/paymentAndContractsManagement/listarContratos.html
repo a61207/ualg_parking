@@ -16,6 +16,7 @@
         {% else %}
 
         <!-- Tabela de Reservas -->
+        <!-- Tabela de Reservas -->
         <table class="table table-light table-hover">
           <thead>
             <tr>
@@ -41,7 +42,7 @@
               <td>{{ contrato.editadoem }}</td>
               <td>{{ contrato.estadocontratoid.nome }}</td>
               <td> <div class="d-flex justify-content-center">
-                <a class="btn btn-secondary" href="{% url 'listarContratos' contrato.id %}">Listar Faturas</a>
+                <a class="btn btn-secondary" href="http://127.0.0.1:8000/fatura/{{contrato.id}}">Listar Faturas</a>
               </div>
               </td>
               <!-- {% if contrato.estadocontratoid.nome == "Aguardar comprovativo" %}

@@ -269,18 +269,46 @@
     allweekStarts = weekdaysStarts.concat(weekendStarts)
     allweekEnds = weekdaysEnds.concat(weekendEnds)
 
-    console
-
-    if (mondayStart.value===tuesdayCheck.value===wednesdayCheck.value===thursdayCheck.value===fridayCheck.value)
-        weekdaysCheck.checked=true;
+    if (mondayStart.value === tuesdayStart.value && tuesdayStart.value === wednesdayStart.value &&
+        wednesdayStart.value === thursdayStart.value && thursdayStart.value === fridayStart.value &&
+        fridayStart.value === saturdayStart.value && saturdayStart.value === sundayStart.value &&
+        mondayEnd.value === tuesdayEnd.value && tuesdayEnd.value === wednesdayEnd.value &&
+        wednesdayEnd.value === thursdayEnd.value && thursdayEnd.value === fridayEnd.value &&
+        fridayEnd.value === saturdayEnd.value && saturdayEnd.value === sundayEnd.value) {
+        allWeekCheck.checked = true;
+        allWeekStart.readOnly = false;
+        allWeekEnd.readOnly = false;
+        allWeekStart.required = true;
+        allWeekEnd.required = true;
+        allWeekStart.value = mondayStart.value;
+        allWeekEnd.value = mondayEnd.value;
+    } else if (mondayStart.value === tuesdayStart.value && tuesdayStart.value === wednesdayStart.value &&
+        wednesdayStart.value === thursdayStart.value && thursdayStart.value === fridayStart.value &&
+        mondayEnd.value === tuesdayEnd.value && tuesdayEnd.value === wednesdayEnd.value &&
+        wednesdayEnd.value === thursdayEnd.value && thursdayEnd.value === fridayEnd.value) {
+        weekdaysCheck.checked = true;
+        weekdaysStart.readOnly = false;
+        weekdaysEnd.readOnly = false;
+        weekdaysStart.required = true;
+        weekdaysEnd.required = true;
+        weekdaysStart.value = mondayStart.value;
+        weekdaysEnd.value = mondayEnd.value;
+    } else if (saturdayStart.value === sundayStart.value && saturdayEnd.value === sundayEnd.value) {
+        weekendCheck.checked = true;
+        weekendStart.readOnly = false;
+        weekendEnd.readOnly = false;
+        weekendStart.required = true;
+        weekendEnd.required = true;
+        weekendStart.value = saturdayStart.value;
+        weekendEnd.value = saturdayEnd.value;
+    }
 
     for (let i = 0; i < allweekStarts.length; i++) {
-        if (allweekStarts[i].value!=="" && !weekdaysCheck.checked) {
-            allweekChecks[i].checked=true;
-        }
         if (!allweekChecks[i].checked) {
             allweekStarts[i].readOnly = true;
             allweekEnds[i].readOnly = true;
+            allweekStarts[i].required = false;
+            allweekEnds[i].required = false;
         }
     }
 
@@ -301,6 +329,8 @@
         if (event.target.checked) {
             allWeekStart.readOnly = false;
             allWeekEnd.readOnly = false;
+            allWeekStart.required = true;
+            allWeekEnd.required = true;
             if (weekdaysCheck.checked) weekdaysCheck.click();
             if (weekendCheck.checked) weekendCheck.click();
             if (mondayCheck.checked) mondayCheck.click();
@@ -310,9 +340,21 @@
             if (fridayCheck.checked) fridayCheck.click();
             if (saturdayCheck.checked) saturdayCheck.click();
             if (sundayCheck.checked) sundayCheck.click();
+            if (allWeekStart.value !== "" || allWeekEnd.value !== "") {
+                for (let i = 0; i < allweekStarts.length; i++) {
+                    allweekStarts[i].value = allWeekStart.value;
+                    allweekEnds[i].value = allWeekEnd.value;
+                }
+            }
         } else {
             allWeekStart.readOnly = true;
             allWeekEnd.readOnly = true;
+            allWeekStart.required = false;
+            allWeekEnd.required = false;
+            for (let i = 0; i < allweekStarts.length; i++) {
+                allweekStarts[i].value = "";
+                allweekEnds[i].value = "";
+            }
         }
     });
 
@@ -320,15 +362,29 @@
         if (event.target.checked) {
             weekdaysStart.readOnly = false;
             weekdaysEnd.readOnly = false;
+            weekdaysStart.required = true;
+            weekdaysEnd.required = true;
             if (allWeekCheck.checked) allWeekCheck.click();
             if (mondayCheck.checked) mondayCheck.click();
             if (tuesdayCheck.checked) tuesdayCheck.click();
             if (wednesdayCheck.checked) wednesdayCheck.click();
             if (thursdayCheck.checked) thursdayCheck.click();
             if (fridayCheck.checked) fridayCheck.click();
+            if (weekdaysStart.value !== "" || weekdaysEnd.value !== "") {
+                for (let i = 0; i < weekdaysStarts.length; i++) {
+                    weekdaysStarts[i].value = weekdaysStart.value;
+                    weekdaysEnds[i].value = weekdaysEnd.value;
+                }
+            }
         } else {
             weekdaysStart.readOnly = true;
             weekdaysEnd.readOnly = true;
+            weekdaysStart.required = false;
+            weekdaysEnd.required = false;
+            for (let i = 0; i < weekdaysStarts.length; i++) {
+                weekdaysStarts[i].value = "";
+                weekdaysEnds[i].value = "";
+            }
         }
     });
 
@@ -336,12 +392,26 @@
         if (event.target.checked) {
             weekendStart.readOnly = false;
             weekendEnd.readOnly = false;
+            weekendStart.required = false;
+            weekendEnd.required = false;
             if (allWeekCheck.checked) allWeekCheck.click();
             if (saturdayCheck.checked) saturdayCheck.click();
             if (sundayCheck.checked) sundayCheck.click();
+            if (weekendStart.value !== "" || weekendEnd.value !== "") {
+                for (let i = 0; i < weekendStarts.length; i++) {
+                    weekendStarts[i].value = weekendStart.value;
+                    weekendEnds[i].value = weekendEnd.value;
+                }
+            }
         } else {
             weekendStart.readOnly = true;
             weekendEnd.readOnly = true;
+            weekendStart.required = false;
+            weekendEnd.required = false;
+            for (let i = 0; i < weekendStarts.length; i++) {
+                weekendStarts[i].value = "";
+                weekendEnds[i].value = "";
+            }
         }
     });
 
@@ -349,11 +419,15 @@
         if (event.target.checked) {
             mondayStart.readOnly = false;
             mondayEnd.readOnly = false;
+            mondayStart.required = true;
+            mondayEnd.required = true;
             if (weekdaysCheck.checked) weekdaysCheck.click();
             if (allWeekCheck.checked) allWeekCheck.click();
         } else {
             mondayStart.readOnly = true;
             mondayEnd.readOnly = true;
+            mondayStart.required = false;
+            mondayEnd.required = false;
         }
     });
 
@@ -361,11 +435,15 @@
         if (event.target.checked) {
             tuesdayStart.readOnly = false;
             tuesdayEnd.readOnly = false
+            tuesdayStart.required = true;
+            tuesdayEnd.required = true
             if (weekdaysCheck.checked) weekdaysCheck.click();
             if (allWeekCheck.checked) allWeekCheck.click();
         } else {
             tuesdayStart.readOnly = true;
             tuesdayEnd.readOnly = true;
+            tuesdayStart.required = true;
+            tuesdayEnd.required = true;
         }
     });
 
@@ -373,11 +451,15 @@
         if (event.target.checked) {
             wednesdayStart.readOnly = false;
             wednesdayEnd.readOnly = false;
+            wednesdayStart.required = true;
+            wednesdayEnd.required = true;
             if (weekdaysCheck.checked) weekdaysCheck.click();
             if (allWeekCheck.checked) allWeekCheck.click();
         } else {
             wednesdayStart.readOnly = true;
             wednesdayEnd.readOnly = true;
+            wednesdayStart.required = false;
+            wednesdayEnd.required = false;
         }
     });
 
@@ -385,11 +467,15 @@
         if (event.target.checked) {
             thursdayStart.readOnly = false;
             thursdayEnd.readOnly = false;
+            thursdayStart.required = true;
+            thursdayEnd.required = true;
             if (weekdaysCheck.checked) weekdaysCheck.click();
             if (allWeekCheck.checked) allWeekCheck.click();
         } else {
             thursdayStart.readOnly = true;
             thursdayEnd.readOnly = true;
+            thursdayStart.required = false;
+            thursdayEnd.required = false;
         }
     });
 
@@ -397,11 +483,15 @@
         if (event.target.checked) {
             fridayStart.readOnly = false;
             fridayEnd.readOnly = false;
+            fridayStart.required = true;
+            fridayEnd.required = true;
             if (weekdaysCheck.checked) weekdaysCheck.click();
             if (allWeekCheck.checked) allWeekCheck.click();
         } else {
             fridayStart.readOnly = true;
             fridayEnd.readOnly = true;
+            fridayStart.required = false;
+            fridayEnd.required = false;
         }
     });
 
@@ -416,6 +506,8 @@
         } else {
             saturdayStart.readOnly = true;
             saturdayEnd.readOnly = true;
+            saturdayStart.required = false;
+            saturdayEnd.required = false;
         }
     });
 
@@ -423,11 +515,15 @@
         if (event.target.checked) {
             sundayStart.readOnly = false;
             sundayEnd.readOnly = false;
+            sundayStart.required = true;
+            sundayEnd.required = true;
             if (weekendCheck.checked) weekendCheck.click();
             if (allWeekCheck.checked) allWeekCheck.click();
         } else {
             sundayStart.readOnly = true;
             sundayEnd.readOnly = true;
+            sundayStart.required = false;
+            sundayEnd.required = false;
         }
     });
 
@@ -448,9 +544,15 @@
     });
 
     allWeekStart.addEventListener('change', () => {
-        if (allWeekCheck.checked)
-            for (let i = 0; i < allweekStarts.length; i++)
-                allweekStarts[i].value = allWeekStart.value
+        if (allWeekCheck.checked) {
+            const d = new Date(0,0,0)
+            d.setHours(allWeekStart.value.substring(0,2))
+            d.setMinutes(allWeekStart.value.substring(3,5))
+            d.setMinutes(d.getMinutes() +1 )
+            allWeekEnd.min = d.toLocaleTimeString();
+        }
+        for (let i = 0; i < allweekStarts.length; i++)
+            allweekStarts[i].value = allWeekStart.value
     });
 
     allWeekEnd.addEventListener('change', () => {
@@ -460,9 +562,15 @@
     });
 
     weekdaysStart.addEventListener('change', () => {
-        if (weekdaysCheck.checked)
-            for (let i = 0; i < weekdaysStarts.length; i++)
-                weekdaysStarts[i].value = weekdaysStart.value
+        if (weekdaysCheck.checked){
+            const d = new Date(0,0,0)
+            d.setHours(weekdaysStart.value.substring(0,2))
+            d.setMinutes(weekdaysStart.value.substring(3,5))
+            d.setMinutes(d.getMinutes() +1 )
+            weekdaysEnd.min = weekdaysStart.value;
+        }
+        for (let i = 0; i < weekdaysStarts.length; i++)
+            weekdaysStarts[i].value = weekdaysStart.value
     });
 
     weekdaysEnd.addEventListener('change', () => {
@@ -472,14 +580,55 @@
     });
 
     weekendStart.addEventListener('change', () => {
-        if (weekendCheck.checked)
-            for (let i = 0; i < weekendStarts.length; i++)
-                weekendStarts[i].value = weekendStart.value
+        if (weekendCheck.checked) {
+            const d = new Date(0,0,0)
+            d.setHours(weekendStart.value.substring(0,2))
+            d.setMinutes(weekendStart.value.substring(3,5))
+            d.setMinutes(d.getMinutes() +1 )
+            weekendEnd.min = weekendStart.value;
+        }
+        for (let i = 0; i < weekendStarts.length; i++)
+            weekendStarts[i].value = weekendStart.value
     });
 
     weekendEnd.addEventListener('change', () => {
         if (weekendCheck.checked)
             for (let i = 0; i < weekendEnds.length; i++)
                 weekendEnds[i].value = weekendEnd.value
+    });
+
+    mondayStart.addEventListener('change', () => {
+        if (mondayStart.checked)
+            mondayEnd.min = mondayStart.value;
+    });
+
+    tuesdayStart.addEventListener('change', () => {
+        if (mondayStart.checked)
+            tuesdayEnd.min = tuesdayStart.value;
+    });
+
+    wednesdayStart.addEventListener('change', () => {
+        if (mondayStart.checked)
+            wednesdayEnd.min = wednesdayStart.value;
+    });
+
+    thursdayStart.addEventListener('change', () => {
+        if (mondayStart.checked)
+            thursdayEnd.min = thursdayStart.value;
+    });
+
+    fridayStart.addEventListener('change', () => {
+        if (mondayStart.checked)
+            fridayEnd.min = fridayStart.value;
+    });
+
+    saturdayStart.addEventListener('change', () => {
+        if (mondayStart.checked)
+            saturdayEnd.min = saturdayStart.value;
+    });
+
+    sundayStart.addEventListener('change', () => {
+        if (mondayStart.checked)
+            sundayEnd.min = sundayStart.value;
     });
 </script>

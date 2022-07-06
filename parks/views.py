@@ -165,6 +165,7 @@ class ViewParkList(SingleTableMixin, FilterView):
     table_class = ParkTable
     filterset_class = ParkFilter
     template_name = 'parks/park_filter.html'
+    
 
 
 class ViewWeekDayScheduleList(LoginRequiredMixin, UserPassesTestMixin, SingleTableMixin, FilterView):

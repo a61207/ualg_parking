@@ -282,25 +282,28 @@
         allWeekEnd.required = true;
         allWeekStart.value = mondayStart.value;
         allWeekEnd.value = mondayEnd.value;
-    } else if (mondayStart.value === tuesdayStart.value && tuesdayStart.value === wednesdayStart.value &&
-        wednesdayStart.value === thursdayStart.value && thursdayStart.value === fridayStart.value &&
-        mondayEnd.value === tuesdayEnd.value && tuesdayEnd.value === wednesdayEnd.value &&
-        wednesdayEnd.value === thursdayEnd.value && thursdayEnd.value === fridayEnd.value) {
-        weekdaysCheck.checked = true;
-        weekdaysStart.readOnly = false;
-        weekdaysEnd.readOnly = false;
-        weekdaysStart.required = true;
-        weekdaysEnd.required = true;
-        weekdaysStart.value = mondayStart.value;
-        weekdaysEnd.value = mondayEnd.value;
-    } else if (saturdayStart.value === sundayStart.value && saturdayEnd.value === sundayEnd.value) {
-        weekendCheck.checked = true;
-        weekendStart.readOnly = false;
-        weekendEnd.readOnly = false;
-        weekendStart.required = true;
-        weekendEnd.required = true;
-        weekendStart.value = saturdayStart.value;
-        weekendEnd.value = saturdayEnd.value;
+    } else {
+        if (mondayStart.value === tuesdayStart.value && tuesdayStart.value === wednesdayStart.value &&
+            wednesdayStart.value === thursdayStart.value && thursdayStart.value === fridayStart.value &&
+            mondayEnd.value === tuesdayEnd.value && tuesdayEnd.value === wednesdayEnd.value &&
+            wednesdayEnd.value === thursdayEnd.value && thursdayEnd.value === fridayEnd.value) {
+            weekdaysCheck.checked = true;
+            weekdaysStart.readOnly = false;
+            weekdaysEnd.readOnly = false;
+            weekdaysStart.required = true;
+            weekdaysEnd.required = true;
+            weekdaysStart.value = mondayStart.value;
+            weekdaysEnd.value = mondayEnd.value;
+        }
+        if (saturdayStart.value === sundayStart.value && saturdayEnd.value === sundayEnd.value) {
+            weekendCheck.checked = true;
+            weekendStart.readOnly = false;
+            weekendEnd.readOnly = false;
+            weekendStart.required = true;
+            weekendEnd.required = true;
+            weekendStart.value = saturdayStart.value;
+            weekendEnd.value = saturdayEnd.value;
+        }
     }
 
     for (let i = 0; i < allweekStarts.length; i++) {
@@ -545,10 +548,10 @@
 
     allWeekStart.addEventListener('change', () => {
         if (allWeekCheck.checked) {
-            const d = new Date(0,0,0)
-            d.setHours(allWeekStart.value.substring(0,2))
-            d.setMinutes(allWeekStart.value.substring(3,5))
-            d.setMinutes(d.getMinutes() +1 )
+            const d = new Date(0, 0, 0)
+            d.setHours(allWeekStart.value.substring(0, 2))
+            d.setMinutes(allWeekStart.value.substring(3, 5))
+            d.setMinutes(d.getMinutes() + 1)
             allWeekEnd.min = d.toLocaleTimeString();
         }
         for (let i = 0; i < allweekStarts.length; i++)
@@ -562,11 +565,11 @@
     });
 
     weekdaysStart.addEventListener('change', () => {
-        if (weekdaysCheck.checked){
-            const d = new Date(0,0,0)
-            d.setHours(weekdaysStart.value.substring(0,2))
-            d.setMinutes(weekdaysStart.value.substring(3,5))
-            d.setMinutes(d.getMinutes() +1 )
+        if (weekdaysCheck.checked) {
+            const d = new Date(0, 0, 0)
+            d.setHours(weekdaysStart.value.substring(0, 2))
+            d.setMinutes(weekdaysStart.value.substring(3, 5))
+            d.setMinutes(d.getMinutes() + 1)
             weekdaysEnd.min = weekdaysStart.value;
         }
         for (let i = 0; i < weekdaysStarts.length; i++)
@@ -581,10 +584,10 @@
 
     weekendStart.addEventListener('change', () => {
         if (weekendCheck.checked) {
-            const d = new Date(0,0,0)
-            d.setHours(weekendStart.value.substring(0,2))
-            d.setMinutes(weekendStart.value.substring(3,5))
-            d.setMinutes(d.getMinutes() +1 )
+            const d = new Date(0, 0, 0)
+            d.setHours(weekendStart.value.substring(0, 2))
+            d.setMinutes(weekendStart.value.substring(3, 5))
+            d.setMinutes(d.getMinutes() + 1)
             weekendEnd.min = weekendStart.value;
         }
         for (let i = 0; i < weekendStarts.length; i++)

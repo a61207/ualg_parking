@@ -11,10 +11,11 @@ from django_filters.views import FilterView
 from django_tables2 import SingleTableMixin
 from main.models import *
 from main.static import postal_codes
-from parks.filters import ParkFilter, ZoneFilter, WeekScheduleFilter
-from parks.forms import ParkForm, ZoneForm, SpotForm, PriceTypeForm, ContractTypeForm, TimePeriodForm, DatePeriodForm
-from parks.functions import check_empty_spots, check_overlaping_spots, validate_price_type, validate_contract_type
-from parks.tables import ParkTable, ZoneTable, WeekScheduleTable
+from parks.filters import ParkFilter, ZoneFilter, WeekScheduleFilter, PriceTableFilter
+from parks.forms import ParkForm, ZoneForm, SpotForm, PriceTypeForm, TimePeriodForm, DatePeriodForm
+from parks.functions import check_empty_spots, check_overlaping_spots, validate_price_type, close_open_park, \
+    permission_to_update_park_resources, permission_to_archive_park
+from parks.tables import ParkTable, ZoneTable, WeekScheduleTable, ClientParkTable, PriceTableTable
 
 
 # Create your views here.
@@ -25,7 +26,7 @@ class AddPark(SuccessMessageMixin, LoginRequiredMixin, UserPassesTestMixin, Crea
     success_message = "Park was created successfully"
 
     def test_func(self):
-        return not (Administrator.objects.filter(user=self.request.user) is None)
+        return Administrator.objects.filter(user=self.request.user) is not None
 
     def form_valid(self, form):
         form.instance.admin = Administrator.objects.get(user=self.request.user)
@@ -47,7 +48,7 @@ class AddWeekDaySchedule(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
         return context
 
     def test_func(self):
-        return not (Administrator.objects.filter(user=self.request.user) is None)
+        return Administrator.objects.filter(user=self.request.user) is not None
 
     @staticmethod
     def post(request, *args, **kwargs):
@@ -61,7 +62,7 @@ class AddWeekDaySchedule(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
             for x in range(len(formset)):
                 if 'start' in formset[x].cleaned_data and 'end' in formset[x].cleaned_data:
                     count += 1
-            for schedule in WeekSchedule.objects.filter(arquived=False, park=kwargs['pk']):
+            for schedule in WeekSchedule.objects.filter(archived=False, park=kwargs['pk']):
                 if schedule.deadline.start_date <= deadlineform.cleaned_data['start_date'] <= \
                         schedule.deadline.end_date or \
                         schedule.deadline.end_date >= deadlineform.cleaned_data['end_date'] >= \
@@ -71,7 +72,10 @@ class AddWeekDaySchedule(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
                     errors.append("Choosen deadline already in a schedule from " +
                                   schedule.deadline.start_date.strftime("%d/%m/%Y") +
                                   " to " + schedule.deadline.end_date.strftime("%d/%m/%Y") + " .")
-            if count != 0 and errors == 0:
+            if count == 0:
+                errors = deadlineform.errors.setdefault("__all__", ErrorList())
+                errors.append("Must choose one of the week days option.")
+            elif errors == 0:
                 deadline = deadlineform.save()
                 for x in range(len(formset)):
                     if 'start' in formset[x].cleaned_data and 'end' in formset[x].cleaned_data:
@@ -83,17 +87,13 @@ class AddWeekDaySchedule(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
                                             wednesday=times[2], thursday=times[3], friday=times[4],
                                             saturday=times[5], sunday=times[6],
                                             park=Park.objects.get(id=kwargs['pk']))
-                return HttpResponseRedirect(reverse('park_detail', kwargs={'pk': kwargs['pk']}))
-            else:
-                errors = deadlineform.errors.setdefault("__all__", ErrorList())
-                errors.append("Must choose on of the week days option.")
-        print(deadlineform.errors, formset.errors)
+                return HttpResponseRedirect(reverse('list_schedules', kwargs={'pk': kwargs['pk']}))
         return render(request, "schedule/weekschedule_add.html", {"deadline": deadlineform, "formset": formset,
                                                                   "park_id": kwargs['pk']})
 
 
 # noinspection PyArgumentList,PyUnresolvedReferences
-class AddPriceType(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+class AddPriceTable(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = PriceType
     form_class = PriceTypeForm
     template_name = 'price/price_type_add.html'
@@ -101,71 +101,81 @@ class AddPriceType(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['deadline'] = DatePeriodForm(auto_id="deadline_%s")
+        context['park_id'] = self.kwargs['pk']
         PriceTypeFormset = modelformset_factory(PriceType, form=PriceTypeForm, extra=1, can_delete_extra=True,
                                                 can_delete=True)
         context['formset'] = PriceTypeFormset(None, queryset=PriceType.objects.none())
         return context
 
     def test_func(self):
-        return not (Administrator.objects.filter(user=self.request.user) is None)
+        return Administrator.objects.filter(user=self.request.user) is not None
 
     def post(self, request, *args, **kwargs):
+        deadlineform = DatePeriodForm(request.POST, auto_id="deadline_%s")
         PriceTypeFormset = modelformset_factory(PriceType, form=PriceTypeForm, extra=0, can_delete=True,
                                                 can_delete_extra=True)
         formset = PriceTypeFormset(request.POST)
-        if formset.is_valid():
+        if deadlineform.is_valid() and formset.is_valid():
             park = Park.objects.get(id=self.kwargs['pk'])
-            if validate_price_type(formset):
+            # noinspection DuplicatedCode
+            errors = 0
+            for table in PriceTable.objects.filter(archived=False, park=kwargs['pk']):
+                if table.deadline.start_date <= deadlineform.cleaned_data['start_date'] <= \
+                        table.deadline.end_date or \
+                        table.deadline.end_date >= deadlineform.cleaned_data['end_date'] >= \
+                        table.deadline.start_date:
+                    errors += 1
+                    errors = deadlineform.errors.setdefault("__all__", ErrorList())
+                    errors.append("Choosen deadline already in a price table from " +
+                                  table.deadline.start_date.strftime("%d/%m/%Y") +
+                                  " to " + table.deadline.end_date.strftime("%d/%m/%Y") + " .")
+
+            count = 0
+            for form in formset:
+                if form.is_valid():
+                    if form['DELETE'].value() is False:
+                        count += 1
+            if validate_price_type(formset) and errors == 0:
+                deadline = deadlineform.save()
+                table = PriceTable.objects.create(park=park, deadline=deadline)
                 for form in formset:
-                    if form.cleaned_data['DELETE'] is False:
-                        total = form.cleaned_data['total']
-                        minutes = form.cleaned_data['minutes']
-                        hours = form.cleaned_data['hours']
-                        PriceType.objects.create(park=park, total=total, minutes=minutes, hours=hours)
-                return HttpResponseRedirect(reverse('park_detail', kwargs={'pk': park.id}))
-        return render(request, "price/price_type_add.html", {"formset": formset})
-
-
-# noinspection PyArgumentList,PyUnresolvedReferences
-class AddContractType(LoginRequiredMixin, UserPassesTestMixin, CreateView):
-    model = ContractType
-    form_class = ContractTypeForm
-    template_name = 'contract/contract_type_add.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        ContractTypeFormset = modelformset_factory(ContractType, form=ContractTypeForm, extra=1, can_delete_extra=True,
-                                                   can_delete=True)
-        context['formset'] = ContractTypeFormset(None, queryset=ContractType.objects.none())
-        return context
-
-    def test_func(self):
-        return not (Administrator.objects.filter(user=self.request.user) is None)
-
-    def post(self, request, *args, **kwargs):
-        ContractTypeFormset = modelformset_factory(ContractType, form=ContractTypeForm, extra=0, can_delete=True,
-                                                   can_delete_extra=True)
-        formset = ContractTypeFormset(request.POST)
-        if formset.is_valid():
-            park = Park.objects.get(id=self.kwargs['pk'])
-            if validate_contract_type(formset):
-                for form in formset:
-                    if form.cleaned_data['DELETE'] is False:
-                        total = form.cleaned_data['total']
-                        years = form.cleaned_data['years']
-                        months = form.cleaned_data['months']
-                        name = form.cleaned_data['name']
-                        ContractType.objects.create(park=park, total=total, years=years, months=months, name=name)
-                return HttpResponseRedirect(reverse('park_detail', kwargs={'pk': park.id}))
-        return render(request, "contract/contract_type_add.html", {"formset": formset})
+                    if form['DELETE'].value() is False:
+                        total = form['total'].value()
+                        minutes = form['minutes'].value()
+                        hours = form['hours'].value()
+                        ttype = form['type'].value()
+                        PriceType.objects.create(table=table, total=total, minutes=minutes, hours=hours, type=ttype)
+                return HttpResponseRedirect(reverse('list_prices', kwargs={'pk': park.id}))
+            elif count == 0:
+                errors = deadlineform.errors.setdefault("__all__", ErrorList())
+                errors.append("Must have at least one price type.")
+        return render(request, "price/price_type_add.html", {"deadline": deadlineform, "formset": formset,
+                                                             "park_id": self.kwargs['pk']})
 
 
 class ViewParkList(SingleTableMixin, FilterView):
     model = Park
-    table_class = ParkTable
+    table_class = ClientParkTable
     filterset_class = ParkFilter
     template_name = 'parks/park_filter.html'
-    
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if self.request.user.is_authenticated and Administrator.objects.filter(user=self.request.user):
+            return qs
+        else:
+            return qs.filter(is_archived=False)
+
+    def get_table_class(self):
+        if self.request.user.is_authenticated and Administrator.objects.filter(user=self.request.user):
+            return ParkTable
+        else:
+            return self.table_class
+
+    @staticmethod
+    def post(request, *args, **kwargs):
+        close_open_park(request)
+        return HttpResponseRedirect(reverse('list_parks'))
 
 
 class ViewWeekDayScheduleList(LoginRequiredMixin, UserPassesTestMixin, SingleTableMixin, FilterView):
@@ -177,7 +187,7 @@ class ViewWeekDayScheduleList(LoginRequiredMixin, UserPassesTestMixin, SingleTab
     def get_queryset(self):
         qs = super().get_queryset()
         return qs.filter(park=Park.objects.get(id=self.kwargs['pk'])) \
-            .order_by('arquived', 'deadline__start_date')
+            .order_by('archived', 'deadline__start_date')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -185,12 +195,37 @@ class ViewWeekDayScheduleList(LoginRequiredMixin, UserPassesTestMixin, SingleTab
         return context
 
     def test_func(self):
-        return not (Administrator.objects.filter(user=self.request.user) is None)
+        return Administrator.objects.filter(user=self.request.user) is not None
+
+
+class ViewPriceTableList(LoginRequiredMixin, UserPassesTestMixin, SingleTableMixin, FilterView):
+    model = PriceTable
+    table_class = PriceTableTable
+    filterset_class = PriceTableFilter
+    template_name = 'price/pricetable_filter.html'
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(park=Park.objects.get(id=self.kwargs['pk'])) \
+            .order_by('archived', 'deadline__start_date')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['park'] = Park.objects.get(id=self.kwargs['pk'])
+        return context
+
+    def test_func(self):
+        return Administrator.objects.filter(user=self.request.user) is not None
 
 
 class ViewParkDetail(DetailView):
     model = Park
     template_name = 'parks/park_detail.html'
+
+    @staticmethod
+    def post(request, *args, **kwargs):
+        close_open_park(request)
+        return HttpResponseRedirect(reverse('park_detail', kwargs={'pk': kwargs['pk']}))
 
 
 class UpdatePark(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -199,7 +234,7 @@ class UpdatePark(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     template_name = 'parks/park_update.html'
 
     def test_func(self):
-        return not (Administrator.objects.filter(user=self.request.user) is None)
+        return Administrator.objects.filter(user=self.request.user) is not None
 
     def form_valid(self, form):
         form.instance.updated = timezone.now()
@@ -215,7 +250,7 @@ class UpdateWeekDaySchedule(LoginRequiredMixin, UserPassesTestMixin, TemplateVie
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         schedule = WeekSchedule.objects.get(id=kwargs['pk'])
-        context['park_id'] = kwargs['pk']
+        context['park_id'] = kwargs['park']
         context['deadline'] = DatePeriodForm(auto_id="deadline_%s",
                                              instance=DatePeriod.objects.get(weekschedule=schedule))
         TimePeriodFormset = modelformset_factory(TimePeriod, form=TimePeriodForm, extra=0)
@@ -223,7 +258,8 @@ class UpdateWeekDaySchedule(LoginRequiredMixin, UserPassesTestMixin, TemplateVie
         return context
 
     def test_func(self):
-        return not (Administrator.objects.filter(user=self.request.user) is None)
+        schedule = WeekSchedule.objects.get(id=self.kwargs['pk'])
+        return permission_to_update_park_resources(self, schedule)
 
     @staticmethod
     def post(request, *args, **kwargs):
@@ -238,7 +274,7 @@ class UpdateWeekDaySchedule(LoginRequiredMixin, UserPassesTestMixin, TemplateVie
             for x in range(len(formset)):
                 if 'start' in formset[x].cleaned_data and 'end' in formset[x].cleaned_data:
                     count += 1
-            for schedule in WeekSchedule.objects.filter(arquived=False, park=kwargs['pk']):
+            for schedule in WeekSchedule.objects.filter(archived=False, park=kwargs['pk']):
                 if (schedule.deadline.start_date <= deadlineform.cleaned_data['start_date'] <=
                     schedule.deadline.end_date or schedule.deadline.end_date >=
                     deadlineform.cleaned_data['end_date'] >= schedule.deadline.start_date) and \
@@ -248,108 +284,112 @@ class UpdateWeekDaySchedule(LoginRequiredMixin, UserPassesTestMixin, TemplateVie
                     errors.append("Choosen deadline already in a schedule from " +
                                   schedule.deadline.start_date.strftime("%d/%m/%Y") +
                                   " to " + schedule.deadline.end_date.strftime("%d/%m/%Y") + " .")
-            if count != 0 and errors == 0:
+            if count == 0:
+                errors = deadlineform.errors.setdefault("__all__", ErrorList())
+                errors.append("Must choose one of the week days option.")
+            elif errors == 0:
                 deadlineform.save()
                 formset.save()
                 return HttpResponseRedirect(reverse('list_schedules', kwargs={'pk': kwargs['park']}))
-            else:
-                errors = deadlineform.errors.setdefault("__all__", ErrorList())
-                errors.append("Must choose on of the week days option.")
         return render(request, "schedule/weekschedule_update.html", {"deadline": deadlineform, "formset": formset,
                                                                      "park_id": kwargs['park']})
 
 
 # noinspection PyUnresolvedReferences,PyArgumentList
 class UpdatePriceType(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
-    model = Park
-    form_class = ParkForm
+    model = PriceTable
+    form_class = PriceTypeForm
     template_name = 'price/price_type_update.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        price = PriceTable.objects.get(id=self.kwargs['pk'])
+        context['park_id'] = self.kwargs['park']
+        context['deadline'] = DatePeriodForm(auto_id="deadline_%s",
+                                             instance=DatePeriod.objects.get(pricetable=price))
         PriceTypeFormset = modelformset_factory(PriceType, form=PriceTypeForm, extra=0, can_delete_extra=True,
                                                 can_delete=True)
-        context['formset'] = PriceTypeFormset(None, queryset=PriceType.objects.filter(
-            park=Park.objects.get(id=self.kwargs['pk'])))
+        context['formset'] = PriceTypeFormset(None, queryset=price.get_prices())
         return context
 
     def test_func(self):
-        return not (Administrator.objects.filter(user=self.request.user) is None)
+        price = PriceTable.objects.get(id=self.kwargs['pk'])
+        return permission_to_update_park_resources(self, price)
 
     def post(self, request, *args, **kwargs):
+        price = PriceTable.objects.get(id=self.kwargs['pk'])
+        deadlineform = DatePeriodForm(request.POST, auto_id="deadline_%s",
+                                      instance=DatePeriod.objects.get(pricetable=price))
         PriceTypeFormset = modelformset_factory(PriceType, form=PriceTypeForm, extra=0, can_delete=True,
                                                 can_delete_extra=True)
-        park = Park.objects.get(id=self.kwargs['pk'])
+        park = Park.objects.get(id=self.kwargs['park'])
         formset = PriceTypeFormset(request.POST)
-        if formset.is_valid():
-            if validate_price_type(formset):
+        if deadlineform.is_valid() and formset.is_valid():
+            # noinspection DuplicatedCode
+            errors = 0
+            for table in PriceTable.objects.filter(archived=False, park=kwargs['pk']):
+                if table.deadline.start_date <= deadlineform.cleaned_data['start_date'] <= \
+                        table.deadline.end_date or \
+                        table.deadline.end_date >= deadlineform.cleaned_data['end_date'] >= \
+                        table.deadline.start_date:
+                    errors += 1
+                    errors = deadlineform.errors.setdefault("__all__", ErrorList())
+                    errors.append("Choosen deadline already in a price table from " +
+                                  table.deadline.start_date.strftime("%d/%m/%Y") +
+                                  " to " + table.deadline.end_date.strftime("%d/%m/%Y") + " .")
+            count = 0
+            for form in formset:
+                if form.is_valid():
+                    if form['DELETE'].value() is False:
+                        count += 1
+            if validate_price_type(formset) and errors == 0:
+                deadlineform.save()
                 for form in formset:
-                    filterType = PriceType.objects.filter(park=park, total=form.cleaned_data['total'],
+                    filterType = PriceType.objects.filter(table=price, total=form.cleaned_data['total'],
                                                           minutes=form.cleaned_data['minutes'],
-                                                          hours=form.cleaned_data['hours'])
+                                                          hours=form.cleaned_data['hours'],
+                                                          type=form.cleaned_data['type'])
                     if form.cleaned_data['DELETE'] is False:
                         child = form.save(commit=False)
-                        child.park = park
+                        child.table = price
                         child.save()
                     elif form.cleaned_data['DELETE'] is True and filterType is not None:
                         filterType.delete()
-                return HttpResponseRedirect(reverse('park_detail', kwargs={'pk': park.id}))
-        return render(request, "price/price_type_add.html", {"formset": formset})
+                return HttpResponseRedirect(reverse('list_prices', kwargs={'pk': park.id}))
+            elif count == 0:
+                errors = deadlineform.errors.setdefault("__all__", ErrorList())
+                errors.append("Must have at least one price type.")
+        return render(request, "price/price_type_update.html", {"deadline": deadlineform, "formset": formset,
+                                                                "park_id": park.id})
 
 
-# noinspection PyUnresolvedReferences,PyArgumentList
-class UpdateContractType(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
-    model = Park
-    form_class = ParkForm
-    template_name = 'contract/contract_type_update.html'
+class ArchivePark(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name = 'parks/park_confirm_archive.html'
+
+    def test_func(self):
+        return permission_to_archive_park(self)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        ContractTypeFormset = modelformset_factory(ContractType, form=ContractTypeForm, extra=0, can_delete_extra=True,
-                                                   can_delete=True)
-        context['formset'] = ContractTypeFormset(None, queryset=ContractType.objects.filter(
-            park=Park.objects.get(id=self.kwargs['pk'])))
+        context['object'] = Park.objects.get(id=kwargs['pk'])
         return context
 
-    def test_func(self):
-        return not (Administrator.objects.filter(user=self.request.user) is None)
-
-    def post(self, request, *args, **kwargs):
-        ContractTypeFormset = modelformset_factory(ContractType, form=ContractTypeForm, extra=0, can_delete=True,
-                                                   can_delete_extra=True)
-        park = Park.objects.get(id=self.kwargs['pk'])
-        formset = ContractTypeFormset(request.POST)
-        if formset.is_valid():
-            if validate_contract_type(formset):
-                for form in formset:
-                    filterContract = ContractType.objects.filter(park=park, total=form.cleaned_data['total'],
-                                                                 years=form.cleaned_data['years'],
-                                                                 months=form.cleaned_data['months'],
-                                                                 name=form.cleaned_data['name'])
-                    if form.cleaned_data['DELETE'] is False:
-                        child = form.save(commit=False)
-                        child.park = park
-                        child.save()
-                    elif form.cleaned_data['DELETE'] is True and filterContract is not None:
-                        filterContract.delete()
-                return HttpResponseRedirect(reverse('park_detail', kwargs={'pk': park.id}))
-        return render(request, "contract/contract_type_update.html", {"formset": formset})
-
-
-class DeletePark(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-    model = Park
-    success_url = reverse_lazy('list_parks')
-    template_name = 'parks/park_confirm_delete.html'
-
-    def test_func(self):
-        return not (Administrator.objects.filter(user=self.request.user) is None)
+    @staticmethod
+    def post(request, *args, **kwargs):
+        Park.objects.filter(id=kwargs['pk']).update(is_archived=True, is_open=False)
+        for zone in Park.objects.get(id=kwargs['pk']).zones():
+            Zone.objects.filter(id=zone.id).update(is_archived=True, is_open=False)
+            for spot in Zone.objects.get(id=zone.id).spots():
+                ParkingSpot.objects.filter(id=spot.id).update(is_archived=True)
+        return HttpResponseRedirect(reverse('park_detail', kwargs={'pk': kwargs['pk']}))
 
 
 class ArquiveSchedule(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name = 'schedule/weekschedule_confirm_arquive.html'
 
     def test_func(self):
-        return not (Administrator.objects.filter(user=self.request.user) is None)
+        schedule = WeekSchedule.objects.get(id=self.kwargs['pk'])
+        return permission_to_update_park_resources(self, schedule)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -359,8 +399,27 @@ class ArquiveSchedule(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
 
     @staticmethod
     def post(request, *args, **kwargs):
-        WeekSchedule.objects.filter(id=kwargs['pk']).update(arquived=True)
+        WeekSchedule.objects.filter(id=kwargs['pk']).update(archived=True)
         return HttpResponseRedirect(reverse('list_schedules', kwargs={'pk': kwargs['park']}))
+
+
+class ArquivePriceTable(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name = 'price/pricetable_confirm_arquive.html'
+
+    def test_func(self):
+        price = PriceTable.objects.get(id=self.kwargs['pk'])
+        return permission_to_update_park_resources(self, price)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['table_id'] = kwargs['pk']
+        context['park_id'] = kwargs['park']
+        return context
+
+    @staticmethod
+    def post(request, *args, **kwargs):
+        PriceTable.objects.filter(id=kwargs['pk']).update(archived=True)
+        return HttpResponseRedirect(reverse('list_prices', kwargs={'pk': kwargs['park']}))
 
 
 class AddZone(LoginRequiredMixin, UserPassesTestMixin, CreateView):
@@ -484,7 +543,7 @@ class UpdateZone(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 class DeleteZone(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Zone
     success_url = reverse_lazy('list_zones')
-    template_name = 'parks/park_confirm_delete.html'
+    template_name = 'parks/park_confirm_archive.html'
 
     def test_func(self):
         return not (Administrator.objects.filter(user=self.request.user) is None)

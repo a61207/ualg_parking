@@ -4,13 +4,13 @@
 {% load crispy_forms_filters %}
 
 {% block title %}
-    Parks
+    Price Tables
 {% endblock %}
 
 {% block main %}
 
     <div class="container">
-        <h1 class="mt-5">Park {{ park.name }} Schedules</h1>
+        <h1 class="mt-5">Park {{ park.name }} Price Tables</h1>
         {% if filter %}
             <form method="get" class="form form-inline">
                 <div class="row">
@@ -31,7 +31,7 @@
         {% endif %}
         {% render_table table %}
         <a type="button" href="{% url 'park_detail' park.id %}" class="btn btn-danger mt-2">Back</a>
-        <a type="button" href="{% url 'add_schedule' park.id %}" class="btn btn-success mt-2">Add Schedule</a>
+        <a type="button" href="{% url 'add_price' park.id %}" class="btn btn-success mt-2">Add Price Table</a>
     </div>
 
 {% endblock main %}

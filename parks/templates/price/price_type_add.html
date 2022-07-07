@@ -7,12 +7,13 @@
 {% block main %}
 
     <div class="container">
-        <h1 class="mt-5">Add Price Type</h1>
+        <h1 class="mt-5">Add Price Table</h1>
         <form method="post">
             {% csrf_token %}
             {% include 'price/price_type_form.html' %}
-            <a type="button" href="{% url 'list_parks' %}" class="btn btn-success mt-2">Back</a>
-            <button type="submit" class="btn btn-success mt-2">Add Price</button>
+            <a type="button" href="{% url 'list_prices' park_id %}" class="btn btn-danger mt-2">Back</a>
+            <button type="submit" class="btn btn-success mt-2">Add Price Table</button>
+            <button type="button" class="btn btn-secondary mt-2" id="addButton">Add Price Type</button>
         </form>
     </div>
 

@@ -12,7 +12,7 @@
         <form method="post">
             {% csrf_token %}
             {% include 'schedule/weekschedule_form.html' %}
-            <a type="button" href="{% url 'list_schedules' park_id %}" class="btn btn-success mt-2">Back</a>
+            <a type="button" href="{% url 'list_schedules' park_id %}" class="btn btn-danger mt-2">Back</a>
             <button type="submit" class="btn btn-success mt-2">Add Schedule</button>
         </form>
     </div>

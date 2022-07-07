@@ -49,7 +49,7 @@ def get_park_all_not_free(park):
 
 
 @register.filter(name='get_zone_all_not_free')
-def get_park_all_not_free(zone):
+def get_zone_all_not_free(zone):
     return zone.reserved_spots(timezone.now().date(), timezone.datetime.max) + \
            zone.occupied_spots(timezone.now().date(), timezone.datetime.max)
 
@@ -57,3 +57,8 @@ def get_park_all_not_free(zone):
 @register.filter(name='get_park_free')
 def get_park_free(park, deadline):
     return park.free_spots(deadline.start_date, deadline.end_date)
+
+
+@register.filter(name='get_non_achived_resources')
+def get_non_achived_resources(park):
+    return park.non_achived_resources()

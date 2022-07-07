@@ -9,26 +9,52 @@
 {% block main %}
 
     <div class="container">
-        <h1 class="mt-5">Park {{ object.name }}</h1>
+        <div class="row justify-content-between mt-5">
+            <h1 class="col">Park {{ object.name }}</h1>
+            {% if object.is_archived %}
+                <h2 class="col text-end"><span class="badge bg-warning">Archived</span></h2>
+            {% elif not object.is_open %}
+                <h2 class="col text-end"><span class="badge bg-dark">Closed</span></h2>
+            {% endif %}
+        </div>
         <div class="row mb-4">
             <div class="col-4">
                 <p>Address: {{ object.address }}</p>
                 <p>Postal Code: {{ object.posta_city }}</p>
                 <p>Typology: {{ object.get_typology_display }}</p>
                 <p>Zones: {{ object.zones.count }}</p>
-                <p>Admin: {{ object.admin.user.first_name }} {{ object.admin.user.last_name }}</p>
-                <p>Created: {{ object.created }}</p>
-                <p>Updated: {{ object.updated }}</p>
+                {% if request.user|is_admin %}
+                    <p>Admin: {{ object.admin.user.first_name }} {{ object.admin.user.last_name }}</p>
+                    <p>Created: {{ object.created }}</p>
+                    <p>Updated: {{ object.updated }}</p>
+                {% endif %}
 
-                {% if object.current_weekly_schedule %}
-                    <h4>Schedule</h4>
-                    <table class="table">
-                        <tbody>
+
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>Schedule</h4>
+                    </div>
+                    <div>
+                        {% if request.user|is_admin %}
+                            {% if object.weekly_schedules %}
+                                <a type="button" class="btn btn-sm btn-info"
+                                   href="{% url 'list_schedules' object.id %}">View Schedules</a>
+                            {% elif not object.is_archived %}
+                                <a type="button" class="btn btn-sm btn-success"
+                                   href="{% url 'add_schedule' object.id %}">Add Schedule</a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <table class="table">
+                    <tbody>
+                    {% if object.current_weekly_schedule %}
                         {% if object.current_weekly_schedule.equal_allweek %}
                             <tr>
                                 <th scope="row">Every Day</th>
                                 {% if object.current_weekly_schedule.monday.start %}
-                                    {% if object.current_weekly_schedule.monday.start == object.current_weekly_schedule.monday.end %}
+                                    {% if object.current_weekly_schedule.monday.all_day %}
                                         <td colspan="3">All Day</td>
                                     {% else %}
                                         <td>{{ object.current_weekly_schedule.monday.start }}</td>
@@ -44,7 +70,7 @@
                                 <tr>
                                     <th scope="row">Week Days</th>
                                     {% if object.current_weekly_schedule.monday.start %}
-                                        {% if object.current_weekly_schedule.monday.start == object.current_weekly_schedule.monday.end %}
+                                        {% if object.current_weekly_schedule.monday.all_day %}
                                             <td colspan="3">All Day</td>
                                         {% else %}
                                             <td>{{ object.current_weekly_schedule.monday.start }}</td>
@@ -60,7 +86,7 @@
                                     <tr>
                                         <th scope="row">Monday</th>
                                         {% if object.current_weekly_schedule.monday.start %}
-                                            {% if object.current_weekly_schedule.monday.start == object.current_weekly_schedule.monday.end %}
+                                            {% if object.current_weekly_schedule.monday.all_day %}
                                                 <td colspan="3">All Day</td>
                                             {% else %}
                                                 <td>{{ object.current_weekly_schedule.monday.start }}</td>
@@ -76,7 +102,7 @@
                                     <tr>
                                         <th scope="row">Tuesday</th>
                                         {% if object.current_weekly_schedule.tuesday.start %}
-                                            {% if object.current_weekly_schedule.tuesday.start == object.current_weekly_schedule.tuesday.end %}
+                                            {% if object.current_weekly_schedule.tuesday.all_day %}
                                                 <td colspan="3">All Day</td>
                                             {% else %}
                                                 <td>{{ object.current_weekly_schedule.tuesday.start }}</td>
@@ -90,7 +116,7 @@
                                     <tr>
                                         <th scope="row">Wednesday</th>
                                         {% if object.current_weekly_schedule.wednesday.start %}
-                                            {% if object.current_weekly_schedule.wednesday.start == object.current_weekly_schedule.wednesday.end %}
+                                            {% if object.current_weekly_schedule.wednesday.all_day %}
                                                 <td colspan="3">All Day</td>
                                             {% else %}
                                                 <td>{{ object.current_weekly_schedule.wednesday.start }}</td>
@@ -104,7 +130,7 @@
                                     <tr>
                                         <th scope="row">Thursday</th>
                                         {% if object.current_weekly_schedule.thursday.start %}
-                                            {% if object.current_weekly_schedule.thursday.start == object.current_weekly_schedule.thursday.end %}
+                                            {% if object.current_weekly_schedule.thursday.all_day %}
                                                 <td colspan="3">All Day</td>
                                             {% else %}
                                                 <td>{{ object.current_weekly_schedule.thursday.start }}</td>
@@ -118,7 +144,7 @@
                                     <tr>
                                         <th scope="row">Friday</th>
                                         {% if object.current_weekly_schedule.friday.start %}
-                                            {% if object.current_weekly_schedule.friday.start == object.current_weekly_schedule.friday.end %}
+                                            {% if object.current_weekly_schedule.friday.all_day %}
                                                 <td colspan="3">All Day</td>
                                             {% else %}
                                                 <td>{{ object.current_weekly_schedule.friday.start }}</td>
@@ -135,7 +161,7 @@
                                 <tr>
                                     <th scope="row">Weekend</th>
                                     {% if object.current_weekly_schedule.sunday.start %}
-                                        {% if object.current_weekly_schedule.sunday.start == object.current_weekly_schedule.sunday.end %}
+                                        {% if object.current_weekly_schedule.sunday.all_day %}
                                             <td colspan="3">All Day</td>
                                         {% else %}
                                             <td>{{ object.current_weekly_schedule.sunday.start }}</td>
@@ -151,7 +177,7 @@
                                     <tr>
                                         <th scope="row">Saturday</th>
                                         {% if object.current_weekly_schedule.saturday.start %}
-                                            {% if object.current_weekly_schedule.saturday.start == object.current_weekly_schedule.saturday.end %}
+                                            {% if object.current_weekly_schedule.saturday.all_day %}
                                                 <td colspan="3">All Day</td>
                                             {% else %}
                                                 <td>{{ object.current_weekly_schedule.saturday.start }}</td>
@@ -165,7 +191,7 @@
                                     <tr>
                                         <th scope="row">Sunday</th>
                                         {% if object.current_weekly_schedule.sunday.start %}
-                                            {% if object.current_weekly_schedule.sunday.start == object.current_weekly_schedule.sunday.end %}
+                                            {% if object.current_weekly_schedule.sunday.all_day %}
                                                 <td colspan="3">All Day</td>
                                             {% else %}
                                                 <td>{{ object.current_weekly_schedule.sunday.start }}</td>
@@ -177,15 +203,34 @@
                                 {% endif %}
                             {% endif %}
                         {% endif %}
+                    {% else %}
+                        <tr>
+                            <th scope="row">Not Available</th>
+                        </tr>
+                    {% endif %}
 
-                        </tbody>
-                    </table>
-                {% endif %}
+                    </tbody>
+                </table>
 
 
-                {% if object.price_types %}
-                    <h4>Price Table</h4>
-                    <table class="table">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>Price Table</h4>
+                    </div>
+                    <div>
+                        {% if request.user|is_admin and not object.is_archived %}
+                            {% if object.price_tables %}
+                                <a type="button" class="btn btn-sm btn-info mt-2"
+                                   href="{% url 'list_prices' object.id %}"> View Prices</a>
+                            {% elif not object.is_archived %}
+                                <a type="button" class="btn btn-sm btn-success mt-2"
+                                   href="{% url 'add_price' object.id %}">Add Prices</a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+                <table class="table">
+                    {% if object.current_price_table %}
                         <thead>
                         <tr>
                             <th scope="col">Time</th>
@@ -193,85 +238,61 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% for row in object.price_types %}
-                            <tr>
-                                <th scope="row">{{ row.total_time }}</th>
-                                {% if row.total == 0 %}
-                                    <td>Free</td>
-                                {% else %}
-                                    <td>{{ row.total }} €</td>
-                                {% endif %}
-                            </tr>
+                        {% for row in object.current_price_table.get_prices %}
+                            {% if row.type == row.NORMAL %}
+                                <tr>
+                                    <th scope="row">{{ row.total_time }}</th>
+                                    {% if row.total == 0 %}
+                                        <td>Free</td>
+                                    {% else %}
+                                        <td>{{ row.total }} €</td>
+                                    {% endif %}
+                                </tr>
+                            {% endif %}
                         {% endfor %}
                         </tbody>
-                    </table>
-                {% endif %}
-
-                {% if object.contract_types %}
-                    <h4>Contract Types</h4>
-                    <table class="table">
-                        <thead>
+                    {% else %}
                         <tr>
-                            <th scope="col">Type</th>
-                            <th scope="col">Price</th>
+                            <th scope="row">Not Available</th>
                         </tr>
-                        </thead>
-                        <tbody>
-                        {% for row in object.contract_types %}
-                            <tr>
-                                <th scope="row">{{ row.name }}</th>
-                                {% if row.total == 0 %}
-                                    <td>Free</td>
-                                {% else %}
-                                    <td>{{ row.total }} €</td>
-                                {% endif %}
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                {% endif %}
+                    {% endif %}
+                </table>
 
-                <a type="button" class="btn btn-success mt-2" href="{% url 'list_parks' %}">Back</a>
-                {% if object.zones %}
-                    <a type="button" class="btn btn-success mt-2" href="{% url 'list_zones' object.id %}">View Zones</a>
-                {% endif %}
-                {% if request.user|is_admin %}
-                    {% if object.weekly_schedules %}
-                        <a type="button" class="btn btn-success mt-2" href="{% url 'list_schedules' object.id %}">View
-                            Schedules</a>
-                    {% else %}
-                        <a type="button" class="btn btn-success mt-2" href="{% url 'add_schedule' object.id %}">Add
-                            Schedule</a>
-                    {% endif %}
-                    {% if object.price_types %}
-                        <a type="button" class="btn btn-success mt-2" href="{% url 'update_price' object.id %}">Update
-                            Prices</a>
-                    {% else %}
-                        <a type="button" class="btn btn-success mt-2" href="{% url 'add_price' object.id %}">Add
-                            Prices</a>
-                    {% endif %}
-                    {% if object.contract_types %}
-                        <a type="button" class="btn btn-success mt-2" href="{% url 'update_contract' object.id %}">Update
-                            Contracts</a>
-                    {% else %}
-                        <a type="button" class="btn btn-success mt-2" href="{% url 'add_contract' object.id %}">Add
-                            Contracts</a>
-                    {% endif %}
-                    {% if not object.zones %}
-                        <a class="btn btn-success mt-2" href="{% url 'add_zone' object.id %}">Add Zone</a>
-                    {% endif %}
-                    <a type="button" href="{% url 'update_park' object.id %}" class="btn btn-success mt-2">Update
-                        Park</a>
 
-                    {% if not object|get_park_all_not_free %}
-                        <a type="button" href="{% url 'delete_park' object.id %}" class="btn btn-success mt-2">Delete
-                            Park</a>
+                <form method="post">
+                    {% csrf_token %}
+                    <a type="button" class="btn btn-outline-dark mt-2" href="{% url 'list_parks' %}">Back</a>
+                    {% if object.zones %}
+                        <a type="button" class="btn btn-secondary mt-2"
+                           href="{% url 'list_zones' object.id %}">Zones</a>
                     {% endif %}
+                    {% if request.user|is_admin and not object.is_archived %}
+                        {% if not object.zones %}
+                            <a class="btn btn-secondary mt-2" href="{% url 'add_zone' object.id %}">Zones</a>
+                        {% endif %}
+                        <a type="button" href="{% url 'update_park' object.id %}" class="btn btn-warning mt-2">Edit</a>
 
-                {% endif %}
+                        {% if not object|get_park_all_not_free and not object|get_non_achived_resources %}
+                            <a type="button" href="{% url 'archive_park' object.id %}"
+                               class="btn btn-danger mt-2">Archive</a>
+                        {% endif %}
+
+                        {% if object.is_open %}
+                            <button type="submit" name="close" value="{{ object.id }}" class="btn btn-dark mt-2">
+                                Close
+                            </button>
+                        {% else %}
+                            <button type="submit" name="open" value="{{ object.id }}" class="btn btn-success mt-2">
+                                Open
+                            </button>
+                        {% endif %}
+
+                    {% endif %}
+                </form>
+
             </div>
             <div class="col-8">
-                <div class="position-sticky" style="top: 2rem; height: 60vh">
+                <div class="position-sticky mb-4" style="top: 2rem; height: 60vh">
                     <iframe src="{{ park.map_src }}" width="100%" style="border:0;" allowfullscreen=""
                             class="border rounded-3 border border-dark shadow h-100"
                             referrerpolicy="no-referrer-when-downgrade"></iframe>

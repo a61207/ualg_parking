@@ -131,6 +131,9 @@ class TimePeriod(models.Model):
     class Meta:
         db_table = 'TimePeriod'
 
+    def all_day(self):
+        return self.start.hour == 0 and self.start.minute == 0 and self.end.hour == 23 and self.end.minute == 59
+
 
 class DatePeriod(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)
@@ -156,7 +159,8 @@ class Park(models.Model):
     city = models.CharField(verbose_name='City', db_column='City', max_length=50)
     typology = models.CharField(verbose_name='Typology', db_column='Typology', choices=TYPOLOGYS, max_length=2)
     map_html = models.TextField(db_column='MapLocationHTML', verbose_name='Map Location HTML')
-    is_open = models.BooleanField(verbose_name='IsOpen', db_column='IsOpen', default=False)
+    is_open = models.BooleanField(verbose_name='Open', db_column='IsOpen', default=False)
+    is_archived = models.BooleanField(verbose_name='Archived', db_column='IsArchived', default=False)
     created = models.DateTimeField(db_column='Created', verbose_name='Created', default=timezone.now)
     updated = models.DateTimeField(db_column='Updated', verbose_name='Updated', default=timezone.now)
     admin = models.ForeignKey(Administrator, models.CASCADE, verbose_name='Admin', db_column='Admin',
@@ -239,18 +243,21 @@ class Park(models.Model):
 
     def reserved_spots(self, start, end):
         count = 0
-        for zone in Zone.objects.filter(park=Park.objects.get(id=self.id)):
+        for zone in Zone.objects.filter(park=Park.objects.get(id=self.id), is_archived=False):
             count += zone.reserved_spots(start, end)
         return count
 
     def zones(self):
         return Zone.objects.filter(park=self.id)
 
-    def price_types(self):
-        return PriceType.objects.filter(park=self.id)
+    def price_tables(self):
+        return PriceTable.objects.filter(park=self.id)
 
-    def contract_types(self):
-        return ContractType.objects.filter(park=self.id)
+    def current_price_table(self):
+        for table in self.price_tables():
+            if table.deadline.end_date >= timezone.now().date() >= table.deadline.start_date and \
+                    not table.archived:
+                return table
 
     def weekly_schedules(self):
         return WeekSchedule.objects.filter(park=self.id)
@@ -258,22 +265,46 @@ class Park(models.Model):
     def current_weekly_schedule(self):
         for schedule in self.weekly_schedules():
             if schedule.deadline.end_date >= timezone.now().date() >= schedule.deadline.start_date and \
-                    not schedule.arquived:
+                    not schedule.archived:
                 return schedule
+
+    def non_achived_resources(self):
+        return PriceTable.objects.filter(park=self, archived=False).count() + \
+               WeekSchedule.objects.filter(park=self, archived=False).count()
+
+
+class PriceTable(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)
+    deadline = models.OneToOneField(DatePeriod, models.CASCADE, db_column='Deadline', verbose_name='Deadline')
+    archived = models.BooleanField(db_column='Archived', verbose_name='Archived', default=False)
+    park = models.ForeignKey(Park, models.CASCADE, db_column='Parque', verbose_name='Park')
+
+    def get_prices(self):
+        return PriceType.objects.filter(table=self.id)
+
+    def get_n_prices(self):
+        return self.get_prices().count()
 
 
 class PriceType(models.Model):
+    NORMAL = 'NO'
+    FINE = 'FI'
+    TYPE = [
+        (NORMAL, 'Normal'),
+        (FINE, 'Fine'),
+    ]
+
     id = models.AutoField(db_column='ID', primary_key=True)
     minutes = models.IntegerField(db_column='MinutesTime', verbose_name='Minutes Time', default=0)
     hours = models.IntegerField(db_column='HoursTime', verbose_name='Hours Time', default=0)
     total = models.DecimalField(db_column='TotalValue', verbose_name='Total Value', max_digits=6, decimal_places=2,
                                 default=0)
-    deadline = models.OneToOneField(DatePeriod, models.CASCADE, db_column='Deadline', verbose_name='Deadline')
-    park = models.ForeignKey(Park, models.CASCADE, db_column='Parque', verbose_name='Park')
+    type = models.CharField(verbose_name='Type', db_column='Type', choices=TYPE, max_length=2)
+    table = models.ForeignKey(PriceTable, models.CASCADE, db_column='PriceTable', verbose_name='Price Table')
 
     class Meta:
         db_table = 'PriceType'
-        unique_together = ('minutes', 'hours', 'park')
+        unique_together = ('minutes', 'hours', 'table', 'type')
 
     def total_time(self):
         if self.minutes and self.hours:
@@ -301,7 +332,7 @@ class WeekSchedule(models.Model):
                                     verbose_name='Saturday')
     sunday = models.OneToOneField(TimePeriod, models.CASCADE, related_name='Sunday', db_column='Sunday',
                                   verbose_name='Sunday')
-    arquived = models.BooleanField(db_column='Arquived', verbose_name='Arquived', default=False)
+    archived = models.BooleanField(db_column='Archived', verbose_name='Archived', default=False)
     park = models.ForeignKey(Park, models.CASCADE, db_column='Parque', verbose_name='Park')
 
     class Meta:
@@ -342,20 +373,6 @@ class WeekSchedule(models.Model):
         return self.reserved_spots() + self.occupied_spots()
 
 
-class ContractType(models.Model):
-    id = models.AutoField(db_column='ID', primary_key=True)
-    name = models.CharField(db_column='Name', verbose_name='Name', max_length=50, unique=True)
-    years = models.IntegerField(db_column='YearsTime', verbose_name='Years Time', default=0)
-    months = models.IntegerField(db_column='MonthsTime', verbose_name='Months Time', default=0)
-    total = models.DecimalField(db_column='TotalValue', verbose_name='Total Value', max_digits=6, decimal_places=2,
-                                default=0)
-    park = models.ForeignKey(Park, models.CASCADE, db_column='Parque', verbose_name='Park')
-
-    class Meta:
-        db_table = 'ContractType'
-        unique_together = ('name', 'park')
-
-
 class LayoutLine(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)
     x = models.IntegerField(db_column="Abscissa", verbose_name="Abscissa")
@@ -369,10 +386,13 @@ class LayoutLine(models.Model):
 
 class Zone(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)
-    name = models.CharField(db_column='Name', verbose_name='Name', max_length=50, unique=True)
+    name = models.CharField(db_column='Name', verbose_name='Name', max_length=50)
     park = models.ForeignKey(Park, models.CASCADE, db_column='ParqueID', verbose_name='Park')
+    is_archived = models.BooleanField(verbose_name='Archived', db_column='IsArchived', default=False)
+    is_open = models.BooleanField(verbose_name='Open', db_column='IsOpen', default=False)
 
     class Meta:
+        unique_together = ['park', 'name']
         db_table = 'Zone'
 
     def spots(self):
@@ -404,7 +424,7 @@ class Zone(models.Model):
 
     def reserved_spots(self, start, end):
         count = 0
-        for spot in ParkingSpot.objects.filter(zone=self.id):
+        for spot in ParkingSpot.objects.filter(zone=self.id, is_archived=False):
             if spot.get_state(start, end) == ParkingSpot.RESERVED:
                 count += 1
         return count
@@ -429,20 +449,21 @@ class ParkingSpot(models.Model):
     x = models.IntegerField(db_column="Abscissa", verbose_name="Abscissa")
     y = models.IntegerField(db_column="Ordiante", verbose_name="Ordiante")
     direction = models.CharField(verbose_name='Direction', db_column='Direction', choices=DIRECTIONS, max_length=2)
+    is_archived = models.BooleanField(verbose_name='Archived', db_column='IsArchived', default=False)
 
     class Meta:
         db_table = 'ParkingSpot'
 
     def get_state(self, start, end):
-        if EntradasSaidas.objects.filter(lugarid=self.id, periocidadeid__start__lte=start,
-                                         periocidadeid__end__gte=start) or \
+        if EntradasSaidas.objects.filter(lugarid=self.id, periocidadeid__start__gte=start,
+                                         periocidadeid__end__gte=start) and \
                 EntradasSaidas.objects.filter(lugarid=self.id, periocidadeid__start__lte=end,
-                                              periocidadeid__end__gte=end):
+                                              periocidadeid__end__lte=end):
             return ParkingSpot.OCCUPIED
-        elif Reserva.objects.filter(lugarid=self.id, periocidadeid__start__lte=start,
-                                    periocidadeid__end__gte=start) or \
+        elif Reserva.objects.filter(lugarid=self.id, periocidadeid__start__gte=start,
+                                    periocidadeid__end__gte=start) and \
                 Reserva.objects.filter(lugarid=self.id, periocidadeid__start__lte=end,
-                                       periocidadeid__end__gte=end):
+                                       periocidadeid__end__lte=end):
             return ParkingSpot.RESERVED
         else:
             return ParkingSpot.FREE
@@ -480,9 +501,9 @@ class Contrato(models.Model):
     lugarid = models.ForeignKey(ParkingSpot, models.DO_NOTHING, db_column='LugarID')
     modalidadepagamentoid = models.ForeignKey(Modalidadepagamento, models.CASCADE,
                                               db_column='ModalidadePagamentoID', blank=True,
-                                   null=True)  # Field name made lowercase.
+                                              null=True)  # Field name made lowercase.
     valorcontrato = models.FloatField(db_column='ValorContrato', blank=True,
-                                   null=True)  # Field name made lowercase.
+                                      null=True)  # Field name made lowercase.
     datainicio = models.DateField(db_column='DataInicio')  # Field name made lowercase.
     datafim = models.DateField(db_column='DataFim', blank=True,
                                null=True)  # Field name made lowercase.

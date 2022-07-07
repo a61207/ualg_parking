@@ -1,4 +1,7 @@
 from django.forms.utils import ErrorList
+from django.utils import timezone
+
+from main.models import Park, Administrator
 
 
 def check_empty_spots(formset):
@@ -13,21 +16,9 @@ def check_empty_spots(formset):
 def duplicated_time(form, formset):
     count = -1
     for formP in formset:
-        if formP.cleaned_data['DELETE'] is False and formP.cleaned_data['hours'] == form.cleaned_data['hours'] and \
-                formP.cleaned_data['minutes'] == form.cleaned_data['minutes']:
-            count += 1
-    if count > 0:
-        return True
-    else:
-        return False
-
-
-def duplicated_contract(form, formset):
-    count = -1
-    for formP in formset:
-        if formP.cleaned_data['DELETE'] is False and formP.cleaned_data['years'] == form.cleaned_data['years'] and \
-                formP.cleaned_data['months'] == form.cleaned_data['months'] and \
-                formP.cleaned_data['name'] == form.cleaned_data['name']:
+        if formP['DELETE'].value() is False and formP['hours'].value() == form['hours'].value() and \
+                formP['minutes'].value() == form['minutes'].value() and \
+                formP['type'].value() == form['type'].value():
             count += 1
     if count > 0:
         return True
@@ -39,35 +30,16 @@ def validate_price_type(formset):
     nerrors = 0
     count = 0
     for form in formset:
-        if form.is_valid() and form.cleaned_data:
-            if form.cleaned_data and form.cleaned_data['DELETE'] is False:
+        if form.is_valid():
+            if form['DELETE'].value() is False:
                 count += 1
-                if form.cleaned_data['hours'] == 0 and form.cleaned_data['minutes'] == 0:
+                if form['hours'].value() is '0' and form['minutes'].value() is '0':
                     errors = form.errors.setdefault("__all__", ErrorList())
-                    errors.append("Time Values can't have null values.")
+                    errors.append("Time Values can't have both null values.")
                     nerrors += 1
                 elif duplicated_time(form, formset):
                     errors = form.errors.setdefault("__all__", ErrorList())
-                    errors.append("Price Type Duration already defined.")
-                    nerrors += 1
-    return not nerrors and count != 0
-
-
-def validate_contract_type(formset):
-    nerrors = 0
-    count = 0
-    for form in formset:
-        if form.is_valid() and form.cleaned_data:
-            if form.cleaned_data and form.cleaned_data['DELETE'] is False:
-                count += 1
-                if form.cleaned_data['years'] == 0 and form.cleaned_data['months'] == 0 \
-                        and not form.cleaned_data['name']:
-                    errors = form.errors.setdefault("__all__", ErrorList())
-                    errors.append("Time Values can't have null values.")
-                    nerrors += 1
-                elif duplicated_contract(form, formset):
-                    errors = form.errors.setdefault("__all__", ErrorList())
-                    errors.append("Contract Type Duration and name already defined.")
+                    errors.append("Price Type Duration duplicated.")
                     nerrors += 1
     return not nerrors and count != 0
 
@@ -103,3 +75,29 @@ def check_overlaping_spots(formset):
             i.append([form.cleaned_data['x'], form.cleaned_data['y'], form.cleaned_data['direction'],
                       form.cleaned_data['number']])
     return False
+
+
+def close_open_park(request):
+    if 'close' in request.POST:
+        print(Park.objects.filter(id=request.POST['close']).first().is_open)
+        Park.objects.filter(id=request.POST['close']).update(is_open=False)
+        print(Park.objects.filter(id=request.POST['close']).first().is_open)
+    if 'open' in request.POST:
+        Park.objects.filter(id=request.POST['open']).update(is_open=True)
+
+
+def permission_to_update_park_resources(self, resource):
+    is_admin = Administrator.objects.filter(user=self.request.user.id).exists()
+    if is_admin:
+        return (Park.objects.get(id=self.kwargs['park']).reserved_spots(resource.deadline.start_date,
+                                                                        resource.deadline.end_date) +
+                Park.objects.get(id=self.kwargs['park']).occupied_spots(resource.deadline.start_date,
+                                                                        resource.deadline.end_date)) == 0
+    return is_admin
+
+
+def permission_to_archive_park(self):
+    return Administrator.objects.filter(user=self.request.user.id).exists() and (
+            Park.objects.get(id=self.kwargs['pk']).reserved_spots(timezone.now().date(), timezone.datetime.max) +
+            Park.objects.get(id=self.kwargs['pk']).occupied_spots(timezone.now().date(), timezone.datetime.max) == 0 and
+            Park.objects.get(id=self.kwargs['pk']).non_achived_resources() == 0)

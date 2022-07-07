@@ -7,10 +7,17 @@
         display: none;
     }
 
-    .form-check {
+    div[id$='DELETE']{
         display: none;
     }
 </style>
+
+{% for erro in deadline.non_field_errors %}
+    <div class="alert alert-danger" role="alert">
+        {{ erro }}
+    </div>
+{% endfor %}
+
 
 <div class="row justify-content-start">
     <div class="col-auto">
@@ -24,7 +31,8 @@
 <div class="row mt-3">
     <div id="price-list">
         {% for form in formset %}
-            <div id="form-{{ forloop.counter0 }}" class='row mb-4 price-form {% if form.DELETE.value == True %}hidden{% endif %}'>
+            <div id="form-{{ forloop.counter0 }}"
+                 class='row mt-4 price-form {% if form.DELETE.value == True %}hidden{% endif %}'>
                 {{ form | crispy }}
                 <div class="col-auto mt-3">
                     <div type="button" id="deleteButton-{{ forloop.counter0 }}-"
@@ -35,17 +43,17 @@
             </div>
         {% endfor %}
     </div>
+    <small class="form-text text-muted">Required *</small>
     {{ formset.management_form }}
     <div id="empty-form" class="hidden">{{ formset.empty_form | crispy }}</div>
 </div>
-<button type="button" class="btn btn-success mt-2" id="addButton">Add Price Type</button>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <!--suppress JSUnusedLocalSymbols -->
 <script>
 
     tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1)
+    tomorrow.setDate(tomorrow.getDate())
     dd = tomorrow.getDate();
     mm = tomorrow.getMonth() + 1; //January is 0 so need to add 1 to make it 1!
     yyyy = tomorrow.getFullYear();
@@ -64,7 +72,7 @@
     start.addEventListener('change', () => {
         console.log(new Date(start.value))
         let tomorrow = new Date(start.value)
-        tomorrow.setDate(tomorrow.getDate() + 1)
+        tomorrow.setDate(tomorrow.getDate())
         let dd = tomorrow.getDate();
         let mm = tomorrow.getMonth() + 1; //January is 0 so need to add 1 to make it 1!
         let yyyy = tomorrow.getFullYear();
@@ -77,7 +85,6 @@
         console.log(tomorrow)
         end.min = tomorrow;
         if (end.value <= start.value) end.value = tomorrow;
-        document.getElementById('sub').disabled = start.value === "";
     });
 
     function delete_click(clicked_id) {
@@ -106,7 +113,7 @@
             const formCount = currentForms.length
             const copyForm = document.getElementById('price-list')
             const emptyForm = document.getElementById('empty-form').cloneNode(true)
-            emptyForm.setAttribute('class', 'row mb-4 price-form')
+            emptyForm.setAttribute('class', 'row mt-2 price-form')
             emptyForm.setAttribute('id', `form-${formCount}`)
             const regex = new RegExp('__prefix__', 'g')
             emptyForm.innerHTML = emptyForm.innerHTML.replace(regex, formCount)

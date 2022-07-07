@@ -14,19 +14,27 @@
         {% if filter %}
             <form method="get" class="form form-inline">
                 <div class="row">
-                    <div class="col-auto">
+                    <div class="col-2">
                         {{ filter.form.name | as_crispy_field }}
                     </div>
-                    <div class="col-auto">
+                    <div class="col-2">
                         {{ filter.form.address | as_crispy_field }}
                     </div>
-                    <div class="col-auto">
+                    <div class="col-2">
                         {{ filter.form.city | as_crispy_field }}
                     </div>
-                    <div class="col-auto">
+                    <div class="col-2">
                         {{ filter.form.typology | as_crispy_field }}
                     </div>
-                    <div class="col-auto">
+                    <div class="col-1">
+                        {{ filter.form.is_open | as_crispy_field }}
+                    </div>
+                    {% if request.user|is_admin %}
+                        <div class="col-1">
+                            {{ filter.form.is_archived | as_crispy_field }}
+                        </div>
+                    {% endif %}
+                    <div class="col-2">
                         <button type="submit" class="btn btn-success mt-4">Filter</button>
                     </div>
                 </div>

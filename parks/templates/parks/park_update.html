@@ -11,7 +11,7 @@
         <form method="post">
             {% csrf_token %}
             {% include 'parks/park_form.html' %}
-            <a type="button" href="{% url 'park_detail' object.id %}" class="btn btn-success mt-2">Back</a>
+            <a type="button" href="{% url 'park_detail' object.id %}" class="btn btn-danger mt-2">Back</a>
             <button type="submit" class="btn btn-success mt-2">Update Park</button>
         </form>
     </div>

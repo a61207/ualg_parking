@@ -8,12 +8,13 @@
 {% block main %}
 
     <div class="container">
-        <h1 class="mt-5">Update Schedule</h1>
+        <h1 class="mt-5">Update Park Weekly Schedule</h1>
         <form method="post">
             {% csrf_token %}
             {% include 'schedule/weekschedule_form.html' %}
+            <a type="button" href="{% url 'list_schedules' park_id %}" class="btn btn-danger mt-2">Back</a>
+            <button type="submit" class="btn btn-success mt-2">Update Schedule</button>
         </form>
-        <a type="button" href="{% url 'list_schedules' park_id %}" class="btn btn-success mt-2">Back</a>
     </div>
 
 {% endblock main %}

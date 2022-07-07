@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 
-from main.models import Park, Zone, ParkingSpot, PriceType, ContractType, TimePeriod, DatePeriod
+from main.models import Park, Zone, ParkingSpot, PriceType, TimePeriod, DatePeriod
 import re
 
 from main.static import postal_codes
@@ -65,33 +65,23 @@ class SpotForm(forms.ModelForm):
 
 
 class PriceTypeForm(forms.ModelForm):
+
     minutes = forms.IntegerField(required=True, initial=0, min_value=0, max_value=59,
                                  widget=forms.NumberInput(attrs={'value': 0}))
     hours = forms.IntegerField(required=True, initial=0, min_value=0, widget=forms.NumberInput(attrs={'value': 0}))
-    total = forms.DecimalField(required=True, initial=0, min_value=0, decimal_places=2, max_digits=14,
-                               widget=forms.NumberInput(attrs={'value': 0}))
+    total = forms.DecimalField(label="Total Cost", required=True, initial=0, min_value=0, decimal_places=2,
+                               max_digits=14, widget=forms.NumberInput(attrs={'value': 0}))
+    type = forms.ChoiceField(required=True, choices=PriceType.TYPE, initial=PriceType.NORMAL)
 
     class Meta:
         model = PriceType
-        fields = ('total', 'minutes', 'hours')
-
-
-class ContractTypeForm(forms.ModelForm):
-    months = forms.IntegerField(required=True, initial=0, min_value=0, max_value=11,
-                                widget=forms.NumberInput(attrs={'value': 0}))
-    years = forms.IntegerField(required=True, initial=0, min_value=0, widget=forms.NumberInput(attrs={'value': 0}))
-    total = forms.DecimalField(required=True, initial=0, min_value=0, decimal_places=2, max_digits=14,
-                               widget=forms.NumberInput(attrs={'value': 0}))
-
-    class Meta:
-        model = ContractType
-        fields = ('name', 'years', 'months', 'total')
+        fields = ('hours', 'minutes', 'total', 'type')
 
 
 class TimePeriodForm(forms.ModelForm):
     check = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}), required=False)
-    start = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}))
-    end = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}))
+    start = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}), required=False)
+    end = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}), required=False)
 
     class Meta:
         model = TimePeriod
@@ -99,10 +89,11 @@ class TimePeriodForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super(TimePeriodForm, self).clean()
-        time1 = self.cleaned_data['start']
-        time2 = self.cleaned_data['end']
-        if time1 >= time2:
-            raise ValidationError("Invalid Schedule")
+        if self.cleaned_data['start'] is not None and self.cleaned_data['end'] is not None:
+            time1 = self.cleaned_data['start']
+            time2 = self.cleaned_data['end']
+            if time1 >= time2:
+                raise ValidationError("Invalid Schedule")
         return cleaned_data
 
 

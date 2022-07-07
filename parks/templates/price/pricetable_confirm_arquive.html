@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load crispy_forms_filters %}
+
+{% block title %}
+    Archive Price Table
+{% endblock %}
+
+{% block main %}
+
+    <div class="container">
+        <h1 class="mt-5">Archive Price Table</h1>
+        <form method="post">
+            {% csrf_token %}
+            <p>Are you sure you want to archive the Price Table?</p>
+            <a type="button" href="{% url 'list_prices' park_id %}" class="btn btn-outline-dark mt-2">Back</a>
+            <button type="submit" class="btn btn-danger mt-2" name="arquive">Arquive</button>
+        </form>
+    </div>
+
+{% endblock main %}

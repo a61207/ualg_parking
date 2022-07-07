@@ -1,0 +1,5 @@
+{% load group_tags %}
+{% if not record.archived and not record.park|get_park_not_free:record.deadline %}
+    <a class="btn btn-warning btn-sm " href="{% url "update_price" record.park.id record.id %}">Update</a>
+    <a class="btn btn-danger btn-sm " href="{% url "arquive_price" record.park.id record.id %}">Archive</a>
+{% endif %}

@@ -2,18 +2,18 @@
 {% load crispy_forms_filters %}
 
 {% block title %}
-    Arquive Schedule
+    Archive Schedule
 {% endblock %}
 
 {% block main %}
 
     <div class="container">
-        <h1 class="mt-5">Arquive Schedule</h1>
+        <h1 class="mt-5">Archive Schedule</h1>
         <form method="post">
             {% csrf_token %}
-            <p>Are you sure you want to arquive schedule?</p>
-            <a type="button" href="{% url 'list_schedules' schedule_id %}" class="btn btn-success mt-2">Back</a>
-            <button type="submit" class="btn btn-success mt-2" name="arquive">Arquive</button>
+            <p>Are you sure you want to archive the Schedule?</p>
+            <a type="button" href="{% url 'list_schedules' park_id %}" class="btn btn-outline-dark mt-2">Back</a>
+            <button type="submit" class="btn btn-danger mt-2" name="arquive">Archive</button>
         </form>
     </div>
 

@@ -5,7 +5,7 @@
         {% csrf_token %}
         <input type="hidden" id="request" name="request" value="{{ record.id }}">
         <button type="submit" name="response" value="accept" class="btn btn-success mt-2">Accept</button>
-        <button type="submit" name="response" value="deny" class="btn btn-success mt-2">Deny</button>
+        <button type="submit" name="response" value="deny" class="btn btn-danger mt-2">Deny</button>
     </form>
 {% else %}
     {% if record.is_accepted %}

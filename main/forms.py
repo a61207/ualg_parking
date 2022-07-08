@@ -1,5 +1,8 @@
+import re
+
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
+from django.core.exceptions import ValidationError
 
 from .models import User, Client, RoleRequest, Car
 
@@ -47,7 +50,20 @@ class RoleRequestForm(forms.ModelForm):
 
 
 class CarForm(forms.ModelForm):
+    TRUE_FALSE_CHOICES = (
+        (True, 'Yes'),
+        (False, 'No')
+    )
+    foreign = forms.ChoiceField(choices=TRUE_FALSE_CHOICES, widget=forms.Select(), required=True)
 
     class Meta:
         model = Car
         fields = ("registration", "foreign", "brand", "model")
+
+    def clean_registration(self):
+        data = self.cleaned_data['registration']
+        # noinspection RegExpSimplifiable
+        matched = re.match("[A-Z0-9]{2}-[A-Z0-9]{2}-[A-Z0-9]{2}", data)
+        if not matched:
+            raise ValidationError("Registration must have 'xx-xx-xx' format beeing 'x' an number or a capital letter.")
+        return data

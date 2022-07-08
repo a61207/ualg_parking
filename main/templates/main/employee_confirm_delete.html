@@ -2,18 +2,18 @@
 {% load crispy_forms_filters %}
 
 {% block title %}
-    Delete Car
+    Remove Employee
 {% endblock %}
 
 {% block main %}
 
     <div class="container">
-        <h1 class="mt-5">Delete Car</h1>
+        <h1 class="mt-5">Remove Employee</h1>
         <form method="post">
             {% csrf_token %}
-            <p>Are you sure you want to <b>delete car "{{ object.registration }}"?</b></p>
+            <p>Are you sure you want to <b>remove Employee role of "{{ object.user.get_full_name }}"</b>?</p>
             <p><b>His role will be changed to client!</b></p>
-            <a type="button" href="{% url 'cars' object.client.user.id %}" class="btn btn-outline-dark mt-2">Back</a>
+            <a type="button" href="{% url 'employees' %}" class="btn btn-outline-dark mt-2">Back</a>
             <button type="submit" class="btn btn-danger mt-2">Remove Role</button>
         </form>
     </div>

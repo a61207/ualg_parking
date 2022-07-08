@@ -1,5 +1,11 @@
 {% load crispy_forms_filters %}
 
+{% if form.non_field_errors %}
+    <div class="alert alert-danger" role="alert">
+        {{ form.non_field_errors }}
+    </div>
+{% endif %}
+
 <div class="row">
     <div class="col-6">
         {{ form.registration |as_crispy_field }}

@@ -1,18 +1,34 @@
-{% extends 'main/account_settings.html' %}
+{% extends 'base.html' %}
 {% load group_tags %}
 {% load django_tables2 %}
 {% load crispy_forms_filters %}
 
-{% block account_section %}
+{% block title %}
+    Role Requests
+{% endblock %}
 
-    {% if filter %}
-        <form method="get" class="form form-inline">
-            <div class="row">
-                <div class="col-auto">
+{% block main %}
+
+    <div class="container">
+        <h1 class="mt-5">Role Requests</h1>
+        {% if filter %}
+            <form method="get" class="form form-inline">
+                <div class="row">
+                    <div class="col-auto">
+                        {{ filter.form.user | as_crispy_field }}
+                    </div>
+                    <div class="col-auto">
+                        {{ filter.form.role | as_crispy_field }}
+                    </div>
+                    <div class="col-2">
+                        <button type="submit" class="btn btn-success mt-4">Filter</button>
+                    </div>
                 </div>
-            </div>
-        </form>
-    {% endif %}
-    {% render_table table %}
+            </form>
+        {% endif %}
+        {% render_table table %}
+        <a type="button" href="{% url 'employees' %}" class="btn btn-info mt-2">Employees</a>
+        <a type="button" href="{% url 'administrators' %}" class="btn btn-primary mt-2">Administrators</a>
+    </div>
 
-{% endblock account_section %}
+{% endblock main %}

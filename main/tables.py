@@ -13,14 +13,24 @@ class RoleRequestTable(tables.Table):
 
 class CarTable(tables.Table):
     view = TemplateColumn(template_name='tables/car_buttons.html', verbose_name="")
+    created = Column(verbose_name="Added")
 
     class Meta:
         model = Car
-        fields = ("registration", "foreign", "brand", "model")
+        fields = ("registration", "foreign", "brand", "model", "created")
 
 
 class EmployeeTable(tables.Table):
+    view = TemplateColumn(template_name='tables/employee_buttons.html', verbose_name="")
 
     class Meta:
         model = Employee
-        fields = ("user__get_full_name", "user__email", "user__is_active")
+        fields = ("user__get_full_name", "user__email", "user__is_active", "user__date_joined", "user__last_login")
+
+
+class AdministratorTable(tables.Table):
+    view = TemplateColumn(template_name='tables/administrator_buttons.html', verbose_name="")
+
+    class Meta:
+        model = Employee
+        fields = ("user__get_full_name", "user__email", "user__is_active", "user__date_joined", "user__last_login")

@@ -80,7 +80,7 @@ class Car(models.Model):
     updated = models.DateTimeField(db_column='Updated', verbose_name='Updated', default=timezone.now)
 
     class Meta:
-        unique_together = ('registration', 'foreign',)
+        unique_together = ('registration', 'foreign')
         db_table = 'Car'
 
     def __str__(self):

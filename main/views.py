@@ -1,17 +1,17 @@
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from django.http import HttpResponseRedirect
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.views.generic import TemplateView, CreateView, DetailView, UpdateView
+from django.views.generic import TemplateView, CreateView, DetailView, UpdateView, DeleteView
 from django_filters.views import FilterView
 from django_tables2 import SingleTableMixin
 
-from main.filters import RoleRequestFilter, CarFilter, EmployeeFilter
+from main.filters import RoleRequestFilter, CarFilter, EmployeeFilter, AdministratorFilter
 from main.forms import UserForm, CarForm
 from main.models import User, Car, Administrator, RoleRequest, Client, Employee
 
 # Create your views here.
-from main.tables import RoleRequestTable, CarTable, EmployeeTable
+from main.tables import RoleRequestTable, CarTable, EmployeeTable, AdministratorTable
 
 
 class Index(TemplateView):
@@ -42,7 +42,7 @@ class ViewCarsList(LoginRequiredMixin, UserPassesTestMixin, SingleTableMixin, Fi
 
     def test_func(self):
         return self.request.user.id is int(self.kwargs['pk']) and \
-               not (Client.objects.filter(user=self.request.user) is None)
+               Client.objects.filter(user=self.request.user).exists()
 
 
 class ViewEmployeeList(LoginRequiredMixin, UserPassesTestMixin, SingleTableMixin, FilterView):
@@ -51,7 +51,57 @@ class ViewEmployeeList(LoginRequiredMixin, UserPassesTestMixin, SingleTableMixin
     filterset_class = EmployeeFilter
 
     def test_func(self):
-        return not (Administrator.objects.filter(user=self.request.user) is None)
+        return Administrator.objects.filter(user=self.request.user).exists()
+
+
+class ViewAdministratorsList(LoginRequiredMixin, UserPassesTestMixin, SingleTableMixin, FilterView):
+    model = Administrator
+    table_class = AdministratorTable
+    filterset_class = AdministratorFilter
+
+    def test_func(self):
+        return Administrator.objects.filter(user=self.request.user).exists()
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        admin = Administrator.objects.get(user=self.request.user)
+        return qs.exclude(id=admin.id)
+
+
+class DeleteEmployee(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    template_name = 'main/employee_confirm_delete.html'
+    model = Employee
+
+    def test_func(self):
+        return Administrator.objects.filter(user=self.request.user).exists()
+
+    def get_success_url(self):
+        Client.objects.create(user=Employee.objects.get(id=self.kwargs['pk']).user)
+        return reverse_lazy('employees')
+
+
+class DeleteAdministrator(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    template_name = 'main/administrator_confirm_delete.html'
+    model = Administrator
+
+    def test_func(self):
+        return Administrator.objects.filter(user=self.request.user).exists()
+
+    def get_success_url(self):
+        Client.objects.create(user=Administrator.objects.get(id=self.kwargs['pk']).user)
+        return reverse_lazy('administrators')
+
+
+class DeleteCar(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    template_name = 'main/car_confirm_delete.html'
+    model = Car
+
+    def test_func(self):
+        return self.request.user.id is int(self.kwargs['user']) and \
+               Client.objects.filter(user=self.request.user).exists()
+
+    def get_success_url(self):
+        return reverse_lazy('cars', kwargs={'pk': self.request.user.id})
 
 
 class AddCar(LoginRequiredMixin, UserPassesTestMixin, CreateView):
@@ -82,30 +132,13 @@ class UpdateCar(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return super().form_valid(form)
 
 
-class DeleteCar(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
-    template_name = 'main/car_confirm_delete.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['car'] = Car.objects.get(id=kwargs['pk'])
-        return context
-
-    def test_func(self):
-        return self.request.user.id is int(self.kwargs['user']) and \
-               not (Client.objects.filter(user=self.request.user) is None)
-
-    @staticmethod
-    def post(request, *args, **kwargs):
-        Car.objects.filter(id=kwargs['pk']).update(deleted=True)
-        return HttpResponseRedirect(reverse('cars', kwargs={'pk': kwargs['user']}))
-
-
 class ViewRoleRequestList(LoginRequiredMixin, UserPassesTestMixin, SingleTableMixin, FilterView):
     model = RoleRequest
     table_class = RoleRequestTable
     filterset_class = RoleRequestFilter
 
-    def post(self, request, *args, **kwargs):
+    @staticmethod
+    def post(request, *args, **kwargs):
         if request.POST['request'] and request.POST['response']:
             id = int(request.POST['request'])
             response = request.POST['response']
@@ -120,7 +153,7 @@ class ViewRoleRequestList(LoginRequiredMixin, UserPassesTestMixin, SingleTableMi
             else:
                 request.update(is_reviewed=True, updated=timezone.now())
 
-        return HttpResponseRedirect(reverse('roles', kwargs={'pk': self.request.user.id}))
+        return HttpResponseRedirect(reverse('roles'))
 
     def test_func(self):
         return not (Administrator.objects.filter(user=self.request.user) is None)

@@ -6,20 +6,28 @@ from main.models import Park, WeekSchedule, PriceTable, Zone
 
 class ParkTable(tables.Table):
     view = TemplateColumn(template_name='tables/park_buttons.html', verbose_name="")
-    posta_city = Column(verbose_name="Postal Code")
+    postal_code = Column(verbose_name="Postal Code")
 
     class Meta:
         model = Park
-        fields = ("name", "address", "posta_city", "typology", "is_open", "is_archived")
+        fields = ("name", "address", "postal_code", "typology", "is_open", "is_archived")
+
+    @staticmethod
+    def render_postal_code(record):
+        return record.posta_city()
 
 
 class ClientParkTable(tables.Table):
     view = TemplateColumn(template_name='tables/park_buttons.html', verbose_name="")
-    posta_city = Column(verbose_name="Postal Code")
+    postal_code = Column(verbose_name="Postal Code")
 
     class Meta:
         model = Park
-        fields = ("name", "address", "posta_city", "typology", "is_open")
+        fields = ("name", "address", "postal_code", "typology", "is_open")
+
+    @staticmethod
+    def render_postal_code(record):
+        return record.posta_city()
 
 
 class WeekScheduleTable(tables.Table):

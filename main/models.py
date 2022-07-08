@@ -23,6 +23,13 @@ class User(AbstractUser):
     def get_full_name(self):
         return self.first_name + " " + self.last_name
 
+    def get_role(self):
+        if Administrator.objects.filter(user=self.id).exists():
+            return "Administrator"
+        if Employee.objects.filter(user=self.id).exists():
+            return "Employee"
+        return "Client"
+
 
 class Administrator(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)

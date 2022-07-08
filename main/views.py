@@ -106,8 +106,6 @@ class ViewRoleRequestList(LoginRequiredMixin, UserPassesTestMixin, SingleTableMi
     filterset_class = RoleRequestFilter
 
     def post(self, request, *args, **kwargs):
-        print(request.POST)
-        print(request.POST['request'])
         if request.POST['request'] and request.POST['response']:
             id = int(request.POST['request'])
             response = request.POST['response']

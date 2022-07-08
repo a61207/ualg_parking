@@ -33,9 +33,9 @@ def validate_price_type(formset):
         if form.is_valid():
             if form['DELETE'].value() is False:
                 count += 1
-                if form['hours'].value() == '0' and form['minutes'].value() == '0':
+                if form['hours'].value() == '0' and form['minutes'].value() == '0' and form['total'].value() == '0':
                     errors = form.errors.setdefault("__all__", ErrorList())
-                    errors.append("Time Values can't have both null values.")
+                    errors.append("Values can't have all null value at same time.")
                     nerrors += 1
                 elif duplicated_time(form, formset):
                     errors = form.errors.setdefault("__all__", ErrorList())

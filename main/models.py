@@ -310,7 +310,9 @@ class PriceType(models.Model):
         unique_together = ('minutes', 'hours', 'table', 'type')
 
     def total_time(self):
-        if self.minutes and self.hours:
+        if self.minutes == 0 and self.hours == 0:
+            return "Minimum"
+        elif self.minutes and self.hours:
             return str(self.hours) + "h:" + str(self.minutes) + "m"
         elif self.hours:
             return str(self.hours) + "h"
@@ -473,8 +475,6 @@ class ParkingSpot(models.Model):
 
     def get_state_now(self):
         time = timezone.now()
-        print(Reserva.objects.filter(lugarid=self.id, periocidadeid__start__lte=time,
-                                     periocidadeid__end__gte=time))
         if EntradasSaidas.objects.filter(lugarid=self.id, periocidadeid__start__lte=time,
                                          periocidadeid__end__gte=time):
             return "Occupied"

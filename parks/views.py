@@ -4,9 +4,9 @@ from django.forms import modelformset_factory
 from django.forms.utils import ErrorList
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse
 from django.views.generic import DetailView, TemplateView
-from django.views.generic.edit import DeleteView, UpdateView, CreateView
+from django.views.generic.edit import UpdateView, CreateView
 from django_filters.views import FilterView
 from django_tables2 import SingleTableMixin
 from main.models import *
@@ -281,7 +281,7 @@ class UpdateWeekDaySchedule(LoginRequiredMixin, UserPassesTestMixin, TemplateVie
                 if (schedule.deadline.start_date <= deadlineform.cleaned_data['start_date'] <=
                     schedule.deadline.end_date or schedule.deadline.end_date >=
                     deadlineform.cleaned_data['end_date'] >= schedule.deadline.start_date) and \
-                        schedule.id != kwargs['pk']:
+                        schedule.id != int(kwargs['pk']):
                     errors += 1
                     error = deadlineform.errors.setdefault("__all__", ErrorList())
                     error.append("Choosen deadline already in a schedule from " +
@@ -335,7 +335,7 @@ class UpdatePriceType(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
                     table.deadline.end_date or
                     table.deadline.end_date >= deadlineform.cleaned_data['end_date'] >=
                     table.deadline.start_date) and \
-                        table.id != kwargs['pk']:
+                        int(kwargs['pk']) != table.id:
                     errors += 1
                     errors = deadlineform.errors.setdefault("__all__", ErrorList())
                     errors.append("Choosen deadline already in a price table from " +
@@ -470,8 +470,6 @@ class AddZone(LoginRequiredMixin, UserPassesTestMixin, CreateView):
                         child.save()
                 zone = Zone.objects.last()
                 return HttpResponseRedirect(reverse('zone_detail', kwargs={'park': zone.park.id, 'pk': zone.id}))
-        print(formset.errors)
-        print(request.POST)
         return render(request, "zone/zone_add.html", {"form": form, "formset": formset,
                                                       "park": Park.objects.get(id=kwargs['park'])})
 
@@ -604,4 +602,3 @@ class ArchiveSpot(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     def post(request, *args, **kwargs):
         ParkingSpot.objects.filter(id=kwargs['pk']).update(is_archived=True)
         return HttpResponseRedirect(reverse('zone_detail', kwargs={'park': kwargs['park'], 'pk': kwargs['zone']}))
-

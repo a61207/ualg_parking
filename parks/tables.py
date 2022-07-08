@@ -35,7 +35,7 @@ class WeekScheduleTable(tables.Table):
     class Meta:
         model = WeekSchedule
         fields = ("deadline.start_date", "deadline.end_date", "monday", "tuesday", "wednesday", "thursday", "friday",
-                  "saturday", "sunday", "archived", "id")
+                  "saturday", "sunday", "archived")
 
     @staticmethod
     def render_monday(record):

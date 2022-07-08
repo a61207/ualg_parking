@@ -116,12 +116,10 @@ class PriceTableTable(tables.Table):
 
 class ZoneTable(tables.Table):
     view = TemplateColumn(template_name='tables/zone_buttons.html', verbose_name="")
-    n_spots = Column(verbose_name='Spots')
-    free_spots_now = Column(verbose_name='Available')
 
     class Meta:
         model = Zone
-        fields = ("name", "n_spots", "free_spots_now", "is_open", "is_archived")
+        fields = ("name", "is_open", "is_archived")
 
 
 class ClientZoneTable(tables.Table):

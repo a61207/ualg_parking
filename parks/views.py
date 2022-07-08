@@ -543,10 +543,16 @@ class UpdateZone(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         SpotFormSet = modelformset_factory(ParkingSpot, form=SpotForm, extra=0, can_delete=True, can_delete_extra=True)
         formset = SpotFormSet(request.POST, queryset=ParkingSpot.objects.filter(
             zone=zone, is_archived=False))
+        print(zone.name, form.instance.name)
+        print(zone.name != form.instance.name)
         if all([form.is_valid(), formset.is_valid()]):
             if check_empty_spots(formset):
                 errors = form.errors.setdefault("__all__", ErrorList())
                 errors.append("At Least one Spot must be incerted.")
+            elif Zone.objects.filter(park=Park.objects.get(id=self.kwargs['park']),
+                                     name=form.cleaned_data['name']).exists() and zone.name == form.instance.name:
+                errors = form.errors.setdefault("__all__", ErrorList())
+                errors.append("Name Zone already exists.")
             else:
                 parent = form.save(commit=False)
                 parent.park = Park.objects.get(id=self.kwargs['park'])

@@ -8,7 +8,7 @@ class RoleRequestTable(tables.Table):
 
     class Meta:
         model = RoleRequest
-        fields = ("created", "user", "role")
+        fields = ("created", "user__email", "role")
 
 
 class CarTable(tables.Table):
@@ -25,7 +25,8 @@ class EmployeeTable(tables.Table):
 
     class Meta:
         model = Employee
-        fields = ("user__get_full_name", "user__email", "user__is_active", "user__date_joined", "user__last_login")
+        fields = ("user__first_name", "user__last_name", "user__email", "user__is_active", "user__date_joined",
+                  "user__last_login")
 
 
 class AdministratorTable(tables.Table):
@@ -33,4 +34,5 @@ class AdministratorTable(tables.Table):
 
     class Meta:
         model = Employee
-        fields = ("user__get_full_name", "user__email", "user__is_active", "user__date_joined", "user__last_login")
+        fields = ("user__first_name", "user__last_name", "user__email", "user__is_active", "user__date_joined",
+                  "user__last_login")

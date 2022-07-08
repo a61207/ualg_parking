@@ -10,8 +10,8 @@
         <h1 class="mt-5">Update Zone</h1>
         <form method="post">
             {% csrf_token %}
-            {% include 'parks/zone_form.html' %}
-            <a type="button" href="{% url 'zone_detail' zone.park.id zone.id %}" class="btn btn-success mt-2">Back</a>
+            {% include 'zone/zone_form.html' %}
+            <a type="button" href="{% url 'zone_detail' zone.park.id zone.id %}" class="btn btn-danger mt-2">Back</a>
             <button type="submit" class="btn btn-success mt-2">Update Zone</button>
         </form>
     </div>

@@ -9,30 +9,97 @@
 {% block main %}
 
     <div class="container">
-        <h1 class="mt-5">Zone {{ object.name }}</h1>
+
+        <div class="row justify-content-between mt-5">
+            <h1 class="col">Zone {{ object.name }}</h1>
+            {% if object.is_archived %}
+                <h2 class="col text-end"><span class="badge bg-warning">Archived</span></h2>
+            {% elif not object.is_open %}
+                <h2 class="col text-end"><span class="badge bg-dark">Closed</span></h2>
+            {% endif %}
+        </div>
         <div class="row">
             <div class="col-4">
                 <p>Park: {{ object.park }}</p>
-                <a type="button" href="{% url 'list_zones' object.park.id %}" class="btn btn-success mt-2">Back</a>
-                {% if request.user|is_admin %}
-                    <a type="button" href="{% url 'update_zone' object.park.id object.id %}"
-                       class="btn btn-success mt-2">Update
-                        Zone</a>
-                    {% if not object|get_zone_all_not_free %}
-                        <a type="button" href="{% url 'delete_zone' object.park.id object.id %}"
-                           class="btn btn-success mt-2">Delete
-                            Zone</a>
+                <p>Total Spots: {{ object.n_spots }}</p>
+                <p>Available Spots: {{ object.free_spots_now }}</p>
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>Parking Spots</h4>
+                    </div>
+                </div>
+                <div class="mb-3" style="overflow: scroll; max-height: 50vh">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th scope="col">Number</th>
+                            <th scope="col">State</th>
+                            <th scope="col"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in object.spots %}
+                            {% if request.user|is_admin or not row.is_archived %}
+                                <tr>
+                                    <th scope="row" class="align-middle">{{ row.number }}</th>
+                                    {% if not row.is_archived %}
+                                        <td class="align-middle">{{ row.get_state_now }}</td>
+                                    {% else %}
+                                        <td class="align-middle">Archived</td>
+                                    {% endif %}
+                                    <td>
+                                        {% if row.get_state_now != "Reserved" and row.get_state_now != "Occupied" %}
+                                            {% if request.user|is_admin %}
+                                                {% if not row.is_archived %}
+                                                    <a class="btn btn-danger btn-sm mt-1" href="{% url 'archive_spot' object.park.id object.id row.id %}">Archive</a>
+                                                {% endif %}
+                                            {% elif row.zone.is_open and request.user|is_client %}
+                                                <a class="btn btn-secondary btn-sm mt-1"
+                                                   href="">Reserve</a>
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+
+                            {% endif %}
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <form method="post">
+                    {% csrf_token %}
+                    <a type="button" href="{% url 'list_zones' object.park.id %}"
+                       class="btn btn-outline-dark mt-2">Back</a>
+                    {% if request.user|is_admin and not object.is_archived %}
+                        <a type="button" href="{% url 'update_zone' object.park.id object.id %}"
+                           class="btn btn-warning mt-2">Edit</a>
+                        {% if not object|get_zone_all_not_free %}
+                            <a type="button" href="{% url 'archive_zone' object.park.id object.id %}"
+                               class="btn btn-danger mt-2">Archive</a>
+                        {% endif %}
+
+                        {% if object.is_open %}
+                            <button type="submit" name="close" value="{{ object.id }}" class="btn btn-dark mt-2">
+                                Close
+                            </button>
+                        {% else %}
+                            <button type="submit" name="open" value="{{ object.id }}" class="btn btn-success mt-2">
+                                Open
+                            </button>
+                        {% endif %}
                     {% endif %}
-                {% endif %}
+                </form>
             </div>
             <div class="col-8">
                 <div class="position-sticky" style="top: 2rem;">
                     <div id="canvas_container" class="border border-2" style="overflow: scroll; height: 60vh">
                         <canvas id="canvas"></canvas>
                     </div>
-                    <label for="rangeInput" class="col-6 form-label">Zoom</label>
-                    <input type="range" class="form-range" min="1" max="3" step="0.25" value="1"
-                           id="rangeInput">
+                    <div class="row">
+                        <label for="rangeInput" class="col-1 form-label">Zoom</label>
+                        <input type="range" class="col form-range" min="1" max="3" step="0.25" value="1"
+                               id="rangeInput">
+                    </div>
                 </div>
             </div>
         </div>
@@ -52,10 +119,16 @@
             const size = 10;
             let zoom = 1, spots = [];
 
+            let color;
             {% for spot in object.spots %}
+                color = "#35C942FF";
+                if ('{{ spot.get_state_now }}' === 'Reserved')
+                    color = "#6c757d";
+                else if ('{{spot.get_state_now}}' === "Occupied")
+                    color = "#db3545"
                 if ('{{ spot.direction }}' === 'HO')
-                    spots.push([Number({{ spot.x }}), Number({{ spot.y }}), 2, 1, Number({{ spot.number }})]);
-                else spots.push([Number({{ spot.x }}), Number({{ spot.y }}), 1, 2, Number({{ spot.number }})]);
+                    spots.push([Number({{ spot.x }}), Number({{ spot.y }}), 2, 1, Number({{ spot.number }}), color]);
+                else spots.push([Number({{ spot.x }}), Number({{ spot.y }}), 1, 2, Number({{ spot.number }}), color]);
             {% endfor %}
 
             let xAcert = get_lowest_x();
@@ -76,7 +149,7 @@
                 ctx.strokeStyle = "#eeeeee";
                 for (let i = 0; i < spots.length; i++) {
                     roundRect(((spots[i][0] - xAcert) * realSize) + realXAcert, ((spots[i][1] - yAcert) * realSize) + realYAcert, realSize * spots[i][2], realSize * spots[i][3], 50, "#000000");
-                    roundRect(((spots[i][0] - xAcert) * realSize) + realXAcert + (realSize / 6), ((spots[i][1] - yAcert) * realSize) + (realSize / 6) + realYAcert, (realSize * spots[i][2]) - (realSize * 2 / 6), (realSize * spots[i][3]) - (realSize * 2 / 6), 50, "#35c942");
+                    roundRect(((spots[i][0] - xAcert) * realSize) + realXAcert + (realSize / 6), ((spots[i][1] - yAcert) * realSize) + (realSize / 6) + realYAcert, (realSize * spots[i][2]) - (realSize * 2 / 6), (realSize * spots[i][3]) - (realSize * 2 / 6), 50, spots[i][5]);
 
                     ctx.font = "bold " + (realSize * 2 / 3) + "px Arial";
                     ctx.fillStyle = "#000000";

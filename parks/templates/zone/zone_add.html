@@ -11,7 +11,7 @@
         <form method="post">
             {% csrf_token %}
             {% include 'zone/zone_form.html' %}
-            <a type="button" href="{% url 'list_zones' park.id %}" class="btn btn-success mt-2">Back</a>
+            <a type="button" href="{% url 'list_zones' park.id %}" class="btn btn-danger mt-2">Back</a>
             <button type="submit" class="btn btn-success mt-2">Add Zone</button>
         </form>
     </div>

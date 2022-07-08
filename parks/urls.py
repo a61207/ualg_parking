@@ -24,7 +24,7 @@ urlpatterns = [
     path('parks/<pk>/schedule/add/', views.AddWeekDaySchedule.as_view(), name='add_schedule'),
     path('parks/', views.ViewParkList.as_view(), name='list_parks'),
     path('parks/<pk>/', views.ViewParkDetail.as_view(), name='park_detail'),
-    path('parks/<pk>/schedules/', views.ViewWeekDayScheduleList.as_view(), name='list_schedules'),
+    path('parks/<pk>/schedule/', views.ViewWeekDayScheduleList.as_view(), name='list_schedules'),
     path('parks/<pk>/price/', views.ViewPriceTableList.as_view(), name='list_prices'),
     path('parks/<pk>/update/', views.UpdatePark.as_view(), name='update_park'),
     path('parks/<park>/schedule/<pk>/update/', views.UpdateWeekDaySchedule.as_view(), name='update_schedule'),
@@ -36,5 +36,6 @@ urlpatterns = [
     path('parks/<park>/zones/', views.ViewZoneList.as_view(), name='list_zones'),
     path('parks/<park>/zones/<pk>/', views.ViewZoneDetail.as_view(), name='zone_detail'),
     path('parks/<park>/zones/<pk>/update/', views.UpdateZone.as_view(), name='update_zone'),
-    path('parks/<park>/zones/<pk>/archive/', views.DeleteZone.as_view(), name='delete_zone'),
+    path('parks/<park>/zones/<pk>/archive/', views.ArchiveZone.as_view(), name='archive_zone'),
+    path('parks/<park>/zones/<zone>/spot/<pk>/archive/', views.ArchiveSpot.as_view(), name='archive_spot'),
 ]

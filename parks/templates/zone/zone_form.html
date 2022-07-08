@@ -1,3 +1,4 @@
+{% load group_tags %}
 {% load crispy_forms_filters %}
 
 <style>
@@ -8,6 +9,7 @@
     .hidden {
         display: none;
     }
+
 </style>
 
 {{ form | crispy }}
@@ -19,14 +21,25 @@
         </div>
     {% endfor %}
 </div>
-<div id="canvas_container" class="border border-2" style="overflow: scroll; height: 300px">
+<div id="canvas_container" class="border border-2 rounded mt-4" style="overflow: scroll; top: 2rem; height: 50vh">
     <canvas id="canvas"></canvas>
 </div>
-<label for="rangeInput" class="col-6 form-label">Zoom</label>
-<input type="range" class="form-range" min="1" max="3" step="0.25" value="1"
-       id="rangeInput">
-<button type="button" class="btn btn-success mt-2" id="turnSpot">Turn Parking Spot</button>
-<button type="button" class="btn btn-success mt-2" id="eraseSpot">Erase Parking Sopt</button>
+<div class="row text-center align-middle gx-3 mt-2">
+    <div class="col-1">
+        <label for="rangeInput" class="form-label mt-2">Zoom</label></div>
+    <div class="col-9">
+        <input type="range" class="form-range mt-2" min="1" max="3" step="0.25" value="1"
+               id="rangeInput"></div>
+    <div class="col-1">
+        <div class="form-check form-switch mt-2">
+            <input class="form-check-input" type="checkbox" id="eraseSpot">
+            <label class="form-check-label" for="eraseSpot">{% if zone %}Archive|Erase{% else %}Erase{% endif %}</label>
+        </div>
+    </div>
+    <div class="col-1">
+        <button type="button" class="btn btn-secondary" id="turnSpot">Rotate</button>
+    </div>
+</div>
 <div id="empty-form" class="hidden">{{ formset.empty_form | crispy }}</div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
@@ -37,19 +50,27 @@
         const zoomButton = document.getElementById('rangeInput')
         const turnButton = document.getElementById('turnSpot')
         const eraseButton = document.getElementById('eraseSpot')
-        const height = document.getElementById('canvas_container').clientHeight;
-        const width = document.getElementById('canvas_container').clientWidth;
+        const height = 1000;
+        const width = 2000;
         canvas.height = height;
         canvas.width = width;
         let ctx = canvas.getContext('2d');
         const size = 10;
         let zoom = 1, x = 0, y = 0, wm = 2, hm = 1, spots = [], erasing = false, on_spot = "", count = 0;
 
+        let color;
         {% for form in formset %}
             {% if not form.DELETE.value %}
+                color = "#35C942FF";
+                {% if zone %}
+                    if ('{{ zone|get_spot_state:form.number.value }}' === 'Reserved')
+                        color = "#6c757d";
+                    else if ('{{ zone|get_spot_state:form.number.value }}' === "Occupied")
+                        color = "#db3545"
+                {% endif %}
                 if ('{{ form.direction.value }}' === 'HO')
-                    spots.push([Number({{ form.x.value }}), Number({{ form.y.value }}), 2, 1, Number({{ form.number.value }}), count]);
-                else spots.push([Number({{ form.x.value }}), Number({{ form.y.value }}), 1, 2, Number({{ form.number.value }}), count]);
+                    spots.push([Number({{ form.x.value }}), Number({{ form.y.value }}), 2, 1, Number({{ form.number.value }}), count, color]);
+                else spots.push([Number({{ form.x.value }}), Number({{ form.y.value }}), 1, 2, Number({{ form.number.value }}), count, color]);
             {% endif %}
             count++;
         {% endfor %}
@@ -59,7 +80,7 @@
         function drawCanvas() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             const realSize = size * zoom;
-            ctx.strokeStyle = "#98a3aa";
+            ctx.strokeStyle = "rgba(152,163,170,0.5)";
             for (let i = 0; i < canvas.width; i += realSize) {
                 ctx.beginPath();
                 ctx.moveTo(i, 0);
@@ -78,7 +99,7 @@
             }
             for (let i = 0; i < spots.length; i++) {
                 roundRect((spots[i][0] * realSize), (spots[i][1] * realSize), realSize * spots[i][2], realSize * spots[i][3], 50, "#000000");
-                roundRect((spots[i][0] * realSize) + (realSize / 6), (spots[i][1] * realSize) + (realSize / 6), (realSize * spots[i][2]) - (realSize * 2 / 6), (realSize * spots[i][3]) - (realSize * 2 / 6), 50, "#35c942");
+                roundRect((spots[i][0] * realSize) + (realSize / 6), (spots[i][1] * realSize) + (realSize / 6), (realSize * spots[i][2]) - (realSize * 2 / 6), (realSize * spots[i][3]) - (realSize * 2 / 6), 50, spots[i][6]);
 
                 ctx.font = "bold " + (realSize * 2 / 3) + "px Arial";
                 ctx.fillStyle = "#000000";
@@ -188,7 +209,7 @@
             if (erasing) {
                 let mouseSpot = get_spot(x, y, spots);
                 console.log(mouseSpot)
-                if (mouseSpot !== -1) {
+                if (mouseSpot !== -1 && spots[mouseSpot][6] === "#35C942FF") {
                     delete_spot_form(spots[mouseSpot][5]);
                     spots.splice(mouseSpot, 1)
                     on_spot = ""
@@ -201,7 +222,7 @@
                     if (wm === 2) id = add_spot_form(x, y, 'HO', num);
                     else id = add_spot_form(x, y, 'VE', num);
                     console.log(id, num)
-                    spots.push([x, y, wm, hm, num, id]);
+                    spots.push([x, y, wm, hm, num, id, "#35C942FF"]);
                     drawCanvas();
                 }
             }
@@ -212,7 +233,7 @@
             x = Math.trunc(pos.x / (size * zoom));
             y = Math.trunc(pos.y / (size * zoom));
             const spot = get_spot(x, y, spots)
-            if (spot === -1)
+            if (spot === -1 || (spots[spot][6] !== "#35C942FF" && erasing))
                 on_spot = "";
             else on_spot = spots[spot];
             drawCanvas()

@@ -1,7 +1,7 @@
 from django import template
 from django.utils import timezone
 
-from main.models import Administrator, Employee, Client
+from main.models import Administrator, Employee, Client, ParkingSpot
 
 register = template.Library()
 
@@ -62,3 +62,8 @@ def get_park_free(park, deadline):
 @register.filter(name='get_non_achived_resources')
 def get_non_achived_resources(park):
     return park.non_achived_resources()
+
+
+@register.filter(name='get_spot_state')
+def get_spot_state(zone, number):
+    return ParkingSpot.objects.get(zone=zone.id, number=number, is_archived=False).get_state_now()

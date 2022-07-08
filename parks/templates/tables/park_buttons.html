@@ -2,13 +2,13 @@
 <form method="post">
     {% csrf_token %}
     <a class="btn btn-info btn-sm mt-1" href="{% url 'park_detail' record.id %}">View</a>
-    {% if record.zones %}
+    {% if record.achived_zones %}
         <a class="btn btn-secondary btn-sm mt-1" href="{% url 'list_zones' record.id %}">Zones</a>
     {% endif %}
 
     {% if request.user|is_admin and not record.is_archived %}
         {% if not record.zones %}
-            <a class="btn btn-secondary mt-1 btn-sm" href="{% url 'add_zone' record.id %}">Add Zone</a>
+            <a class="btn btn-secondary mt-1 btn-sm" href="{% url 'add_zone' record.id %}">Zones</a>
         {% endif %}
         <a class="btn btn-warning btn-sm mt-1" href="{% url 'update_park' record.id %}">Edit</a>
         {% if not record|get_park_all_not_free and not record|get_non_achived_resources %}

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load crispy_forms_filters %}
+
+{% block title %}
+    Archive Zone
+{% endblock %}
+
+{% block main %}
+
+    <div class="container">
+        <h1 class="mt-5">Archive Zone</h1>
+        <form method="post">
+            {% csrf_token %}
+            <p>Are you sure you want to <b>archive zone "{{ object.name }}"</b> and all its <b>parking spots</b>?</p>
+            <p><b>This action cannot be undone!</b></p>
+            <a type="button" href="{% url 'zone_detail' object.park.id object.id %}" class="btn btn-outline-dark mt-2">Back</a>
+            <button type="submit" class="btn btn-danger mt-2">Archive Zone</button>
+        </form>
+    </div>
+
+{% endblock main %}

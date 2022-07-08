@@ -159,7 +159,7 @@ class Park(models.Model):
     city = models.CharField(verbose_name='City', db_column='City', max_length=50)
     typology = models.CharField(verbose_name='Typology', db_column='Typology', choices=TYPOLOGYS, max_length=2)
     map_html = models.TextField(db_column='MapLocationHTML', verbose_name='Map Location HTML')
-    is_open = models.BooleanField(verbose_name='Open', db_column='IsOpen', default=False)
+    is_open = models.BooleanField(verbose_name='Open', db_column='IsOpen', default=True)
     is_archived = models.BooleanField(verbose_name='Archived', db_column='IsArchived', default=False)
     created = models.DateTimeField(db_column='Created', verbose_name='Created', default=timezone.now)
     updated = models.DateTimeField(db_column='Updated', verbose_name='Updated', default=timezone.now)
@@ -249,6 +249,9 @@ class Park(models.Model):
 
     def zones(self):
         return Zone.objects.filter(park=self.id)
+
+    def achived_zones(self):
+        return Zone.objects.filter(park=self.id, is_archived=False)
 
     def price_tables(self):
         return PriceTable.objects.filter(park=self.id)
@@ -389,35 +392,35 @@ class Zone(models.Model):
     name = models.CharField(db_column='Name', verbose_name='Name', max_length=50)
     park = models.ForeignKey(Park, models.CASCADE, db_column='ParqueID', verbose_name='Park')
     is_archived = models.BooleanField(verbose_name='Archived', db_column='IsArchived', default=False)
-    is_open = models.BooleanField(verbose_name='Open', db_column='IsOpen', default=False)
+    is_open = models.BooleanField(verbose_name='Open', db_column='IsOpen', default=True)
 
     class Meta:
-        unique_together = ['park', 'name']
+        unique_together = ['park', 'name', 'is_archived']
         db_table = 'Zone'
 
     def spots(self):
-        return ParkingSpot.objects.filter(zone=self.id)
+        return ParkingSpot.objects.filter(zone=self.id, is_archived=False)
 
     def n_spots(self):
         return self.spots().count()
 
     def free_spots_now(self):
         count = 0
-        for spot in ParkingSpot.objects.filter(zone=self.id):
-            if spot.get_state(timezone.now().date(), timezone.now().date()) == ParkingSpot.FREE:
+        for spot in ParkingSpot.objects.filter(zone=self.id, is_archived=False):
+            if spot.get_state_now() == "Free":
                 count += 1
         return count
 
     def free_spots(self, start, end):
         count = 0
-        for spot in ParkingSpot.objects.filter(zone=self.id):
+        for spot in ParkingSpot.objects.filter(zone=self.id, is_archived=False):
             if spot.get_state(start, end) == ParkingSpot.FREE:
                 count += 1
         return count
 
     def occupied_spots(self, start, end):
         count = 0
-        for spot in ParkingSpot.objects.filter(zone=self.id):
+        for spot in ParkingSpot.objects.filter(zone=self.id, is_archived=False):
             if spot.get_state(start, end) == ParkingSpot.OCCUPIED:
                 count += 1
         return count
@@ -468,6 +471,31 @@ class ParkingSpot(models.Model):
         else:
             return ParkingSpot.FREE
 
+    def get_state_now(self):
+        time = timezone.now()
+        print(Reserva.objects.filter(lugarid=self.id, periocidadeid__start__lte=time,
+                                     periocidadeid__end__gte=time))
+        if EntradasSaidas.objects.filter(lugarid=self.id, periocidadeid__start__lte=time,
+                                         periocidadeid__end__gte=time):
+            return "Occupied"
+        elif Reserva.objects.filter(lugarid=self.id, periocidadeid__start__lte=time,
+                                    periocidadeid__end__gte=time):
+            return "Reserved"
+        else:
+            return "Free"
+
+    def get_reserves(self):
+        return Reserva.objects.filter(lugarid=self.id)
+
+    def get_occupies(self):
+        return EntradasSaidas.objects.filter(lugarid=self.id)
+
+    def get_next_reserves(self):
+        return Reserva.objects.filter(lugarid=self.id, periocidadeid__start__gte=timezone.now().date())
+
+    def get_next_occupies(self):
+        return EntradasSaidas.objects.filter(lugarid=self.id, periocidadeid__start__gte=timezone.now().date())
+
 
 class Estadoreserva(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
@@ -498,7 +526,7 @@ class Contrato(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     userid = models.ForeignKey(User, models.CASCADE,
                                db_column='UserID')  # Field name made lowercase.
-    lugarid = models.ForeignKey(ParkingSpot, models.DO_NOTHING, db_column='LugarID')
+    lugarid = models.ForeignKey(ParkingSpot, models.CASCADE, db_column='LugarID')
     modalidadepagamentoid = models.ForeignKey(Modalidadepagamento, models.CASCADE,
                                               db_column='ModalidadePagamentoID', blank=True,
                                               null=True)  # Field name made lowercase.

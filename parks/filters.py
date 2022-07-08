@@ -18,9 +18,9 @@ class ParkFilter(django_filters.FilterSet):
 
 # noinspection DuplicatedCode
 class WeekScheduleFilter(django_filters.FilterSet):
-    deadline__start_date = django_filters.DateFilter(lookup_expr='gt', label='Min Start',
+    deadline__start_date = django_filters.DateFilter(lookup_expr='gte', label='Min Start',
                                                      widget=forms.DateInput(attrs={'type': 'date'}))
-    deadline__end_date = django_filters.DateFilter(lookup_expr='lt', label='Max End',
+    deadline__end_date = django_filters.DateFilter(lookup_expr='lte', label='Max End',
                                                    widget=forms.DateInput(attrs={'type': 'date'}))
 
     class Meta:
@@ -30,9 +30,9 @@ class WeekScheduleFilter(django_filters.FilterSet):
 
 # noinspection DuplicatedCode
 class PriceTableFilter(django_filters.FilterSet):
-    deadline__start_date = django_filters.DateFilter(lookup_expr='gt', label='Min Start',
+    deadline__start_date = django_filters.DateFilter(lookup_expr='gte', label='Min Start',
                                                      widget=forms.DateInput(attrs={'type': 'date'}))
-    deadline__end_date = django_filters.DateFilter(lookup_expr='lt', label='Max End',
+    deadline__end_date = django_filters.DateFilter(lookup_expr='lte', label='Max End',
                                                    widget=forms.DateInput(attrs={'type': 'date'}))
 
     class Meta:
@@ -45,4 +45,4 @@ class ZoneFilter(django_filters.FilterSet):
 
     class Meta:
         model = Zone
-        fields = ['name']
+        fields = ['name', 'is_open', 'is_archived']

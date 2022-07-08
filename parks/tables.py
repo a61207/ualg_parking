@@ -1,7 +1,7 @@
 from django.utils.html import format_html
 from django_tables2 import tables, TemplateColumn, Column
 
-from main.models import Park, WeekSchedule, PriceTable
+from main.models import Park, WeekSchedule, PriceTable, Zone
 
 
 class ParkTable(tables.Table):
@@ -112,5 +112,24 @@ class ZoneTable(tables.Table):
     free_spots_now = Column(verbose_name='Available')
 
     class Meta:
-        model = Park
-        fields = ("name", "n_spots", "free_spots_now")
+        model = Zone
+        fields = ("name", "n_spots", "free_spots_now", "is_open", "is_archived")
+
+
+class ClientZoneTable(tables.Table):
+    view = TemplateColumn(template_name='tables/zone_buttons.html', verbose_name="")
+    n_spots = Column(verbose_name='Spots')
+    free_spots_now = Column(verbose_name='Available')
+
+    class Meta:
+        model = Zone
+        fields = ("name", "n_spots", "free_spots_now", "is_open")
+
+
+class OccupancySpotTable(tables.Table):
+    n_spots = Column(verbose_name='Spots')
+    free_spots_now = Column(verbose_name='Available')
+
+    class Meta:
+        model = Zone
+        fields = ("name", "n_spots", "free_spots_now", "is_open")

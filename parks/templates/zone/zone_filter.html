@@ -18,13 +18,21 @@
                         {{ filter.form.name | as_crispy_field }}
                     </div>
                     <div class="col-auto">
+                        {{ filter.form.is_open | as_crispy_field }}
+                    </div>
+                    {% if request.user|is_admin %}
+                        <div class="col-auto">
+                            {{ filter.form.is_archived | as_crispy_field }}
+                        </div>
+                    {% endif %}
+                    <div class="col-auto">
                         <button type="submit" class="btn btn-success mt-4">Filter</button>
                     </div>
                 </div>
             </form>
         {% endif %}
         {% render_table table %}
-        <a type="button" href="{% url 'park_detail' park.id %}" class="btn btn-success mt-2">Back</a>
+        <a type="button" href="{% url 'park_detail' park.id %}" class="btn btn-outline-dark mt-2">Back</a>
         {% if request.user|is_admin %}
             <a type="button" href="{% url 'add_zone' park.id %}" class="btn btn-success mt-2">Add Zone</a>
         {% endif %}

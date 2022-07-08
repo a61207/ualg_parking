@@ -1,7 +1,7 @@
 from django.forms.utils import ErrorList
 from django.utils import timezone
 
-from main.models import Park, Administrator
+from main.models import Park, Administrator, Zone, ParkingSpot
 
 
 def check_empty_spots(formset):
@@ -33,7 +33,7 @@ def validate_price_type(formset):
         if form.is_valid():
             if form['DELETE'].value() is False:
                 count += 1
-                if form['hours'].value() is '0' and form['minutes'].value() is '0':
+                if form['hours'].value() == '0' and form['minutes'].value() == '0':
                     errors = form.errors.setdefault("__all__", ErrorList())
                     errors.append("Time Values can't have both null values.")
                     nerrors += 1
@@ -79,11 +79,20 @@ def check_overlaping_spots(formset):
 
 def close_open_park(request):
     if 'close' in request.POST:
-        print(Park.objects.filter(id=request.POST['close']).first().is_open)
         Park.objects.filter(id=request.POST['close']).update(is_open=False)
-        print(Park.objects.filter(id=request.POST['close']).first().is_open)
+        for zone in Park.objects.get(id=request.POST['close']).zones():
+            Zone.objects.filter(id=zone.id).update(is_open=False)
     if 'open' in request.POST:
         Park.objects.filter(id=request.POST['open']).update(is_open=True)
+        for zone in Park.objects.get(id=request.POST['open']).zones():
+            Zone.objects.filter(id=zone.id).update(is_open=True)
+
+
+def close_open_zone(request):
+    if 'close' in request.POST:
+        Zone.objects.filter(id=request.POST['close']).update(is_open=False)
+    if 'open' in request.POST:
+        Zone.objects.filter(id=request.POST['open']).update(is_open=True)
 
 
 def permission_to_update_park_resources(self, resource):
@@ -101,3 +110,15 @@ def permission_to_archive_park(self):
             Park.objects.get(id=self.kwargs['pk']).reserved_spots(timezone.now().date(), timezone.datetime.max) +
             Park.objects.get(id=self.kwargs['pk']).occupied_spots(timezone.now().date(), timezone.datetime.max) == 0 and
             Park.objects.get(id=self.kwargs['pk']).non_achived_resources() == 0)
+
+
+def permission_to_archive_zone(self):
+    return Administrator.objects.filter(user=self.request.user.id).exists() and (
+            Zone.objects.get(id=self.kwargs['pk']).reserved_spots(timezone.now().date(), timezone.datetime.max) +
+            Zone.objects.get(id=self.kwargs['pk']).occupied_spots(timezone.now().date(), timezone.datetime.max) == 0)
+
+
+def permission_to_archive_spot(self):
+    return Administrator.objects.filter(user=self.request.user.id).exists() and not \
+        ParkingSpot.objects.get(id=self.kwargs['pk']).get_next_occupies() and not \
+        ParkingSpot.objects.get(id=self.kwargs['pk']).get_next_reserves()

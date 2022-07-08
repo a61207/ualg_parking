@@ -14,8 +14,9 @@ from main.static import postal_codes
 from parks.filters import ParkFilter, ZoneFilter, WeekScheduleFilter, PriceTableFilter
 from parks.forms import ParkForm, ZoneForm, SpotForm, PriceTypeForm, TimePeriodForm, DatePeriodForm
 from parks.functions import check_empty_spots, check_overlaping_spots, validate_price_type, close_open_park, \
-    permission_to_update_park_resources, permission_to_archive_park
-from parks.tables import ParkTable, ZoneTable, WeekScheduleTable, ClientParkTable, PriceTableTable
+    permission_to_update_park_resources, permission_to_archive_park, close_open_zone, permission_to_archive_zone, \
+    permission_to_archive_spot
+from parks.tables import ParkTable, ZoneTable, WeekScheduleTable, ClientParkTable, PriceTableTable, ClientZoneTable
 
 
 # Create your views here.
@@ -26,7 +27,7 @@ class AddPark(SuccessMessageMixin, LoginRequiredMixin, UserPassesTestMixin, Crea
     success_message = "Park was created successfully"
 
     def test_func(self):
-        return Administrator.objects.filter(user=self.request.user) is not None
+        return Administrator.objects.filter(user=self.request.user.id).exists()
 
     def form_valid(self, form):
         form.instance.admin = Administrator.objects.get(user=self.request.user)
@@ -48,7 +49,7 @@ class AddWeekDaySchedule(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
         return context
 
     def test_func(self):
-        return Administrator.objects.filter(user=self.request.user) is not None
+        return Administrator.objects.filter(user=self.request.user.id).exists()
 
     @staticmethod
     def post(request, *args, **kwargs):
@@ -108,7 +109,7 @@ class AddPriceTable(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return context
 
     def test_func(self):
-        return Administrator.objects.filter(user=self.request.user) is not None
+        return Administrator.objects.filter(user=self.request.user.id).exists()
 
     def post(self, request, *args, **kwargs):
         deadlineform = DatePeriodForm(request.POST, auto_id="deadline_%s")
@@ -174,7 +175,8 @@ class ViewParkList(SingleTableMixin, FilterView):
 
     @staticmethod
     def post(request, *args, **kwargs):
-        close_open_park(request)
+        if Administrator.objects.filter(user=request.user.id).exists():
+            close_open_park(request)
         return HttpResponseRedirect(reverse('list_parks'))
 
 
@@ -195,7 +197,7 @@ class ViewWeekDayScheduleList(LoginRequiredMixin, UserPassesTestMixin, SingleTab
         return context
 
     def test_func(self):
-        return Administrator.objects.filter(user=self.request.user) is not None
+        return Administrator.objects.filter(user=self.request.user.id).exists()
 
 
 class ViewPriceTableList(LoginRequiredMixin, UserPassesTestMixin, SingleTableMixin, FilterView):
@@ -215,7 +217,7 @@ class ViewPriceTableList(LoginRequiredMixin, UserPassesTestMixin, SingleTableMix
         return context
 
     def test_func(self):
-        return Administrator.objects.filter(user=self.request.user) is not None
+        return Administrator.objects.filter(user=self.request.user.id).exists()
 
 
 class ViewParkDetail(DetailView):
@@ -224,7 +226,8 @@ class ViewParkDetail(DetailView):
 
     @staticmethod
     def post(request, *args, **kwargs):
-        close_open_park(request)
+        if Administrator.objects.filter(user=request.user.id).exists():
+            close_open_park(request)
         return HttpResponseRedirect(reverse('park_detail', kwargs={'pk': kwargs['pk']}))
 
 
@@ -234,7 +237,7 @@ class UpdatePark(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     template_name = 'parks/park_update.html'
 
     def test_func(self):
-        return Administrator.objects.filter(user=self.request.user) is not None
+        return Administrator.objects.filter(user=self.request.user.id).exists()
 
     def form_valid(self, form):
         form.instance.updated = timezone.now()
@@ -274,19 +277,19 @@ class UpdateWeekDaySchedule(LoginRequiredMixin, UserPassesTestMixin, TemplateVie
             for x in range(len(formset)):
                 if 'start' in formset[x].cleaned_data and 'end' in formset[x].cleaned_data:
                     count += 1
-            for schedule in WeekSchedule.objects.filter(archived=False, park=kwargs['pk']):
+            for schedule in WeekSchedule.objects.filter(archived=False, park=kwargs['park']):
                 if (schedule.deadline.start_date <= deadlineform.cleaned_data['start_date'] <=
                     schedule.deadline.end_date or schedule.deadline.end_date >=
                     deadlineform.cleaned_data['end_date'] >= schedule.deadline.start_date) and \
                         schedule.id != kwargs['pk']:
                     errors += 1
-                    errors = deadlineform.errors.setdefault("__all__", ErrorList())
-                    errors.append("Choosen deadline already in a schedule from " +
-                                  schedule.deadline.start_date.strftime("%d/%m/%Y") +
-                                  " to " + schedule.deadline.end_date.strftime("%d/%m/%Y") + " .")
+                    error = deadlineform.errors.setdefault("__all__", ErrorList())
+                    error.append("Choosen deadline already in a schedule from " +
+                                 schedule.deadline.start_date.strftime("%d/%m/%Y") +
+                                 " to " + schedule.deadline.end_date.strftime("%d/%m/%Y") + " .")
             if count == 0:
-                errors = deadlineform.errors.setdefault("__all__", ErrorList())
-                errors.append("Must choose one of the week days option.")
+                error = deadlineform.errors.setdefault("__all__", ErrorList())
+                error.append("Must choose one of the week days option.")
             elif errors == 0:
                 deadlineform.save()
                 formset.save()
@@ -327,11 +330,12 @@ class UpdatePriceType(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         if deadlineform.is_valid() and formset.is_valid():
             # noinspection DuplicatedCode
             errors = 0
-            for table in PriceTable.objects.filter(archived=False, park=kwargs['pk']):
-                if table.deadline.start_date <= deadlineform.cleaned_data['start_date'] <= \
-                        table.deadline.end_date or \
-                        table.deadline.end_date >= deadlineform.cleaned_data['end_date'] >= \
-                        table.deadline.start_date:
+            for table in PriceTable.objects.filter(archived=False, park=kwargs['park']):
+                if (table.deadline.start_date <= deadlineform.cleaned_data['start_date'] <=
+                    table.deadline.end_date or
+                    table.deadline.end_date >= deadlineform.cleaned_data['end_date'] >=
+                    table.deadline.start_date) and \
+                        table.id != kwargs['pk']:
                     errors += 1
                     errors = deadlineform.errors.setdefault("__all__", ErrorList())
                     errors.append("Choosen deadline already in a price table from " +
@@ -435,7 +439,7 @@ class AddZone(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return context
 
     def test_func(self):
-        return not (Administrator.objects.filter(user=self.request.user) is None)
+        return Administrator.objects.filter(user=self.request.user.id).exists()
 
     def form_valid(self, form):
         form.instance.park = Park.objects.get(id=self.kwargs['park'])
@@ -451,6 +455,10 @@ class AddZone(LoginRequiredMixin, UserPassesTestMixin, CreateView):
             if check_empty_spots(formset):
                 errors = form.errors.setdefault("__all__", ErrorList())
                 errors.append("At Least one Spot must be incerted.")
+            elif Zone.objects.filter(park=Park.objects.get(id=self.kwargs['park']),
+                                     name=form.cleaned_data['name']).exists():
+                errors = form.errors.setdefault("__all__", ErrorList())
+                errors.append("Name Zone already exists.")
             else:
                 parent = form.save(commit=False)
                 parent.park = Park.objects.get(id=self.kwargs['park'])
@@ -470,23 +478,44 @@ class AddZone(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
 class ViewZoneList(SingleTableMixin, FilterView):
     model = Zone
-    table_class = ZoneTable
+    table_class = ClientZoneTable
     filterset_class = ZoneFilter
     template_name = 'zone/zone_filter.html'
 
     def get_queryset(self):
         qs = super().get_queryset()
-        return qs.filter(park=Park.objects.get(id=self.kwargs['park']))
+        if self.request.user.is_authenticated and Administrator.objects.filter(user=self.request.user):
+            return qs.filter(park=Park.objects.get(id=self.kwargs['park']))
+        else:
+            return qs.filter(is_archived=False, park=Park.objects.get(id=self.kwargs['park']))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['park'] = Park.objects.get(id=self.kwargs['park'])
         return context
 
+    def get_table_class(self):
+        if self.request.user.is_authenticated and Administrator.objects.filter(user=self.request.user):
+            return ZoneTable
+        else:
+            return self.table_class
+
+    @staticmethod
+    def post(request, *args, **kwargs):
+        if Administrator.objects.filter(user=request.user.id).exists():
+            close_open_zone(request)
+        return HttpResponseRedirect(reverse('list_zones', kwargs={'park': kwargs['park']}))
+
 
 class ViewZoneDetail(DetailView):
     model = Zone
     template_name = 'zone/zone_detail.html'
+
+    @staticmethod
+    def post(request, *args, **kwargs):
+        if Administrator.objects.filter(user=request.user.id).exists():
+            close_open_zone(request)
+        return HttpResponseRedirect(reverse('zone_detail', kwargs={'park': kwargs['park'], 'pk': kwargs['pk']}))
 
 
 class UpdateZone(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -495,7 +524,7 @@ class UpdateZone(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     template_name = 'zone/zone_update.html'
 
     def test_func(self):
-        return not (Administrator.objects.filter(user=self.request.user) is None)
+        return Administrator.objects.filter(user=self.request.user.id).exists()
 
     def form_valid(self, form):
         Park.objects.filter(id=self.kwargs['park']).update(updated=timezone.now())
@@ -505,7 +534,7 @@ class UpdateZone(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         SpotFormset = modelformset_factory(ParkingSpot, form=SpotForm, extra=0, can_delete=True)
         context['formset'] = SpotFormset(None, queryset=ParkingSpot.objects.filter(
-            zone=Zone.objects.get(id=self.kwargs['pk'])))
+            zone=Zone.objects.get(id=self.kwargs['pk']), is_archived=False))
         context['zone'] = Zone.objects.get(id=self.kwargs['pk'])
         return context
 
@@ -515,7 +544,7 @@ class UpdateZone(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         form = ZoneForm(request.POST, instance=zone)
         SpotFormSet = modelformset_factory(ParkingSpot, form=SpotForm, extra=0, can_delete=True, can_delete_extra=True)
         formset = SpotFormSet(request.POST, queryset=ParkingSpot.objects.filter(
-            zone=zone))
+            zone=zone, is_archived=False))
         if all([form.is_valid(), formset.is_valid()]):
             if check_empty_spots(formset):
                 errors = form.errors.setdefault("__all__", ErrorList())
@@ -528,25 +557,51 @@ class UpdateZone(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
                     if len(form.cleaned_data) == 6:
                         filterSpot = ParkingSpot.objects.filter(zone=zone, number=form.cleaned_data['number'],
                                                                 direction=form.cleaned_data['direction'],
-                                                                x=form.cleaned_data['x'], y=form.cleaned_data['y'])
+                                                                x=form.cleaned_data['x'], y=form.cleaned_data['y'],
+                                                                is_archived=False)
                         if form.cleaned_data['DELETE'] is False:
                             child = form.save(commit=False)
                             child.zone = parent
                             child.save()
                         elif form.cleaned_data['DELETE'] is True and filterSpot is not None:
-                            filterSpot.delete()
+                            filterSpot.update(is_archived=True)
                 return HttpResponseRedirect(parent.get_absolute_url())
 
-        return render(request, "zone/zone_update.html", {"form": form, "formset": formset})
+        return render(request, "zone/zone_update.html", {"form": form, "formset": formset, "zone": zone})
 
 
-class DeleteZone(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-    model = Zone
-    success_url = reverse_lazy('list_zones')
-    template_name = 'parks/park_confirm_archive.html'
+class ArchiveZone(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name = 'zone/zone_confirm_archive.html'
 
     def test_func(self):
-        return not (Administrator.objects.filter(user=self.request.user) is None)
+        return permission_to_archive_zone(self)
 
-    def get_success_url(self):
-        return "/parks/" + self.kwargs['park'] + "/zones/"
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['object'] = Zone.objects.get(id=kwargs['pk'])
+        return context
+
+    @staticmethod
+    def post(request, *args, **kwargs):
+        Zone.objects.filter(id=kwargs['pk']).update(is_archived=True, is_open=False)
+        for spot in Zone.objects.get(id=kwargs['pk']).spots():
+            ParkingSpot.objects.filter(id=spot.id).update(is_archived=True)
+        return HttpResponseRedirect(reverse('zone_detail', kwargs={'park': kwargs['park'], 'pk': kwargs['pk']}))
+
+
+class ArchiveSpot(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name = 'zone/spot_confirm_archive.html'
+
+    def test_func(self):
+        return permission_to_archive_spot(self)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['object'] = ParkingSpot.objects.get(id=kwargs['pk'])
+        return context
+
+    @staticmethod
+    def post(request, *args, **kwargs):
+        ParkingSpot.objects.filter(id=kwargs['pk']).update(is_archived=True)
+        return HttpResponseRedirect(reverse('zone_detail', kwargs={'park': kwargs['park'], 'pk': kwargs['zone']}))
+

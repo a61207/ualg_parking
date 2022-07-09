@@ -1,0 +1,100 @@
+{% extends "baseContainer.html" %}
+{% load static %}
+
+    {% block title %}
+        Saída
+    {% endblock %}
+    {% block containerTitle %}
+        Registar saída
+    {% endblock %}
+
+    {% block containerContent %}
+        <form action="{% url 'sairParque' %}" method="post">
+            {% csrf_token %}
+            <div class="form-row">
+                <!-- Matricula Input -->
+                <div class="form-group col">
+                    <label for="nome">Matrícula</label>
+                    <input type="text" class="form-control {% if erros %}is-invalid{% endif %}"
+                           id="matricula" name="matricula" placeholder="Inserir matricula"
+                           {% if matricula %}value="{{ matricula }}"{% endif %}>
+                      <div class="invalid-feedback">
+                          {{ erros }}
+                      </div>
+                </div>
+                <!-- Data e hora Input -->
+                <div class="form-group col">
+                    <label for="dia">Data e hora</label>
+                    <input type="datetime-local" min="2022-01-01" class="form-control"
+                        id="saida" name="saida" placeholder="Inserir data e hora" >
+                </div>
+            </div>
+            <br>
+            <!-- Botão Submit -->
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary">Procurar</button>
+            </div>
+        </form>
+        <br>
+        <br>
+        {% include 'messages.html' %}
+        <br>
+        <!-- Ocupações encontradas -->
+        {% if reservas or contratos %}
+        <p class="text-center font-weight-bold">Ocupações encontradas</p>
+        <br>
+        <table class="table table-light table-hover">
+            <thead>
+              <tr>
+                <th scope="col">Tipo</th>
+                <th scope="col">Matrícula</th>
+                <th scope="col">Entrada</th>
+                <th scope="col">Saída</th>
+                <th scope="col">Validade</th>
+                <th scope="col">Parque</th>
+                <th scope="col">Zona</th>
+                <th scope="col">Lugar</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            <tbody>
+                {% for reserva in reservas %}
+                {% if reserva.entradassaidasid.periocidadeid.start and not reserva.entradassaidasid.periocidadeid.end %}
+                <tr>  
+                  <td>Reserva</td>
+                  <td>{{ reserva.matricula.matricula }}</td>
+                  <td>{{ reserva.entradassaidasid.periocidadeid.start }}</td>
+                  <td style="color: blue;"><strong>{{ saida2 }}</strong></td>
+                  <td>{{ reserva.periocidadeid.start }} - {{ reserva.periocidadeid.end }}</td>
+                  <td>{{ reserva.lugarid.zonaid.parqueid.nome }}</td>
+                  <td>{{ reserva.lugarid.zonaid.nome }}</td>
+                  <td>{{ reserva.lugarid.nome }}</td>
+                  <td><a class="btn btn-primary" href="{% url 'pagamento' id=reserva.id %}">Efetuar pagamento</a></td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+                {% for contrato in contratos %}
+                {% if contrato.entradassaidasid.periocidadeid.start and not contrato.entradassaidasid.periocidadeid.end %}
+                <tr>  
+                  <td>Contrato</td>
+                  <td>{{ contrato.matricula.matricula }}</td>
+                  <td>{{ contrato.entradassaidasid.periocidadeid.start }}</td>
+                  <td style="color: blue;"><strong>{{ saida2 }}</strong></td>
+                  <td>{{ contrato.datainicio }} - {{ contrato.datavalidade }}</td>
+                  <td>{{ contrato.lugarid.zonaid.parqueid.nome }}</td>
+                  <td>{{ contrato.lugarid.zonaid.nome }}</td>
+                  <td>{{ contrato.lugarid.nome }}</td>
+                  <td><a class="btn btn-primary" href="{% url 'registarSaidaContrato' id=contrato.id saida=saida %}">Registar saída</a></td>
+                </tr>
+                {% endif %}
+              {% endfor %}
+            </tbody>
+        </table>
+        {% elif check%}
+        <!-- Botão Associar -->
+        <div class="d-flex justify-content-center">
+            <a class="btn btn-primary" href="{% url 'listarLugares' %}">Desassociar manualmente viatura e lugar</a>
+        </div>
+        <br>
+      {% endif %}
+  {% endblock %}

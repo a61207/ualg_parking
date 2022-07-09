@@ -1,0 +1,37 @@
+{% extends "baseContainer.html" %}
+{% load static %}
+    {% block title %}
+        Associar manualmente viatura ao lugar
+    {% endblock %}
+    {% block containerTitle %}
+        Associar manualmente viatura ao lugar <b>{{ lugar.nome }}</b>
+    {% endblock %}
+    {% block containerContent %}
+        <form action="{% url 'associarLugar' lugar.id %}" method="post">
+            {% csrf_token %}
+            <div class="form-row">
+                <!-- Matricula Input -->
+                <div class="form-group col">
+                    <label for="nome">Matrícula</label>
+                    <input type="text" class="form-control {% if erros %}is-invalid{% endif %}"
+                           id="matricula" name="matricula" placeholder="Inserir matricula"
+                           {% if matricula %}value="{{ matricula }}"{% endif %}>
+                      <div class="invalid-feedback">
+                          {{ erros }}
+                      </div>
+                </div>
+                <!-- Data e hora Input -->
+                <div class="form-group col">
+                    <label for="dia">Data e hora</label>
+                    <input type="datetime-local" min="2022-01-01" class="form-control"
+                        id="entrada" name="entrada" placeholder="Inserir data e hora" >
+                </div>
+            </div>
+            <br>
+            <!-- Botão Submit -->
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary">Associar</button>
+            </div>
+        </form>
+        <br>
+    {% endblock %}

@@ -1,0 +1,27 @@
+{% extends "baseContainer.html" %}
+{% load static %}
+    {% block title %}
+        Desassociar manualmente viatura ao lugar
+    {% endblock %}
+    {% block containerTitle %}
+        Desassociar manualmente viatura ao lugar  <b>{{ lugar.nome }}</b>
+    {% endblock %}
+    {% block containerContent %}
+        <form action="{% url 'desassociarLugar' lugar.id %}" method="post">
+            {% csrf_token %}
+            <div class="form-row">
+                <!-- Data e hora Input -->
+                <div class="form-group col">
+                    <label for="dia">Data e hora</label>
+                    <input type="datetime-local" min="2022-01-01" class="form-control"
+                        id="saida" name="saida" placeholder="Inserir data e hora" >
+                </div>
+            </div>
+            <br>
+            <!-- Botão Submit -->
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary">Desassociar</button>
+            </div>
+        </form>
+        <br>
+    {% endblock %}

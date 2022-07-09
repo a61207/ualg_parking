@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+    Visualizar lugar
+{% endblock %}
+{% block main %}
+    <div class="container my-4">
+        <div class="row rounded bg-light pt-3">
+            <div class="col">
+                <div class="jumbotron border p-3 mb-3">
+                    <h1 class="text-center">Visualizar lugar <b>{{ lugar.nome }}</b></h1>
+                    <hr>
+                    <!-- Div de Info da zona -->
+                    <div class="p-3 mb-2 bg-light text-dark">
+                        <div class="row">
+                            <div class="col">
+                                <p><b>Parque: </b><br>{{ lugar.zone.park.name }}</p>
+                            </div>
+                            <div class="col">
+                                <p><b>Zona: </b><br>{{ lugar.zone.name }}</p>
+                            </div>
+                            <div class="col">
+                                <p><b>Estado: </b><br>{{ lugar.get_state_now }}</p>
+                            </div>
+                            <div class="col">
+                                <p><b>Criado em: </b><br>{{ lugar.zone.park.created }}</p>
+                            </div>
+                            <div class="col">
+                                <p><b>Atualizado em: </b><br>{{ lugar.zone.park.updated }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    {% if perms.main.add_parque %}
+                        <div class="row">
+                            {% if lugar.estadorecursoid.id == 2 %}
+                                <!-- Botão de Apagar -->
+                                <div class="col">
+                                    <div class="d-flex justify-content-center">
+                                        <a class="btn btn-primary" href="{% url 'associarLugar' lugar.id %}">Associar
+                                            viatura</a>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            <!-- Botão de Apagar -->
+                            <div class="col">
+                                <div class="d-flex justify-content-center">
+                                    <a class="btn btn-danger"
+                                       href="{% url 'archive_spot' lugar.zone.park.id lugar.zone.id lugar.id %}">Arquivar
+                                        lugar</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <br>
+                    <hr>
+                    <br>
+                    {% if perms.main.add_parque %}
+                        {% if lugar.estadorecursoid.id == 3 %}
+                            <p class="text-center font-weight-bold">Viatura a ocupar atualmente este lugar</p>
+                            <br>
+                            <table class="table table-light table-hover">
+                                <thead>
+                                <tr>
+                                    <th scope="col">Matrícula</th>
+                                    <th scope="col">País</th>
+                                    <th scope="col">Modelo</th>
+                                    <th scope="col">Cor</th>
+                                    <th scope="col">Início</th>
+                                    <th scope="col"></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% if entsaid and reservas %}
+                                    <tr>
+                                        <td>{{ entsaid.matriculaviatura.matricula }}</td>
+                                        <td>{{ entsaid.matriculaviatura.pais }}</td>
+                                        <td>{{ entsaid.matriculaviatura.modelo }}</td>
+                                        <td>{{ entsaid.matriculaviatura.cor }}</td>
+                                        <td>{{ entsaid.periocidadeid.start }}</td>
+                                        <td></td>
+                                    </tr>
+                                {% endif %}
+                                {% if visitas %}
+                                    <tr>
+                                        <td>{{ visitas.matricula.matricula }}</td>
+                                        <td>{{ visitas.matricula.pais }}</td>
+                                        <td>{{ visitas.matricula.modelo }}</td>
+                                        <td>{{ visitas.matricula.cor }}</td>
+                                        <td>{{ visitas.periocidadeid.start }}</td>
+                                        <td><a class="btn btn-primary" href="{% url 'desassociarLugar' id=lugar.id %}">Desassociar
+                                            viatura</a></td>
+                                    </tr>
+                                {% endif %}
+                                </tbody>
+                            </table>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

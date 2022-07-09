@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}
+    View Parking Spots
+{% endblock %}
+
+{% block main %}
+
+    <div class="container my-4">
+        <div class="row rounded bg-light pt-3">
+            <div class="col">
+                <div class="jumbotron border p-3 mb-3">
+                    <h1 class="text-center">Parking Spots</h1>
+                    <hr>
+                    {% if not lugares %}
+                        <h4 class="text-center">No Parking Spots Created</h4>
+                    {% else %}
+
+                        <!-- Tabela de Lugares -->
+                        <table class="table table-light table-hover">
+                            <thead>
+                            <tr>
+                                <th scope="col">Name</th>
+                                <th scope="col">Park</th>
+                                <th scope="col">Zone</th>
+                                <th scope="col">State</th>
+                                <th scope="col">Updated</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for lugar in lugares %}
+                                <tr>
+                                    <th scope="row"><a href="{% url 'visualizarLugar' lugar.id %}">{{ lugar.number }}</a>
+                                    </th>
+                                    <td>
+                                        <a href="{% url 'park_detail' lugar.zone.park.id %}">{{ lugar.zone.park.name }}</a>
+                                    </td>
+                                    <td><a href="{% url 'zone_detail' lugar.zone.park.id lugar.zone.id %}">{{ lugar.zone.name }}</a>
+                                    </td>
+                                    <td>{{ lugar.get_state_now }}</td>
+                                    <td>{{ lugar.zone.park.updated }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

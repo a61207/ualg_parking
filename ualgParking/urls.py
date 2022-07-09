@@ -25,4 +25,5 @@ urlpatterns = [
     path('', include('parks.urls')),
     path('', include('stats.urls')),
     path('', include('reserves.urls')),
+    path('', include('operations.urls')),
 ]

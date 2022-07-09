@@ -504,6 +504,14 @@ class ParkingSpot(models.Model):
         return EntradasSaidas.objects.filter(lugarid=self.id, periocidadeid__start__gte=timezone.now().date())
 
 
+class Estadorecurso(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    nome = models.CharField(db_column='Nome', unique=True, max_length=15)  # Field name made lowercase.
+
+    class Meta:
+        db_table = 'EstadoRecurso'
+
+
 class Estadoreserva(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     nome = models.CharField(db_column='Nome', unique=True, max_length=15)  # Field name made lowercase.
@@ -542,7 +550,8 @@ class Contrato(models.Model):
     datainicio = models.DateField(db_column='DataInicio')  # Field name made lowercase.
     datafim = models.DateField(db_column='DataFim', blank=True,
                                null=True)  # Field name made lowercase.
-    matricula = models.CharField(db_column='Matricula', max_length=8)  # Field name made lowercase.
+    matricula = models.ForeignKey(Car, models.CASCADE, db_column='matricula',
+                                  null=True)  # Field name made lowercase.
     criadoem = models.DateTimeField(db_column='CriadoEm', default=timezone.now)  # Field name made lowercase.
     editadoem = models.DateTimeField(db_column='EditadoEm', default=timezone.now)  # Field name made lowercase.
     estadoreservaid = models.ForeignKey(Estadoreserva, models.DO_NOTHING,
@@ -559,6 +568,10 @@ class EntradasSaidas(models.Model):
     matriculaviatura = models.ForeignKey(Car, models.CASCADE,
                                          db_column='MatriculaViatura')
     lugarid = models.ForeignKey(ParkingSpot, models.CASCADE, db_column='LugarID')
+    tipo = models.ForeignKey(Estadorecurso, models.CASCADE,
+                             db_column='EstadoRecursoID')  # Field name made lowercase.
+    criadoem = models.DateTimeField(db_column='CriadoEm', default=timezone.now)  # Field name made lowercase.
+    editadoem = models.DateTimeField(db_column='EditadoEm', default=timezone.now)  # Field name made lowercase.
 
     class Meta:
         db_table = 'Entradas/Saidas'
@@ -631,3 +644,17 @@ class Reclamacao(models.Model):
 
     class Meta:
         db_table = 'Reclamacao'
+
+
+class Visit(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    matricula = models.ForeignKey(Car, models.DO_NOTHING, db_column='matricula')  # Field name made lowercase.
+    lugarid = models.ForeignKey(ParkingSpot, models.DO_NOTHING, db_column='LugarID')  # Field name made lowercase.
+    preco = models.FloatField(db_column='Preco', blank=True, null=True)
+    periocidadeid = models.ForeignKey(Periocidade, models.DO_NOTHING,
+                                      db_column='PeriocidadeID')  # Field name made lowercase.
+    criadoem = models.DateTimeField(db_column='CriadoEm', default=timezone.now)  # Field name made lowercase.
+    editadoem = models.DateTimeField(db_column='EditadoEm', default=timezone.now)  # Field name made lowercase.
+
+    class Meta:
+        db_table = 'Visit'

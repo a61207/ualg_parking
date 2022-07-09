@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+    Entrada
+{% endblock %}
+
+{% block main %}
+
+    <div class="container my-4">
+        <div class="row rounded bg-light pt-3">
+            <div class="col">
+                <div class="jumbotron border p-3 mb-3">
+                    <h1 class="text-center">Registar entrada</h1>
+                    <hr>
+                    <form action="{% url 'entrarParque' %}" method="post">
+                        {% csrf_token %}
+                        <div class="form-row">
+                            <!-- Matricula Input -->
+                            <div class="form-group col">
+                                <label for="nome">Matrícula</label>
+                                <input type="text" class="form-control {% if erros %}is-invalid{% endif %}"
+                                       id="matricula" name="matricula" placeholder="Inserir matricula"
+                                       {% if matricula %}value="{{ matricula }}"{% endif %}>
+                                <div class="invalid-feedback">
+                                    {{ erros }}
+                                </div>
+                            </div>
+                            <!-- Data e hora Input -->
+                            <div class="form-group col">
+                                <label for="dia">Data e hora</label>
+                                <input type="datetime-local" min="2022-01-01" class="form-control"
+                                       id="entrada" name="entrada" placeholder="Inserir data e hora">
+                            </div>
+                        </div>
+                        <br>
+                        <!-- Botão Submit -->
+                        <div class="d-flex justify-content-center">
+                            <button type="submit" class="btn btn-primary">Procurar</button>
+                        </div>
+                    </form>
+                    <br>
+                    <br>
+                    <div class="container my-4">
+                        <div class="alert alert-{{ type }}" role="alert">
+                            <h4 class="alert-heading text-center">{{ message }}</h4>
+                        </div>
+                    </div>
+                    <br>
+                    <!-- Reserva encontrada -->
+                    {% if reservas or contratos %}
+                        <br>
+                        <p class="text-center font-weight-bold">Dados encontrados</p>
+                        <br>
+                        <table class="table table-light table-hover">
+                            <thead>
+                            <tr>
+                                <th scope="col">Tipo</th>
+                                <th scope="col">Matrícula</th>
+                                <th scope="col">Validade</th>
+                                <th scope="col">Parque</th>
+                                <th scope="col">Zona</th>
+                                <th scope="col">Lugar</th>
+                                <th scope="col"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for reserva in reservas %}
+                                <tr>
+                                    <td>Reserva</td>
+                                    <td>{{ reserva.matricula.matricula }}</td>
+                                    <td>{{ reserva.periocidadeid.start }} - {{ reserva.periocidadeid.end }}</td>
+                                    <td>{{ reserva.lugarid.zonaid.parqueid.nome }}</td>
+                                    <td>{{ reserva.lugarid.zonaid.nome }}</td>
+                                    <td>{{ reserva.lugarid.nome }}</td>
+                                    <td><a class="btn btn-primary"
+                                           href="{% url 'registarEntradaReserva' id=reserva.id entrada=entrada %}">Registar
+                                        entrada</a></td>
+                                </tr>
+                            {% endfor %}
+                            {% for contrato in contratos %}
+                                <tr>
+                                    <td>Contrato</td>
+                                    <td>{{ contrato.matricula.matricula }}</td>
+                                    <td>{{ contrato.datainicio }} - {{ contrato.datavalidade }}</td>
+                                    <td>{{ contrato.lugarid.zonaid.parqueid.nome }}</td>
+                                    <td>{{ contrato.lugarid.zonaid.nome }}</td>
+                                    <td>{{ contrato.lugarid.nome }}</td>
+                                    <td><a class="btn btn-primary"
+                                           href="{% url 'registarEntradaContrato' id=contrato.id entrada=entrada %}">Registar
+                                        entrada</a></td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% elif check %}
+                        <!-- Botão Associar -->
+                        <div class="d-flex justify-content-center">
+                            <a class="btn btn-primary" href="{% url 'listarLugares' %}">Associar viatura a lugar</a>
+                        </div>
+                        <br>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

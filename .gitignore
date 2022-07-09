@@ -18,6 +18,7 @@ venv
 /operations/migrations
 /parks/migrations
 /reserves/migrations
+/main/migrations
 
 
 

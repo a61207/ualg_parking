@@ -21,7 +21,8 @@ def criar_reserva(request, id):
             matricula = request.POST['matricula']
             viatura = Car.objects.get(registration=matricula)
             period = Periocidade.objects.create(start=dataI, end=dataF)
-            Reserva.objects.create(userid=client, lugarid=ParkingSpot.objects.get(id=id),
+            lugar = ParkingSpot.objects.get(id=id)
+            Reserva.objects.create(userid=client, lugarid=lugar, parqueid=lugar.zone.park,
                                    periocidadeid=period, matricula=viatura)
             messages.add_message(request, messages.SUCCESS, "Reserva in park '" + parque + "' created")
             return HttpResponseRedirect(reverse('listarReservas'))

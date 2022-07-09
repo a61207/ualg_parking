@@ -31,7 +31,7 @@
                         <!-- Data inicio Input -->
                         <div class="form-group col">
                             <label for="date">Data Inicio</label>
-                            <input type="date" class="form-control {% if erros %}is-invalid{% endif %}"
+                            <input type="datetime-local" class="form-control {% if erros %}is-invalid{% endif %}"
                                    id="datastart" name="datastart" placeholder="Enter date"
                                    {% if datainicio %}value="{{ datastart }}"{% endif %}>
                             <div class="invalid-feedback">
@@ -42,7 +42,7 @@
                         <!-- Data fim Input -->
                         <div class="form-group col">
                             <label for="date">Data Fim</label>
-                            <input type="date" class="form-control {% if erros %}is-invalid{% endif %}"
+                            <input type="datetime-local" class="form-control {% if erros %}is-invalid{% endif %}"
                                    id="dataend" name="dataend" placeholder="Enter date"
                                    {% if datafim %}value="{{ dataend }}"{% endif %}>
                             <div class="invalid-feedback">

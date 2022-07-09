@@ -5,24 +5,30 @@ de média dimensão integrando os conhecimentos disciplinas da área científica
 ágeis, o tema selecionado envolve um sistema que faz a gestão de um sistema de parque de estacionamento. Para desenvolver este sistema em formato web 
 foi utilizada a framework Django.
 
-## Instalação de Projeto
+## Instalação de Projeto Windows 
+## ( !!! NO BASH !!! NÃO NO POWERSHELL !!! )
 
 1. Fazer clone do projecto:
 
 ```git clone https://github.com/a61207/ualg_parking.git```
 
-2. Criar ambiente virtual: 
+2. Entrar no ambiente de trabalho:
+
+```cd ualg_parking```
+
+3. Criar ambiente virtual: 
 
 ```python -m venv venv```
 
-3. Ativar ambiente virtual:
+4. Ativar ambiente virtual:
 
-```source venv/bin/activate```
-```. venv/Scripts/activate```
+```.\venv\Scripts\activate```
 
-4. Enable Settings File by Decompressing "settings.zip":
+5. Enable Settings File by Decompressing "settings.zip":
 
-5. Instalar Requirements:
+```tar -xf ualgParking\settings.zip -C ualgParking```
+
+6. Instalar Requirements:
 
 ```pip3 install -r requirements.txt```
 

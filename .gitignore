@@ -2,3 +2,15 @@ venv
 /db.sqlite3
 /ualgParking/settings.py
 .idea
+/reserves/__pycache__
+/main/__pycache__
+/operations/__pycache__
+/parks/__pycache__
+/stats/__pycache__
+/ualgParking/__pycache__
+/reserves/__init__.py
+/main/__init__.py
+/operations/__init__.py
+/parks/__init__.py
+/stats/__init__.py
+/ualgParking/__init__.py

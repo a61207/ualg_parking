@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 
 from main.models import *
-from reserves.forms import ReclamacaoForm, ComprovativoForm, ContratoForm
+from reserves.forms import ReclamacaoForm, ComprovativoForm, ContratoForm, ReservaForm
 
 
 def criar_reserva(request, id):
@@ -47,6 +47,7 @@ def editar_reserva(request, id):
     parque = ParkingSpot.objects.get(id=id).zone.park.name
     client = Client.objects.get(user=request.user)
     cars = Car.objects.filter(client=client)
+    start = reserva.periocidadeid.start.strftime("%Y-%m-%dT%H:%m").__str__()
     if estados:
         if request.method == 'POST':
             instance = Reserva.objects.get(id=id)
@@ -61,9 +62,8 @@ def editar_reserva(request, id):
                                    periocidadeid=period, matricula=matricula)
                 messages.add_message(request, messages.SUCCESS, "Reserva in park '" + parque + "' updated")
                 return HttpResponseRedirect(reverse('listarReservas'))
-            else:
-                return render(request, 'editarReserva.html',
-                          {'estados': estados, 'id': id})
+        return render(request, 'reservas/editarReserva.html',
+                  {'estados': estados, 'id': id, 'reserva': reserva, 'start': start})
     return HttpResponseNotFound()
 
 def apagar_reserva(request, id):

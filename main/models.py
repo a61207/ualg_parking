@@ -539,8 +539,8 @@ class Periocidade(models.Model):
 
 class Contrato(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-    userid = models.ForeignKey(User, models.CASCADE,
-                               db_column='UserID')  # Field name made lowercase.
+    userid = models.ForeignKey(Client, models.CASCADE,
+                               db_column='ClientID')  # Field name made lowercase.
     lugarid = models.ForeignKey(ParkingSpot, models.CASCADE, db_column='LugarID')
     modalidadepagamentoid = models.ForeignKey(Modalidadepagamento, models.CASCADE,
                                               db_column='ModalidadePagamentoID', blank=True,
@@ -581,7 +581,7 @@ class Reserva(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     contratoid = models.ForeignKey(Contrato, models.CASCADE, db_column='ContratoID', blank=True,
                                    null=True)  # Field name made lowercase.
-    userid = models.ForeignKey(User, models.CASCADE,
+    userid = models.ForeignKey(Client, models.CASCADE,
                                db_column='UserID')  # Field name made lowercase.
     matricula = models.ForeignKey(Car, models.CASCADE, db_column='matricula',
                                   null=True)  # Field name made lowercase.

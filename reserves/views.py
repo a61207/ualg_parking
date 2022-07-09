@@ -6,12 +6,13 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 
 from main.models import *
-from reserves.forms import ReservaForm, ReclamacaoForm, ComprovativoForm, ContratoForm
+from reserves.forms import ReclamacaoForm, ComprovativoForm, ContratoForm
 
 
 def criar_reserva(request, id):
     estados = Estadoreserva.objects.all()
     parque = ParkingSpot.objects.get(id=id).zone.park.name
+    client = Client.objects.get(user=request.user)
     if estados:
         if request.method == 'POST':
             print(request.POST)
@@ -20,7 +21,7 @@ def criar_reserva(request, id):
             matricula = request.POST['matricula']
             viatura = Car.objects.get(registration=matricula)
             period = Periocidade.objects.create(start=dataI, end=dataF)
-            Reserva.objects.create(userid=request.user, lugarid=ParkingSpot.objects.get(id=id),
+            Reserva.objects.create(userid=client, lugarid=ParkingSpot.objects.get(id=id),
                                    periocidadeid=period, matricula=viatura)
             messages.add_message(request, messages.SUCCESS, "Reserva in park '" + parque + "' created")
             return HttpResponseRedirect(reverse('listarReservas'))
@@ -32,7 +33,7 @@ def criar_reserva(request, id):
 
 def listar_reservas(request):
     reservas = Reserva.objects.all().order_by('-editadoem')
-    return render(request, 'reservas/listarReservas.html', {'reservas': reservas})
+    return render(request, 'listarReservas.html', {'reservas': reservas})
 
 
 def visualizar_reserva(request, id):
@@ -53,6 +54,7 @@ def apagar_reserva(request, id):
 def criar_contrato(request):
     estados = Estadoreserva.objects.all()
     parques = Park.objects.all().order_by('-updated')
+    client = Client.objects.get(user=request.user)
     if parques and estados:
         if request.method == 'POST':
             form = ContratoForm(request.POST)
@@ -64,7 +66,7 @@ def criar_contrato(request):
                 dataF = request.POST['datafim']
                 matricula = request.POST['matricula']
                 viatura = Car.objects.get(registration=matricula)
-                Contrato.objects.create(userid=request.user, lugarid=lugar, estadoreservaid=estado, datainicio=dataI,
+                Contrato.objects.create(userid=client, lugarid=lugar, estadoreservaid=estado, datainicio=dataI,
                                         datafim=dataF, matricula=viatura)
                 messages.add_message(request, messages.SUCCESS, "Contrato in park '" + parque.name + "' created")
                 return HttpResponseRedirect(reverse('listarContratos'))

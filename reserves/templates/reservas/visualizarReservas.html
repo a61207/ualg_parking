@@ -16,7 +16,7 @@
                     <div class="p-3 mb-2 bg-light text-dark">
                         <div class="row">
                             <div class="col">
-                                <p><b>User: </b>{{ reserva.userid.username }}</p>
+                                <p><b>User: </b>{{ reserva.userid.user.get_full_name }}</p>
                             </div>
                             <div class="col">
                                 <p><b>Matricula: </b>{{ reserva.matricula }}</p>

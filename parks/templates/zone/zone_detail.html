@@ -55,7 +55,7 @@
                                                 {% endif %}
                                             {% elif row.zone.is_open and request.user|is_client %}
                                                 <a class="btn btn-secondary btn-sm mt-1"
-                                                   href="">Reserve</a>
+                                                   href="{% url 'criarReserva' row.id %}">Reserve</a>
                                             {% endif %}
                                         {% endif %}
                                     </td>

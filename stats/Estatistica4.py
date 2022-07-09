@@ -3,12 +3,14 @@ from datetime import *
 from .forms import *
 from main.models import *
 
-def intervalo_horas_4(hora_inicio, hora_final, periocidades):
+def intervalo_horas_4(hora_inicio, hora_final, periocidades, data_inicio):
     data = []
     data2 = []
     data3 = []
     data4 = []
     label = []
+    dateStart = datetime.strptime(data_inicio,"%Y-%m-%d").date()
+
 
     hinicio = hora_inicio.split(":")
 
@@ -16,7 +18,7 @@ def intervalo_horas_4(hora_inicio, hora_final, periocidades):
     
     for h in range(int(hinicio[0]), int(hfinal[0])+1):
         
-        perio = periocidades.filter(start__hour=h)
+        perio = periocidades.filter(start__hour=h, start__year=dateStart.year, start__month = dateStart.month, start__day = dateStart.day)
 
         perioc = []
         for p in perio:
@@ -267,8 +269,8 @@ def intervaloTempo_4(data_inicio, hora_inicio, data_final, hora_final, periocida
     dateStart = datetime.strptime(data_inicio,"%Y-%m-%d").date()
     dateEnd = datetime.strptime(data_final,"%Y-%m-%d").date()
     d = dateEnd - dateStart
-    if (d.days <= 2): #ver em intervalo de horas
-        return intervalo_horas_4(hora_inicio, hora_final, periocidades)
+    if (d.days < 1): #ver em intervalo de horas
+        return intervalo_horas_4(hora_inicio, hora_final, periocidades, data_inicio)
     elif (d.days <= 31): #ver em intervalo de dias
         return intervalo_dias_4(data_inicio, data_final, periocidades)
     elif (d.days<=365): #ver em intervalo de meses

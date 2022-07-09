@@ -18,7 +18,7 @@ foi utilizada a framework Django.
 
 ```cd ualg_parking```
 
-3. Setup ambiente virtual: 
+3. Setup ambiente virtual (se não tiver tar instalado fazer unzip manualmente de ualgParking/settings.zip): 
 
 ```venv.bat```
 

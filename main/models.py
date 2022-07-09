@@ -584,8 +584,7 @@ class Reserva(models.Model):
                                    null=True)  # Field name made lowercase.
     userid = models.ForeignKey(Client, models.CASCADE,
                                db_column='UserID')  # Field name made lowercase.
-    matricula = models.ForeignKey(Car, models.CASCADE, db_column='matricula',
-                                  null=True)  # Field name made lowercase.
+    matricula = models.CharField(db_column='Matricula', verbose_name='Matricula', max_length=8)
     lugarid = models.ForeignKey(ParkingSpot, models.CASCADE, db_column='LugarID')  # Field name made lowercase.
     divida = models.FloatField(db_column='Divida', blank=True, null=True)
     preco = models.FloatField(db_column='Preco', blank=True, null=True)

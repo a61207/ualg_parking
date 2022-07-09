@@ -62,7 +62,7 @@ def editar_reserva(request, id):
                 messages.add_message(request, messages.SUCCESS, "Reserva in park '" + parque + "' updated")
                 return HttpResponseRedirect(reverse('listarReservas'))
             else:
-                return render(request, 'editarReserva.html',
+                return render(request, 'reservas/editarReserva.html',
                           {'estados': estados, 'id': id})
     return HttpResponseNotFound()
 

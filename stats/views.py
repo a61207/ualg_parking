@@ -17,6 +17,7 @@ from main.models import *
 
 # --------------------RESTART---------------------------------------------
 
+
 def menu(request):
     return render(request, 'estatistica/menu.html')
 
@@ -864,7 +865,7 @@ def Grafico7(request):
         periocidades.append(reserva.periocidadeid.id)
 
     periocidades = Periocidade.objects.filter(id__in=periocidades)
-    dados = intervaloTempo_4(str(start), str(starth), str(end), str(endh), periocidades)
+    dados = intervaloTempo_7(str(start), str(starth), str(end), str(endh), periocidades)
 
     data = dados[0]
     label = dados[1]

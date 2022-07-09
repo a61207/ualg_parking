@@ -50,9 +50,9 @@
                                     {% for parque in parques %}
 
                                         {% if parque_id == parque.id %}
-                                            <option selected="true" value="{{ parque.id }}">{{ parque.nome }}</option>
+                                            <option selected="true" value="{{ parque.id }}">{{ parque.name }}</option>
                                         {% else %}
-                                            <option value="{{ parque.id }}">{{ parque.nome }}</option>
+                                            <option value="{{ parque.id }}">{{ parque.name }}</option>
                                         {% endif %}
                                     {% endfor %}
 

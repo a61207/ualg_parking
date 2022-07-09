@@ -20,16 +20,15 @@ def criar_reserva(request, id):
             dataI = request.POST['datastart']
             dataF = request.POST['dataend']
             matricula = request.POST['matricula']
-            viatura = Car.objects.get(registration=matricula)
             period = Periocidade.objects.create(start=dataI, end=dataF)
             lugar = ParkingSpot.objects.get(id=id)
             Reserva.objects.create(userid=client, lugarid=lugar, parqueid=lugar.zone.park,
-                                   periocidadeid=period, matricula=viatura)
+                                   periocidadeid=period, matricula=matricula)
             messages.add_message(request, messages.SUCCESS, "Reserva in park '" + parque + "' created")
             return HttpResponseRedirect(reverse('listarReservas'))
         else:
             return render(request, 'criarReserva.html',
-                          {'estados': estados, 'id': id, 'cars': cars})
+                          {'estados': estados, 'id': id})
     return HttpResponseNotFound()
 
 
@@ -42,6 +41,30 @@ def visualizar_reserva(request, id):
     reserva = Reserva.objects.get(id=id)
     return render(request, 'reservas/visualizarReservas.html', {'reserva': reserva})
 
+def editar_reserva(request, id):
+    reserva = Reserva.objects.get(id=id)
+    estados = Estadoreserva.objects.all()
+    parque = ParkingSpot.objects.get(id=id).zone.park.name
+    client = Client.objects.get(user=request.user)
+    cars = Car.objects.filter(client=client)
+    if estados:
+        if request.method == 'POST':
+            instance = Reserva.objects.get(id=id)
+            form = ReservaForm(request.POST, instance=instance)
+            if form.is_valid():
+                dataI = request.POST['datastart']
+                dataF = request.POST['dataend']
+                matricula = request.POST['matricula']
+                period = Periocidade.objects.create(start=dataI, end=dataF)
+                lugar = ParkingSpot.objects.get(id=id) 
+                Reserva.objects.filter(id=id).update(userid=request.user, lugarid=lugar, parqueid=lugar.zone.park,
+                                   periocidadeid=period, matricula=matricula)
+                messages.add_message(request, messages.SUCCESS, "Reserva in park '" + parque + "' updated")
+                return HttpResponseRedirect(reverse('listarReservas'))
+            else:
+                return render(request, 'editarReserva.html',
+                          {'estados': estados, 'id': id})
+    return HttpResponseNotFound()
 
 def apagar_reserva(request, id):
     reserva = Reserva.objects.get(id=id)

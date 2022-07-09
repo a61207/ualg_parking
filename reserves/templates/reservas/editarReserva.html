@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+    {% block title %}
+        Editar Reserva
+    {% endblock %}
+
+    {% block main %}
+
+    <div class="container my-4">
+        <div class="row rounded bg-light pt-3">
+            <div class="col">
+                <div class="jumbotron border p-3 mb-3">
+        <form action="{% url 'editarReserva' id %}" method="post">
+            {% csrf_token %}
+            
+            <div class="form-row">
+            
+
+            <!-- Matricula Input -->
+            <div class="form-group col">
+                <label for="nome">Matricula</label>
+                <input type="text" class="form-control {% if erros %}is-invalid{% endif %}"
+                       id="matricula" name="matricula" placeholder="Enter matricula"
+                       {% if matricula %}value="{{ matricula }}"{% endif %}>
+                  <div class="invalid-feedback">
+                      {{ erros }}
+                  </div>
+            </div>
+
+            <!-- Data inicio Input -->
+            <div class="form-group col">
+                <label for="date">Data Inicio</label>
+                <input type="datetime-local" class="form-control {% if erros %}is-invalid{% endif %}"
+                       id="datastart" name="datastart" placeholder="Enter date"
+                       {% if datainicio %}value="{{ datastart }}"{% endif %}>
+                <div class="invalid-feedback">
+                    {{ erros }}
+                </div>
+            </div>
+
+            <!-- Data fim Input -->
+            <div class="form-group col">
+                <label for="date">Data Fim</label>
+                <input type="datetime-local" class="form-control {% if erros %}is-invalid{% endif %}"
+                       id="dataend" name="dataend" placeholder="Enter date"
+                       {% if datafim %}value="{{ dataend }}"{% endif %}>
+                <div class="invalid-feedback">
+                    {{ erros }}
+                </div>
+            </div>
+        
+            <!-- Botão Submit -->
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-secondary">Update</button>
+            </div>
+        </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock %}

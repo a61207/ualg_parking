@@ -22,6 +22,7 @@ urlpatterns = [
     path('reserves/add/<int:id>/', views.criar_reserva, name='criarReserva'),
     path('reserves/', views.listar_reservas, name='listarReservas'),
     path('reserves/<int:id>', views.visualizar_reserva, name='visualizarReserva'),
+    path('reserves/update/<int:id>', views.editar_reserva, name='editarReserva'),
     path('reserves/delete/<int:id>', views.apagar_reserva, name='apagarReserva'),
 
     # CRUD Contratos

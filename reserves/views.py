@@ -48,22 +48,21 @@ def editar_reserva(request, id):
     client = Client.objects.get(user=request.user)
     cars = Car.objects.filter(client=client)
     start = reserva.periocidadeid.start.strftime("%Y-%m-%dT%H:%m").__str__()
+    end = reserva.periocidadeid.end.strftime("%Y-%m-%dT%H:%m").__str__()
     if estados:
         if request.method == 'POST':
-            instance = Reserva.objects.get(id=id)
-            form = ReservaForm(request.POST, instance=instance)
-            if form.is_valid():
-                dataI = request.POST['datastart']
-                dataF = request.POST['dataend']
-                matricula = request.POST['matricula']
-                period = Periocidade.objects.create(start=dataI, end=dataF)
-                lugar = ParkingSpot.objects.get(id=id) 
-                Reserva.objects.filter(id=id).update(userid=request.user, lugarid=lugar, parqueid=lugar.zone.park,
-                                   periocidadeid=period, matricula=matricula)
-                messages.add_message(request, messages.SUCCESS, "Reserva in park '" + parque + "' updated")
-                return HttpResponseRedirect(reverse('listarReservas'))
+            dataI = request.POST['datastart']
+            dataF = request.POST['dataend']
+            matricula = request.POST['matricula']
+            period = Periocidade.objects.create(start=dataI, end=dataF)
+            lugar = ParkingSpot.objects.get(id=id)
+
+            Reserva.objects.filter(id=id).update(userid=client, lugarid=lugar, parqueid=lugar.zone.park,
+                                                 periocidadeid=period, matricula=matricula)
+            messages.add_message(request, messages.SUCCESS, "Reserva in park '" + parque + "' updated")
+            return HttpResponseRedirect(reverse('listarReservas'))
         return render(request, 'reservas/editarReserva.html',
-                  {'estados': estados, 'id': id, 'reserva': reserva, 'start': start})
+                  {'estados': estados, 'id': id, 'reserva': reserva, 'start': start, 'end': end})
     return HttpResponseNotFound()
 
 def apagar_reserva(request, id):
@@ -119,6 +118,40 @@ def listar_contratos(request):
 def visualizar_contrato(request, id):
     contrato = Contrato.objects.get(id=id)
     return render(request, 'visualizarContratos.html', {'contrato': contrato})
+
+
+def editar_contrato(request, id):
+    contrato = Contrato.objects.get(id=id)
+    estados = Estadoreserva.objects.all()
+    parques = Park.objects.all().order_by('-updated')
+    client = Client.objects.get(user=request.user)
+    if estados and contrato and parques:
+        if request.method == 'POST':
+            instance = Contrato.objects.get(id=id)
+            form = ContratoForm(request.POST, instance=instance)
+            if form.is_valid():
+                parque = form.cleaned_data['parqueid']
+                lugar = form.cleaned_data['lugarid']
+                estado = form.cleaned_data['estadoreservaid']
+                dataI = request.POST['datainicio']
+                dataF = request.POST['datafim']
+                matricula = request.POST['matricula']
+                viatura = Viatura.objects.get(matricula=matricula) 
+                Reserva.objects.filter(id=id).update(userid=request.user, parqueid=parque, lugarid=lugar, estadoreservaid=estado, datainicio=dataI, datafim=dataF, matricula=viatura)
+                return render(request, '../templates/main/message.html',
+                              {'message': "Reserva Atualizada", 'type': "success",
+                               'url': "..", "title": 'Success'})
+            else:
+                parque_old = request.POST['parqueid']
+                lugar_old = request.POST['lugarid']
+                estado_old = request.POST['estadoreservaid']
+                return render(request, 'reservas/editarReserva.html',
+                              {'estados': estados, 'parques': parques, 'erros': form.non_field_errors().as_text,
+                               'parque_old': parque_old, 'lugar_old': lugar_old, 'estado_old': int(estado_old), 'id': reserva.id})
+        else:
+            return render(request, 'reservas/editarReserva.html',
+                          {'estados': estados, 'parques': parques})
+    return HttpResponseNotFound()
 
 
 def listar_pagamentos_contratos(request):

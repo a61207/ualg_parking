@@ -47,7 +47,7 @@ def editar_reserva(request, id):
     parque = ParkingSpot.objects.get(id=id).zone.park.name
     client = Client.objects.get(user=request.user)
     cars = Car.objects.filter(client=client)
-    print(estados)
+    start = reserva.periocidadeid.start.strftime("%Y-%m-%dT%H:%m").__str__()
     if estados:
         if request.method == 'POST':
             instance = Reserva.objects.get(id=id)
@@ -63,7 +63,7 @@ def editar_reserva(request, id):
                 messages.add_message(request, messages.SUCCESS, "Reserva in park '" + parque + "' updated")
                 return HttpResponseRedirect(reverse('listarReservas'))
         return render(request, 'reservas/editarReserva.html',
-                  {'estados': estados, 'id': id})
+                  {'estados': estados, 'id': id, 'reserva': reserva, 'start': start})
     return HttpResponseNotFound()
 
 def apagar_reserva(request, id):

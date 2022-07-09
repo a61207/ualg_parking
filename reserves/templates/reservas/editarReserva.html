@@ -23,7 +23,7 @@
                 <label for="nome">Matricula</label>
                 <input type="text" class="form-control {% if erros %}is-invalid{% endif %}"
                        id="matricula" name="matricula" placeholder="Enter matricula"
-                       {% if matricula %}value="{{ matricula }}"{% endif %}>
+                       value="{{ reserva.matricula }}">
                   <div class="invalid-feedback">
                       {{ erros }}
                   </div>
@@ -34,7 +34,7 @@
                 <label for="date">Data Inicio</label>
                 <input type="datetime-local" class="form-control {% if erros %}is-invalid{% endif %}"
                        id="datastart" name="datastart" placeholder="Enter date"
-                       {% if datainicio %}value="{{ datastart }}"{% endif %}>
+                       value="{{ start }}">
                 <div class="invalid-feedback">
                     {{ erros }}
                 </div>
@@ -45,7 +45,7 @@
                 <label for="date">Data Fim</label>
                 <input type="datetime-local" class="form-control {% if erros %}is-invalid{% endif %}"
                        id="dataend" name="dataend" placeholder="Enter date"
-                       {% if datafim %}value="{{ dataend }}"{% endif %}>
+                       value="2018-06-12T19:30">
                 <div class="invalid-feedback">
                     {{ erros }}
                 </div>

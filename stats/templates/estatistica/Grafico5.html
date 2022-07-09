@@ -31,7 +31,7 @@
                     </center>
                     <br>
 
-                    <h5 class="text-center">Selecione o utilizador, o parque e o intervalo de tempo que pretende
+                    <h5 class="text-center">Selecione o cliente, o parque e o intervalo de tempo que pretende
                         visualizar</h5>
                     <br>
 
@@ -47,15 +47,14 @@
                             </tr>
 
                             <tr>
-                                <td><label for="utilizador_id">Selecione o utilizador:</label></td>
+                                <td><label for="utilizador_id">Selecione o Cliente:</label></td>
                                 <td><select name="utilizador_id" id="utilizador_id" style="height: 35px; width: 100%;">
                                     {% for utilizador in utilizadores %}
 
                                         {% if utilizador_id == utilizador.id %}
-                                            <option selected="true"
-                                                    value="{{ utilizador.id }}">{{ utilizador.username }}</option>
+                                            <option selected="true" value="{{ utilizador.id }}">{{ utilizador.user.get_full_name }}</option>
                                         {% else %}
-                                            <option value="{{ utilizador.id }}">{{ utilizador.username }}</option>
+                                            <option value="{{ utilizador.id }}">{{ utilizador.user.get_full_name }}</option>
                                         {% endif %}
                                     {% endfor %}
                                 </select></td>

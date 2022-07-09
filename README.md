@@ -6,7 +6,9 @@ de média dimensão integrando os conhecimentos disciplinas da área científica
 foi utilizada a framework Django.
 
 ## Instalação de Projeto Windows 
-## ( !!! NO BASH !!! NÃO NO POWERSHELL !!! )
+## ( !!! COMMAND PROMPT !!! NÃO NO POWERSHELL !!! )
+
+0. Download e install [Python](https://www.python.org/downloads/)
 
 1. Fazer clone do projecto:
 

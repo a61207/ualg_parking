@@ -579,6 +579,7 @@ class EntradasSaidas(models.Model):
 
 class Reserva(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    parqueid = models.ForeignKey(Park, models.DO_NOTHING, db_column='ParqueID', blank=True, null=True)
     contratoid = models.ForeignKey(Contrato, models.CASCADE, db_column='ContratoID', blank=True,
                                    null=True)  # Field name made lowercase.
     userid = models.ForeignKey(Client, models.CASCADE,

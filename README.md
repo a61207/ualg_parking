@@ -16,35 +16,19 @@ foi utilizada a framework Django.
 
 ```cd ualg_parking```
 
-3. Criar ambiente virtual: 
+3. Setup ambiente virtual: 
 
-```python -m venv venv```
+```venv.bat```
 
-4. Ativar ambiente virtual:
+4. Instalação do Projeto:
 
-```.\venv\Scripts\activate```
+```install.bat```
 
-5. Enable Settings File by Decompressing "settings.zip":
+5. Run server
 
-```tar -xf ualgParking\settings.zip -C ualgParking```
+```run.bat```
 
-6. Instalar Requirements:
+6. Run Task Scheduler Server (Not Required)
 
-```pip3 install -r requirements.txt```
-
-6. Fazer migração:
-
-```python manage.py migrate```
-
-7. Popular base de dados:
-
-```python manage.py loaddata inidb.json```
-
-8. Run server
-
-```python manage.py runserver```
-
-9. Run Task Scheduler Server (Not Required)
-
-```celery -A ualgParking worker --beat --scheduler django --loglevel=info```
+```tasks.bat```
 

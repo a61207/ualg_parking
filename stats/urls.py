@@ -3,10 +3,6 @@ from django.urls import path
 from stats import views
 
 urlpatterns = [
-    path("estatistica/", views.menuEstatisticas, name="menuEstatisticas"),
-    # path("estatistica/finalDay", views.finalDay, name="finalDay"),
-    # path("estatistica/finalMonth", views.finalMonth, name="finalMonth"),
-    # path("estatistica/finalYear", views.finalYear, name="finalYear"),
     path("estatistica/menu", views.menu, name="menu"),
     path("estatistica/Grafico1", views.Grafico1, name="Grafico1"),
     path("estatistica/Grafico2", views.Grafico2, name="Grafico2"),

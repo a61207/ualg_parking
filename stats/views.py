@@ -1,21 +1,20 @@
+import calendar
 import json
 from django.shortcuts import render
-from .Estatistica import *
+from datetime import *
+from .Estatistica import intervaloTempo
 from .Estatistica2 import intervaloTempo_2
 from .Estatistica3 import intervaloTempo_3
 from .Estatistica4 import intervaloTempo_4
 from .Estatistica5 import intervaloTempo_5
 from .Estatistica6 import intervaloTempo_6
+from .Estatistica7 import intervaloTempo_7
 from .forms import *
 from main.models import *
 
 
 # Create your views here.
 
-def menuEstatisticas(request):
-    return render(request, 'menuEstatisticas.html')
-
-#TODO adminim permission
 # --------------------RESTART---------------------------------------------
 
 def menu(request):
@@ -29,12 +28,11 @@ def Grafico1(request):
     parque = Park.objects.filter(id=parque_id).first()
     if parque is None:
         parque = Park.objects.first()
-
+    print(parque.today_opening_time())
     start = datetime.date(datetime.now())
     end = datetime.date(datetime.now())
     starth = parque.today_opening_time()
     endh = parque.today_closing_time()
-    print(starth, endh)
     parques = Park.objects.all()
 
     tipografico = 1
@@ -77,13 +75,13 @@ def Grafico1(request):
         starth = request.POST.get("starth", starth)
         endh = request.POST.get("endh", endh)
 
-        if starth < str(parque.today_opening_time()):
-            starth = str(parque.today_opening_time())
-        if endh > str(parque.today_closing_time()):
-            endh = str(parque.today_closing_time())
+        if starth < str(parque.abertura):
+            starth = str(parque.abertura)
+        if endh > str(parque.fecho):
+            endh = str(parque.fecho)
 
-        min = str(parque.today_opening_time())
-        max = str(parque.today_closing_time())
+        min = str(parque.abertura)
+        max = str(parque.fecho)
 
     if tipografico == 1:
         type = "bar"
@@ -153,13 +151,13 @@ def Grafico2(request):
 
     start = datetime.date(datetime.now())
     end = datetime.date(datetime.now())
-    starth = parque.today_opening_time()
-    endh = parque.today_closing_time()
+    starth = parque.abertura
+    endh = parque.fecho
     parques = Park.objects.all()
 
     tipografico = 1
-    min = str(parque.today_opening_time())
-    max = str(parque.today_closing_time())
+    min = str(parque.abertura)
+    max = str(parque.fecho)
 
     if request.method == "POST":
         start = request.POST.get("start", start)
@@ -199,13 +197,13 @@ def Grafico2(request):
             }
             return render(request, 'estatistica/Grafico2.html', context)
 
-        if starth < str(parque.today_opening_time()):
-            starth = str(parque.today_opening_time())
-        if endh > str(parque.today_closing_time()):
-            endh = str(parque.today_closing_time())
+        if starth < str(parque.abertura):
+            starth = str(parque.abertura)
+        if endh > str(parque.fecho):
+            endh = str(parque.fecho)
 
-        min = str(parque.today_opening_time())
-        max = str(parque.today_closing_time())
+        min = str(parque.abertura)
+        max = str(parque.fecho)
 
     if tipografico == 1:
         type = "bar"
@@ -271,13 +269,13 @@ def Grafico3(request):
 
     start = datetime.date(datetime.now())
     end = datetime.date(datetime.now())
-    starth = parque.today_opening_time()
-    endh = parque.today_closing_time()
+    starth = parque.abertura
+    endh = parque.fecho
     parques = Park.objects.all()
 
     tipografico = 2
-    min = str(parque.today_opening_time())
-    max = str(parque.today_closing_time())
+    min = str(parque.abertura)
+    max = str(parque.fecho)
 
     if request.method == "POST":
         start = request.POST.get("start", start)
@@ -317,13 +315,13 @@ def Grafico3(request):
             }
             return render(request, 'estatistica/Grafico3.html', context)
 
-        if starth < str(parque.today_opening_time()):
-            starth = str(parque.today_opening_time())
-        if endh > str(parque.today_closing_time()):
-            endh = str(parque.today_closing_time())
+        if starth < str(parque.abertura):
+            starth = str(parque.abertura)
+        if endh > str(parque.fecho):
+            endh = str(parque.fecho)
 
-        min = str(parque.today_opening_time())
-        max = str(parque.today_closing_time())
+        min = str(parque.abertura)
+        max = str(parque.fecho)
 
     if tipografico == 1:
         type = "bar"
@@ -389,13 +387,13 @@ def Grafico4(request):
 
     start = datetime.date(datetime.now())
     end = datetime.date(datetime.now())
-    starth = parque.today_opening_time()
-    endh = parque.today_closing_time()
+    starth = parque.abertura
+    endh = parque.fecho
     parques = Park.objects.all()
 
     tipografico = 2
-    min = str(parque.today_opening_time())
-    max = str(parque.today_closing_time())
+    min = str(parque.abertura)
+    max = str(parque.fecho)
 
     if request.method == "POST":
         start = request.POST.get("start", start)
@@ -435,13 +433,13 @@ def Grafico4(request):
             }
             return render(request, 'estatistica/Grafico4.html', context)
 
-        if starth < str(parque.today_opening_time()):
-            starth = str(parque.today_opening_time())
-        if endh > str(parque.today_closing_time()):
-            endh = str(parque.today_closing_time())
+        if starth < str(parque.abertura):
+            starth = str(parque.abertura)
+        if endh > str(parque.fecho):
+            endh = str(parque.fecho)
 
-        min = str(parque.today_opening_time())
-        max = str(parque.today_closing_time())
+        min = str(parque.abertura)
+        max = str(parque.fecho)
 
     if tipografico == 1:
         type = "bar"
@@ -518,14 +516,14 @@ def Grafico5(request):
 
     start = datetime.date(datetime.now())
     end = datetime.date(datetime.now())
-    starth = parque.today_opening_time()
-    endh = parque.today_closing_time()
+    starth = parque.abertura
+    endh = parque.fecho
     parques = Park.objects.all()
     utilizadores = User.objects.all()
 
     tipografico = 1
-    min = str(parque.today_opening_time())
-    max = str(parque.today_closing_time())
+    min = str(parque.abertura)
+    max = str(parque.fecho)
 
     if request.method == "POST":
         start = request.POST.get("start", start)
@@ -568,13 +566,13 @@ def Grafico5(request):
             }
             return render(request, 'estatistica/Grafico5.html', context)
 
-        if starth < str(parque.today_opening_time()):
-            starth = str(parque.today_opening_time())
-        if endh > str(parque.today_closing_time()):
-            endh = str(parque.today_closing_time())
+        if starth < str(parque.abertura):
+            starth = str(parque.abertura)
+        if endh > str(parque.fecho):
+            endh = str(parque.fecho)
 
-        min = str(parque.today_opening_time())
-        max = str(parque.today_closing_time())
+        min = str(parque.abertura)
+        max = str(parque.fecho)
 
     if tipografico == 1:
         type = "bar"
@@ -647,14 +645,14 @@ def Grafico6(request):
 
     start = datetime.date(datetime.now())
     end = datetime.date(datetime.now())
-    starth = parque.today_opening_time()
-    endh = parque.today_closing_time()
+    starth = parque.abertura
+    endh = parque.fecho
     parques = Park.objects.all()
     utilizadores = User.objects.all()
 
     tipografico = 2
-    min = str(parque.today_opening_time())
-    max = str(parque.today_closing_time())
+    min = str(parque.abertura)
+    max = str(parque.fecho)
 
     if request.method == "POST":
         start = request.POST.get("start", start)
@@ -697,13 +695,13 @@ def Grafico6(request):
             }
             return render(request, 'estatistica/Grafico6.html', context)
 
-        if starth < str(parque.today_opening_time()):
-            starth = str(parque.today_opening_time())
-        if endh > str(parque.today_closing_time()):
-            endh = str(parque.today_closing_time())
+        if starth < str(parque.abertura):
+            starth = str(parque.abertura)
+        if endh > str(parque.fecho):
+            endh = str(parque.fecho)
 
-        min = str(parque.today_opening_time())
-        max = str(parque.today_closing_time())
+        min = str(parque.abertura)
+        max = str(parque.fecho)
 
     if tipografico == 1:
         type = "bar"
@@ -775,14 +773,14 @@ def Grafico7(request):
 
     start = datetime.date(datetime.now())
     end = datetime.date(datetime.now())
-    starth = parque.today_opening_time()
-    endh = parque.today_closing_time()
+    starth = parque.abertura
+    endh = parque.fecho
     parques = Park.objects.all()
     utilizadores = User.objects.all()
 
     tipografico = 2
-    min = str(parque.today_opening_time())
-    max = str(parque.today_closing_time())
+    min = str(parque.abertura)
+    max = str(parque.fecho)
 
     if request.method == "POST":
         start = request.POST.get("start", start)
@@ -825,13 +823,13 @@ def Grafico7(request):
             }
             return render(request, 'estatistica/Grafico7.html', context)
 
-        if starth < str(parque.today_opening_time()):
-            starth = str(parque.today_opening_time())
-        if endh > str(parque.today_closing_time()):
-            endh = str(parque.today_closing_time())
+        if starth < str(parque.abertura):
+            starth = str(parque.abertura)
+        if endh > str(parque.fecho):
+            endh = str(parque.fecho)
 
-        min = str(parque.today_opening_time())
-        max = str(parque.today_closing_time())
+        min = str(parque.abertura)
+        max = str(parque.fecho)
 
     if tipografico == 1:
         type = "bar"
@@ -893,4 +891,3 @@ def Grafico7(request):
         'label': json.dumps(label),
     }
     return render(request, 'estatistica/Grafico7.html', context)
-

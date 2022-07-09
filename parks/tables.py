@@ -51,7 +51,8 @@ class WeekScheduleTable(tables.Table):
             return format_html("Closed")
         elif record.monday.all_day():
             return format_html("All Day")
-        return format_html("{} to {}", record.monday.start.strftime("%-H:%-M"), record.monday.end.strftime("%-H:%-M"))
+        return format_html("{}:{} to {}:{}", record.monday.start.hour, record.monday.start.minute,
+                           record.monday.end.hour, record.monday.end.minute)
 
     @staticmethod
     def render_tuesday(record):
@@ -59,7 +60,8 @@ class WeekScheduleTable(tables.Table):
             return format_html("Closed")
         elif record.tuesday.all_day():
             return format_html("All Day")
-        return format_html("{} to {}", record.tuesday.start.strftime("%-H:%-M"), record.tuesday.end.strftime("%-H:%-M"))
+        return format_html("{}:{} to {}:{}", record.monday.start.hour, record.monday.start.minute,
+                           record.monday.end.hour, record.monday.end.minute)
 
     @staticmethod
     def render_wednesday(record):
@@ -67,8 +69,8 @@ class WeekScheduleTable(tables.Table):
             return format_html("Closed")
         elif record.wednesday.all_day():
             return format_html("All Day")
-        return format_html("{} to {}", record.wednesday.start.strftime("%-H:%-M"),
-                           record.wednesday.end.strftime("%-H:%-M"))
+        return format_html("{}:{} to {}:{}", record.wednesday.start.hour, record.wednesday.start.minute,
+                           record.wednesday.end.hour, record.wednesday.end.minute)
 
     @staticmethod
     def render_thursday(record):
@@ -76,8 +78,8 @@ class WeekScheduleTable(tables.Table):
             return format_html("Closed")
         elif record.thursday.all_day():
             return format_html("All Day")
-        return format_html("{} to {}", record.thursday.start.strftime("%-H:%-M"),
-                           record.thursday.end.strftime("%-H:%-M"))
+        return format_html("{}:{} to {}:{}", record.thursday.start.hour, record.thursday.start.minute,
+                           record.thursday.end.hour, record.thursday.end.minute)
 
     @staticmethod
     def render_friday(record):
@@ -85,7 +87,8 @@ class WeekScheduleTable(tables.Table):
             return format_html("Closed")
         elif record.friday.all_day():
             return format_html("All Day")
-        return format_html("{} to {}", record.friday.start.strftime("%-H:%-M"), record.friday.end.strftime("%-H:%-M"))
+        return format_html("{}:{} to {}:{}", record.friday.start.hour, record.friday.start.minute,
+                           record.friday.end.hour, record.friday.end.minute)
 
     @staticmethod
     def render_saturday(record):
@@ -93,8 +96,8 @@ class WeekScheduleTable(tables.Table):
             return format_html("Closed")
         elif record.saturday.all_day():
             return format_html("All Day")
-        return format_html("{} to {}", record.saturday.start.strftime("%-H:%-M"),
-                           record.saturday.end.strftime("%-H:%-M"))
+        return format_html("{} to {}", record.saturday.start.hour, record.saturday.start.minute,
+                           record.saturday.end.hour, record.saturday.end.minute)
 
     @staticmethod
     def render_sunday(record):
@@ -102,7 +105,8 @@ class WeekScheduleTable(tables.Table):
             return format_html("Closed")
         elif record.sunday.all_day():
             return format_html("All Day")
-        return format_html("{} to {}", record.sunday.start.strftime("%-H:%-M"), record.sunday.end.strftime("%-H:%-M"))
+        return format_html("{}:{} to {}:{}", record.sunday.start.hour, record.sunday.start.minute,
+                           record.sunday.end.hour, record.sunday.end.minute)
 
 
 class PriceTableTable(tables.Table):

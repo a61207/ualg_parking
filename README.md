@@ -38,3 +38,7 @@ foi utilizada a framework Django.
 
 ```python manage.py runserver```
 
+9. Run Task Scheduler Server (Not Required)
+
+```celery -A ualgParking worker --beat --scheduler django --loglevel=info```
+

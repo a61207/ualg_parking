@@ -51,18 +51,16 @@ def editar_reserva(request, id):
     end = reserva.periocidadeid.end.strftime("%Y-%m-%dT%H:%m").__str__()
     if estados:
         if request.method == 'POST':
-            instance = Reserva.objects.get(id=id)
-            form = ReservaForm(request.POST, instance=instance)
-            if form.is_valid():
-                dataI = request.POST['datastart']
-                dataF = request.POST['dataend']
-                matricula = request.POST['matricula']
-                period = Periocidade.objects.create(start=dataI, end=dataF)
-                lugar = ParkingSpot.objects.get(id=id) 
-                Reserva.objects.filter(id=id).update(userid=request.user, lugarid=lugar, parqueid=lugar.zone.park,
-                                   periocidadeid=period, matricula=matricula)
-                messages.add_message(request, messages.SUCCESS, "Reserva in park '" + parque + "' updated")
-                return HttpResponseRedirect(reverse('listarReservas'))
+            dataI = request.POST['datastart']
+            dataF = request.POST['dataend']
+            matricula = request.POST['matricula']
+            period = Periocidade.objects.create(start=dataI, end=dataF)
+            lugar = ParkingSpot.objects.get(id=id)
+
+            Reserva.objects.filter(id=id).update(userid=client, lugarid=lugar, parqueid=lugar.zone.park,
+                                                 periocidadeid=period, matricula=matricula)
+            messages.add_message(request, messages.SUCCESS, "Reserva in park '" + parque + "' updated")
+            return HttpResponseRedirect(reverse('listarReservas'))
         return render(request, 'reservas/editarReserva.html',
                   {'estados': estados, 'id': id, 'reserva': reserva, 'start': start, 'end': end})
     return HttpResponseNotFound()

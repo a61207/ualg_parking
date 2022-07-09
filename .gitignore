@@ -13,4 +13,9 @@ venv
 /operations/__init__.py
 /parks/__init__.py
 /stats/__init__.py
-/ualgParking/__init__.py
+/ualgParking/__init__.py!/operations/migrations/
+/reserves/migrations
+/stats/migrations
+/operations/migrations
+
+

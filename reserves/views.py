@@ -13,6 +13,7 @@ def criar_reserva(request, id):
     estados = Estadoreserva.objects.all()
     parque = ParkingSpot.objects.get(id=id).zone.park.name
     client = Client.objects.get(user=request.user)
+    cars = Car.objects.filter(client=client)
     if estados:
         if request.method == 'POST':
             print(request.POST)
@@ -28,7 +29,7 @@ def criar_reserva(request, id):
             return HttpResponseRedirect(reverse('listarReservas'))
         else:
             return render(request, 'criarReserva.html',
-                          {'estados': estados, 'id': id})
+                          {'estados': estados, 'id': id, 'cars': cars})
     return HttpResponseNotFound()
 
 

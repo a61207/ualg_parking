@@ -96,7 +96,7 @@ class WeekScheduleTable(tables.Table):
             return format_html("Closed")
         elif record.saturday.all_day():
             return format_html("All Day")
-        return format_html("{} to {}", record.saturday.start.hour, record.saturday.start.minute,
+        return format_html("{}:{} to {}:{}", record.saturday.start.hour, record.saturday.start.minute,
                            record.saturday.end.hour, record.saturday.end.minute)
 
     @staticmethod

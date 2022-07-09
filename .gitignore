@@ -16,3 +16,10 @@ venv
 /ualgParking/__init__.py
 /stats/migrations
 /operations/migrations
+/parks/migrations
+/reserves/migrations
+/main/migrations
+
+
+
+

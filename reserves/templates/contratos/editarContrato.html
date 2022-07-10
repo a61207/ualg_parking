@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+    {% block title %}
+        Editar Contrato
+    {% endblock %}
+
+    {% block main %}
+    <div class="container my-4">
+        <div class="row rounded bg-light pt-3">
+            <div class="col">
+                <div class="jumbotron border p-3 mb-3">
+        <form action="{% url 'editarContrato' id %}" method="post">
+            {% csrf_token %}
+            
+            <div class="form-row">
+            
+            
+            <!-- Parque Input -->
+            <div class="form-group col">
+                <label for="parqueid">Park</label>
+                <select id="parqueid" name="parqueid" class="form-control">
+                    {% for parque in parques %}
+                        <option {% if parque_old == parque.id %} selected {% endif %}
+                                value="{{ parque.id }}">{{ contrato.parque.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <!-- Zone Input -->
+            <div class="form-group">
+                <label for="zonaid">Zone</label>
+                <select id="zonaid" name="zonaid" class="form-control selectpicker">
+                    {% for parque in parques %}
+                      {% if parque.zones %}
+                      <optgroup label="{{ parque.name }}">
+                        {% for zone in parque.zones %}
+                            <option {% if zona_old == zone.id %} selected {% endif %} value="{{ zone.id }}">
+                                Zone {{ contrato.zone.name }}</option>
+                        {% endfor %}
+                      </optgroup>
+                      {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        
+            <!-- Lugar
+                 Input -->
+            <div class="form-group">
+                <label for="lugarid">Lugar</label>
+                <select id="lugarid" name="lugarid" class="form-control selectpicker">
+                    {% for parque in parques %}
+                      {% if parque.zones %}
+                      <optgroup label="{{ parque.name }}">
+                        {% for lugar in parque.zones %}
+                            <option {% if lugar_old == lugar.id %} selected {% endif %} value="{{ lugar.id }}">
+                                Lugar {{ contrato.lugar.number }}</option>
+                        {% endfor %}
+                      </optgroup>
+                      {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Matricula Input -->
+            <div class="form-group col">
+                <label for="nome">Matricula</label>
+                <input type="text" class="form-control {% if erros %}is-invalid{% endif %}"
+                       id="matricula" name="matricula" placeholder="Enter matricula"
+                       value="{{ contrato.matricula }}">
+                  <div class="invalid-feedback">
+                      {{ erros }}
+                  </div>
+            </div>
+
+            <!-- Data inicio Input -->
+            <div class="form-group col">
+                <label for="date">Data Inicio</label>
+                <input type="datetime-local" class="form-control {% if erros %}is-invalid{% endif %}"
+                       id="datainicio" name="datainicio" placeholder="Enter date"
+                       value="{{ start }}">
+                <div class="invalid-feedback">
+                    {{ erros }}
+                </div>
+            </div>
+
+            <!-- Data fim Input -->
+            <div class="form-group col">
+                <label for="date">Data Fim</label>
+                <input type="datetime-local" class="form-control {% if erros %}is-invalid{% endif %}"
+                       id="datafim" name="datafim" placeholder="Enter date"
+                       value="{{ end }}">
+                <div class="invalid-feedback">
+                    {{ erros }}
+                </div>
+            </div>
+
+            <!-- Estado Input -->
+            <div class="form-group col">
+                <label for="estadoreservaid">State</label>
+                <select id="estadoreservaid" name="estadoreservaid" class="form-control">
+                    {% for estado in estados %}
+                        <option {% if estado_old == estado.id %} selected {% endif %}
+                                value="{{ estado.id }}">{{ estado.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <br>
+            <!-- Botão Submit -->
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-secondary">Update</button>
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+</div>
+    {% endblock %}

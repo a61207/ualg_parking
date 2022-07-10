@@ -33,7 +33,7 @@ def criar_reserva(request, id):
 
 
 def listar_reservas(request):
-    reservas = Reserva.objects.all().order_by('-editadoem')
+    reservas = Reserva.objects.filter(userid=Client.objects.get(user=request.user))
     return render(request, 'listarReservas.html', {'reservas': reservas})
 
 
@@ -111,7 +111,7 @@ def criar_contrato(request):
 
 
 def listar_contratos(request):
-    contratos = Contrato.objects.all().order_by('-editadoem')
+    contratos = Contrato.objects.filter(userid=Client.objects.get(user=request.user)).order_by('-editadoem') 
     return render(request, 'listarContratos.html', {'contratos': contratos})
 
 
@@ -123,34 +123,38 @@ def visualizar_contrato(request, id):
 def editar_contrato(request, id):
     contrato = Contrato.objects.get(id=id)
     estados = Estadoreserva.objects.all()
-    parques = Park.objects.all().order_by('-updated')
+    parques = ParkingSpot.objects.get(id=id).zone.park.name
     client = Client.objects.get(user=request.user)
-    if estados and contrato and parques:
+    start = contrato.datainicio.strftime("%Y-%m-%dT%H:%m").__str__()
+    end = contrato.datafim.strftime("%Y-%m-%dT%H:%m").__str__()
+    if estados:
         if request.method == 'POST':
-            instance = Contrato.objects.get(id=id)
-            form = ContratoForm(request.POST, instance=instance)
-            if form.is_valid():
-                parque = form.cleaned_data['parqueid']
-                lugar = form.cleaned_data['lugarid']
-                estado = form.cleaned_data['estadoreservaid']
+                parque = request.POST['parqueid']
+                lugar = ParkingSpot.objects.get(id=id)
+                estado = request.POST['estadoreservaid']
                 dataI = request.POST['datainicio']
                 dataF = request.POST['datafim']
                 matricula = request.POST['matricula']
-                viatura = Viatura.objects.get(matricula=matricula) 
-                Reserva.objects.filter(id=id).update(userid=request.user, parqueid=parque, lugarid=lugar, estadoreservaid=estado, datainicio=dataI, datafim=dataF, matricula=viatura)
-                return render(request, '../templates/main/message.html',
-                              {'message': "Reserva Atualizada", 'type': "success",
-                               'url': "..", "title": 'Success'})
-            else:
-                parque_old = request.POST['parqueid']
-                lugar_old = request.POST['lugarid']
-                estado_old = request.POST['estadoreservaid']
-                return render(request, 'reservas/editarReserva.html',
-                              {'estados': estados, 'parques': parques, 'erros': form.non_field_errors().as_text,
-                               'parque_old': parque_old, 'lugar_old': lugar_old, 'estado_old': int(estado_old), 'id': reserva.id})
-        else:
-            return render(request, 'reservas/editarReserva.html',
-                          {'estados': estados, 'parques': parques})
+                viatura = Car.objects.get(registration=matricula) 
+                Contrato.objects.filter(id=id).update(userid=request.user, parqueid=parque, lugarid=lugar, estadoreservaid=estado, datainicio=dataI, datafim=dataF, matricula=viatura)
+                messages.add_message(request, messages.SUCCESS, "Contrato in park '" + parque.name + "' updated")
+                return HttpResponseRedirect(reverse('listarContratos'))
+        return render(request, 'contratos/editarContrato.html', {'estados': estados, 'parques': parques, 'id': id, 'contrato': contrato, 'start': start, 'end': end})
+    return HttpResponseNotFound()
+
+
+def estender_contrato(request, id):
+    contrato = Contrato.objects.get(id=id)
+    parques = ParkingSpot.objects.get(id=id).zone.park.name
+    client = Client.objects.get(user=request.user)
+    end = contrato.datafim.strftime("%Y-%m-%d").__str__()
+    if parques:
+        if request.method == 'POST':                
+                dataF = request.POST['datafim']
+                Contrato.objects.filter(id=id).update(userid=request.user, datafim=dataF)
+                messages.add_message(request, messages.SUCCESS, "Contrato extended")
+                return HttpResponseRedirect(reverse('listarContratos'))
+        return render(request, 'contratos/estenderContrato.html', {'id': id, 'end': end})
     return HttpResponseNotFound()
 
 

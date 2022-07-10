@@ -24,6 +24,7 @@
                                 <th scope="col">User</th>
                                 <th scope="col">Matricula</th>
                                 <th scope="col">Parque</th>
+                                <th scope="col">Zona</th>
                                 <th scope="col">Lugar</th>
                                 <th scope="col">Data Inicio</th>
                                 <th scope="col">Data Fim</th>
@@ -40,10 +41,10 @@
                                     </th>
                                     <td>{{ contrato.matricula }}</td>
                                     <td>{{ contrato.lugarid.zone.park.name }}</td>
+                                    <td>{{ contrato.lugarid.zone.name }}</td>
                                     <td>{{ contrato.lugarid.number }}</td>
                                     <td>{{ contrato.datainicio }}</td>
                                     <td>{{ contrato.datafim }}</td>
-                                    <td>{{ contrato.editadoem }}</td>
                                     <td>{{ contrato.editadoem }}</td>
                                     <td>
                                         <a class="btn btn-info btn-sm" href="{% url 'visualizarContrato' contrato.id %}">View</a>

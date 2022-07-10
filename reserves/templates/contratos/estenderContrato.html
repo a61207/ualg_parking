@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+    {% block title %}
+        Estender Contrato
+    {% endblock %}
+
+    {% block main %}
+    <div class="container my-4">
+        <div class="row rounded bg-light pt-3">
+            <div class="col">
+                <div class="jumbotron border p-3 mb-3">
+        <form action="{% url 'estenderContrato' id %}" method="post">
+            {% csrf_token %}
+            
+            <div class="form-row">
+
+            <!-- Data fim Input -->
+            <div class="form-group col">
+                <label for="date">Data Fim</label>
+                <input type="date" class="form-control {% if erros %}is-invalid{% endif %}"
+                       id="datafim" name="datafim" placeholder="Enter date"
+                       value="{{ end }}">
+                <div class="invalid-feedback">
+                    {{ erros }}
+                </div>
+            </div>
+        
+            <br>
+            <!-- Botão Submit -->
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-secondary">Update</button>
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+</div>
+    {% endblock %}

@@ -44,6 +44,20 @@
 
                     <div class="row">
 
+                        <!-- Botão de Editar -->
+                        <div class="col">
+                            <div class="d-flex justify-content-center">
+                                <a class="btn btn-secondary" href="{% url 'editarContrato' contrato.id %}">Edit Contract</a>
+                            </div>
+                        </div>
+
+                        <!-- Botão de Editar -->
+                        <div class="col">
+                            <div class="d-flex justify-content-center">
+                                <a class="btn btn-secondary" href="{% url 'estenderContrato' contrato.id %}">Extend Contract</a>
+                            </div>
+                        </div>
+
                         <!-- Botão de Apagar -->
                         <div class="col">
                             <div class="d-flex justify-content-center">

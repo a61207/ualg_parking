@@ -45,12 +45,13 @@
                 <label for="date">Data Fim</label>
                 <input type="datetime-local" class="form-control {% if erros %}is-invalid{% endif %}"
                        id="dataend" name="dataend" placeholder="Enter date"
-                       value="2018-06-12T19:30">
+                       value="{{ end }}">
                 <div class="invalid-feedback">
                     {{ erros }}
                 </div>
             </div>
         
+            <br>
             <!-- Botão Submit -->
             <div class="d-flex justify-content-center">
                 <button type="submit" class="btn btn-secondary">Update</button>

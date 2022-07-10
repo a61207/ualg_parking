@@ -23,7 +23,7 @@
                 <select id="parqueid" name="parqueid" class="form-control">
                     {% for parque in parques %}
                         <option {% if parque_old == parque.id %} selected {% endif %}
-                                value="{{ parque.id }}">{{ parque.nome }}</option>
+                                value="{{ parque.id }}">{{ contrato.parque.name }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -33,11 +33,11 @@
                 <label for="zonaid">Zone</label>
                 <select id="zonaid" name="zonaid" class="form-control selectpicker">
                     {% for parque in parques %}
-                      {% if parque.get_zones %}
-                      <optgroup label="{{ parque.nome }}">
-                        {% for zone in parque.get_zones %}
+                      {% if parque.zones %}
+                      <optgroup label="{{ parque.name }}">
+                        {% for zone in parque.zones %}
                             <option {% if zona_old == zone.id %} selected {% endif %} value="{{ zone.id }}">
-                                Zone {{ zone.nome }}</option>
+                                Zone {{ contrato.zone.name }}</option>
                         {% endfor %}
                       </optgroup>
                       {% endif %}
@@ -53,11 +53,11 @@
                 <label for="lugarid">Lugar</label>
                 <select id="lugarid" name="lugarid" class="form-control selectpicker">
                     {% for parque in parques %}
-                      {% if parque.get_zones %}
-                      <optgroup label="{{ parque.nome }}">
-                        {% for lugar in parque.get_zones %}
+                      {% if parque.zones %}
+                      <optgroup label="{{ parque.name }}">
+                        {% for lugar in parque.zones %}
                             <option {% if lugar_old == lugar.id %} selected {% endif %} value="{{ lugar.id }}">
-                                Lugar {{ lugar.nome }}</option>
+                                Lugar {{ contrato.lugar.number }}</option>
                         {% endfor %}
                       </optgroup>
                       {% endif %}
@@ -70,7 +70,7 @@
                 <label for="nome">Matricula</label>
                 <input type="text" class="form-control {% if erros %}is-invalid{% endif %}"
                        id="matricula" name="matricula" placeholder="Enter matricula"
-                       {% if matricula %}value="{{ matricula }}"{% endif %}>
+                       value="{{ contrato.matricula }}">
                   <div class="invalid-feedback">
                       {{ erros }}
                   </div>
@@ -79,23 +79,23 @@
             <!-- Data inicio Input -->
             <div class="form-group col">
                 <label for="date">Data Inicio</label>
-                <input type="text" class="form-control {% if erros %}is-invalid{% endif %}"
+                <input type="datetime-local" class="form-control {% if erros %}is-invalid{% endif %}"
                        id="datainicio" name="datainicio" placeholder="Enter date"
-                       {% if datainicio %}value="{{ datainicio }}"{% endif %}>
-                  <div class="invalid-feedback">
-                      {{ erros }}
-                  </div>
+                       value="{{ start }}">
+                <div class="invalid-feedback">
+                    {{ erros }}
+                </div>
             </div>
 
             <!-- Data fim Input -->
             <div class="form-group col">
-                <label for="date">Data Inicio</label>
-                <input type="text" class="form-control {% if erros %}is-invalid{% endif %}"
+                <label for="date">Data Fim</label>
+                <input type="datetime-local" class="form-control {% if erros %}is-invalid{% endif %}"
                        id="datafim" name="datafim" placeholder="Enter date"
-                       {% if datafim %}value="{{ datafim }}"{% endif %}>
-                  <div class="invalid-feedback">
-                      {{ erros }}
-                  </div>
+                       value="{{ end }}">
+                <div class="invalid-feedback">
+                    {{ erros }}
+                </div>
             </div>
 
             <!-- Estado Input -->

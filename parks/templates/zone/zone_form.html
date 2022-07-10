@@ -62,7 +62,7 @@
         {% for form in formset %}
             {% if not form.DELETE.value %}
                 color = "#35C942FF";
-                {% if zone %}
+                {% if zone and zone|has_number:form.number.value %}
                     if ('{{ zone|get_spot_state:form.number.value }}' === 'Reserved')
                         color = "#6c757d";
                     else if ('{{ zone|get_spot_state:form.number.value }}' === "Occupied")

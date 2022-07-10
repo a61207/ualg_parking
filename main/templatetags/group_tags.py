@@ -67,3 +67,8 @@ def get_non_achived_resources(park):
 @register.filter(name='get_spot_state')
 def get_spot_state(zone, number):
     return ParkingSpot.objects.get(zone=zone.id, number=number, is_archived=False).get_state_now()
+
+
+@register.filter(name='has_number')
+def has_number(zone, number):
+    return ParkingSpot.objects.filter(zone=zone.id, number=number, is_archived=False).exists()

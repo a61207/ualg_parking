@@ -18,7 +18,7 @@
                     <div class="p-3 mb-2 bg-light text-dark">
                         <div class="row">
                             <div class="col">
-                                <p><b>User: </b>{{ contrato.userid.username }}</p>
+                                <p><b>User: </b>{{ contrato.userid.user.get_full_name }}</p>
                             </div>
                             <div class="col">
                                 <p><b>Matricula: </b>{{ contrato.matricula }}</p>
@@ -30,10 +30,10 @@
                                 <p><b>Lugar: </b>{{ contrato.lugarid.number }}</p>
                             </div>
                             <div class="col">
-                                <p><b>Data de inicio: </b>{{ contrato.datainicio }}</p>
+                                <p><b>Data de inicio: </b>{{ contrato.periocidadeid.start.date }}</p>
                             </div>
                             <div class="col">
-                                <p><b>Data de fim: </b>{{ contrato.datafim }}</p>
+                                <p><b>Data de fim: </b>{{ contrato.periocidadeid.end.date }}</p>
                             </div>
                             <div class="col">
                                 <p><b>Updated: </b>{{ contrato.editadoem }}</p>

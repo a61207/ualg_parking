@@ -85,23 +85,22 @@ def criar_contrato(request):
             if form.is_valid():
                 parque = form.cleaned_data['parqueid']
                 lugar = form.cleaned_data['lugarid']
-                estado = form.cleaned_data['estadoreservaid']
                 dataI = request.POST['datainicio']
                 dataF = request.POST['datafim']
+                period = Periocidade.objects.create(start=dataI, end=dataF)
                 matricula = request.POST['matricula']
                 viatura = Car.objects.get(registration=matricula)
-                Contrato.objects.create(userid=client, lugarid=lugar, estadoreservaid=estado, datainicio=dataI,
-                                        datafim=dataF, matricula=viatura)
+                Contrato.objects.create(userid=client, lugarid=lugar, periocidadeid=period,
+                                        matricula=viatura)
                 messages.add_message(request, messages.SUCCESS, "Contrato in park '" + parque.name + "' created")
                 return HttpResponseRedirect(reverse('listarContratos'))
             else:
                 parque_old = request.POST['parqueid']
                 lugar_old = request.POST['lugarid']
-                estado_old = request.POST['estadoreservaid']
                 print(form.errors)
                 return render(request, 'criarContrato.html',
                               {'estados': estados, 'erros': form.non_field_errors().as_text,
-                               'estado_old': int(estado_old), 'parque_old': int(parque_old),
+                              'parque_old': int(parque_old),
                                'lugar_old': int(lugar_old),
                                'parques': parques})
         else:
@@ -125,18 +124,19 @@ def editar_contrato(request, id):
     estados = Estadoreserva.objects.all()
     parques = ParkingSpot.objects.get(id=id).zone.park.name
     client = Client.objects.get(user=request.user)
-    start = contrato.datainicio.strftime("%Y-%m-%dT%H:%m").__str__()
-    end = contrato.datafim.strftime("%Y-%m-%dT%H:%m").__str__()
+    start = contrato.periocidadeid.start.strftime("%Y-%m-%dT%H:%m").__str__()
+    end = contrato.periocidadeid.end.strftime("%Y-%m-%dT%H:%m").__str__()
     if estados:
         if request.method == 'POST':
                 parque = request.POST['parqueid']
-                lugar = ParkingSpot.objects.get(id=id)
+                lugar = form.cleaned_data['lugarid']
                 estado = request.POST['estadoreservaid']
                 dataI = request.POST['datainicio']
                 dataF = request.POST['datafim']
+                period = Periocidade.objects.create(start=dataI, end=dataF)
                 matricula = request.POST['matricula']
                 viatura = Car.objects.get(registration=matricula) 
-                Contrato.objects.filter(id=id).update(userid=request.user, parqueid=parque, lugarid=lugar, estadoreservaid=estado, datainicio=dataI, datafim=dataF, matricula=viatura)
+                Contrato.objects.filter(id=id).update(userid=request.user, parqueid=parque, lugarid=lugar, estadoreservaid=estado, periocidadeid=period, matricula=viatura)
                 messages.add_message(request, messages.SUCCESS, "Contrato in park '" + parque.name + "' updated")
                 return HttpResponseRedirect(reverse('listarContratos'))
         return render(request, 'contratos/editarContrato.html', {'estados': estados, 'parques': parques, 'id': id, 'contrato': contrato, 'start': start, 'end': end})
@@ -147,14 +147,17 @@ def estender_contrato(request, id):
     contrato = Contrato.objects.get(id=id)
     parques = ParkingSpot.objects.get(id=id).zone.park.name
     client = Client.objects.get(user=request.user)
-    end = contrato.datafim.strftime("%Y-%m-%d").__str__()
+    start = contrato.periocidadeid.start.strftime("%Y-%m-%d").__str__()
+    end = contrato.periocidadeid.end.strftime("%Y-%m-%d").__str__()
     if parques:
-        if request.method == 'POST':                
+        if request.method == 'POST':
+                dataI = request.POST['datainicio']                
                 dataF = request.POST['datafim']
-                Contrato.objects.filter(id=id).update(userid=request.user, datafim=dataF)
-                messages.add_message(request, messages.SUCCESS, "Contrato extended")
+                period = Periocidade.objects.create(start= dataI, end=dataF)
+                Contrato.objects.filter(id=id).update(userid=request.user, periocidadeid=period)
+                messages.add_message(request, messages.SUCCESS, "Contrato in park extended")
                 return HttpResponseRedirect(reverse('listarContratos'))
-        return render(request, 'contratos/estenderContrato.html', {'id': id, 'end': end})
+        return render(request, 'contratos/estenderContrato.html', {'id': id, 'start': start, 'end': end})
     return HttpResponseNotFound()
 
 

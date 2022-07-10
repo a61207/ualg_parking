@@ -33,7 +33,7 @@ def criar_reserva(request, id):
 
 
 def listar_reservas(request):
-    reservas = Reserva.objects.all().order_by('-editadoem')
+    reservas = Reserva.objects.filter(userid=Client.objects.get(user=request.user))
     return render(request, 'listarReservas.html', {'reservas': reservas})
 
 
@@ -111,7 +111,7 @@ def criar_contrato(request):
 
 
 def listar_contratos(request):
-    contratos = Contrato.objects.all().order_by('-editadoem')
+    contratos = Contrato.objects.filter(userid=Client.objects.get(user=request.user)).order_by('-editadoem') 
     return render(request, 'listarContratos.html', {'contratos': contratos})
 
 
@@ -138,18 +138,17 @@ def editar_contrato(request, id):
                 matricula = request.POST['matricula']
                 viatura = Viatura.objects.get(matricula=matricula) 
                 Reserva.objects.filter(id=id).update(userid=request.user, parqueid=parque, lugarid=lugar, estadoreservaid=estado, datainicio=dataI, datafim=dataF, matricula=viatura)
-                return render(request, '../templates/main/message.html',
-                              {'message': "Reserva Atualizada", 'type': "success",
-                               'url': "..", "title": 'Success'})
+                messages.add_message(request, messages.SUCCESS, "Contrato in park '" + parque.name + "' updated")
+                return HttpResponseRedirect(reverse('listarContratos'))
             else:
                 parque_old = request.POST['parqueid']
                 lugar_old = request.POST['lugarid']
                 estado_old = request.POST['estadoreservaid']
-                return render(request, 'reservas/editarReserva.html',
+                return render(request, 'contratos/editarContrato.html',
                               {'estados': estados, 'parques': parques, 'erros': form.non_field_errors().as_text,
                                'parque_old': parque_old, 'lugar_old': lugar_old, 'estado_old': int(estado_old), 'id': reserva.id})
         else:
-            return render(request, 'reservas/editarReserva.html',
+            return render(request, 'contratos/editarContrato.html',
                           {'estados': estados, 'parques': parques})
     return HttpResponseNotFound()
 

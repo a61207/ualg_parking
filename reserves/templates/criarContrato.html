@@ -35,7 +35,7 @@
                             <select id="zonaid" name="zonaid" class="form-control selectpicker">
                                 {% for parque in parques %}
                                     {% if parque.zones %}
-                                        <optgroup label="{{ parque.name }}">
+                                        <optgroup label="Parque {{ parque.name }}">
                                             {% for zone in parque.zones %}
                                                 <option {% if zona_old == zone.id %} selected {% endif %}
                                                                                      value="{{ zone.id }}">
@@ -55,7 +55,7 @@
                                 {% for parque in parques %}
                                     {% if parque.zones %}
                                         {% for zone in parque.zones %}
-                                            <optgroup label="{{ zone.name }}">
+                                            <optgroup label="Zona {{ zone.name }}">
                                                 {% for lugar in zone.spots %}
                                                     <option {% if lugar_old == lugar.id %} selected {% endif %}
                                                                                            value="{{ lugar.id }}">
@@ -112,7 +112,7 @@
                                 {% endfor %}
                             </select>
                         </div>
-
+                        <br>
                         <!-- Botão Submit -->
                         <div class="d-flex justify-content-center">
                             <button type="submit" class="btn btn-secondary">Submit</button>

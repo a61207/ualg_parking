@@ -80,7 +80,7 @@
             <div class="form-group col">
                 <label for="date">Data Inicio</label>
                 <input type="datetime-local" class="form-control {% if erros %}is-invalid{% endif %}"
-                       id="datainicio" name="datainicio" placeholder="Enter date"
+                       id="datainicio" name="datainicio" placeholder="Enter date" min="{{ start }}"
                        value="{{ start }}">
                 <div class="invalid-feedback">
                     {{ erros }}
@@ -91,7 +91,7 @@
             <div class="form-group col">
                 <label for="date">Data Fim</label>
                 <input type="datetime-local" class="form-control {% if erros %}is-invalid{% endif %}"
-                       id="datafim" name="datafim" placeholder="Enter date"
+                       id="datafim" name="datafim" placeholder="Enter date" min="{{ end }}"
                        value="{{ end }}">
                 <div class="invalid-feedback">
                     {{ erros }}

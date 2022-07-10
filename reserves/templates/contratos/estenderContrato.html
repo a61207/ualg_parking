@@ -20,7 +20,7 @@
             <div class="form-group col">
                 <label for="date">Data Fim</label>
                 <input type="date" class="form-control {% if erros %}is-invalid{% endif %}"
-                       id="datafim" name="datafim" placeholder="Enter date"
+                       id="datafim" name="datafim" placeholder="Enter date" min="{{ end }}"
                        value="{{ end }}">
                 <div class="invalid-feedback">
                     {{ erros }}

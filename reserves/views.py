@@ -130,7 +130,7 @@ def editar_contrato(request, id):
     if estados:
         if request.method == 'POST':
                 parque = request.POST['parqueid']
-                lugar = ParkingSpot.objects.get(id=id)
+                lugar = form.cleaned_data['lugarid']
                 estado = request.POST['estadoreservaid']
                 dataI = request.POST['datainicio']
                 dataF = request.POST['datafim']
@@ -152,7 +152,7 @@ def estender_contrato(request, id):
         if request.method == 'POST':                
                 dataF = request.POST['datafim']
                 Contrato.objects.filter(id=id).update(userid=request.user, datafim=dataF)
-                messages.add_message(request, messages.SUCCESS, "Contrato extended")
+                messages.add_message(request, messages.SUCCESS, "Contrato in park extended")
                 return HttpResponseRedirect(reverse('listarContratos'))
         return render(request, 'contratos/estenderContrato.html', {'id': id, 'end': end})
     return HttpResponseNotFound()

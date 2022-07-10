@@ -2,7 +2,6 @@ from django.contrib.auth.decorators import permission_required
 from django.http import FileResponse
 from django.shortcuts import render, redirect
 from datetime import datetime
-from django.contrib import messages
 
 from .forms import EntrarForm, SairForm
 from main.models import *
@@ -29,8 +28,7 @@ def entradassaidas(request):
 @permission_required('main.entrar_parque')
 def entrar_parque(request):
     form = EntrarForm()
-    message = ""
-    context = {"form": form, "message": message}
+    context = {"form": form}
     if request.method == 'POST':
         matricula = request.POST['matricula']
         entrada = request.POST['entrada']
@@ -70,15 +68,12 @@ def entrar_parque(request):
                         contratosEncontrados = True
                         contratosArr.append(contrato)
             if reservasEncontradas or contratosEncontrados:
-                messages.success(request, "Foram encontradas entradas com os dados especificados")
-                context = {"form": form, "message": message, "reservas": reservasArr, "contratos": contratosArr,
+                context = {"form": form, "reservas": reservasArr, "contratos": contratosArr,
                            "entrada": timeEntrada}
             else:
-                messages.error(request, "Não foram encontradas quaisquer entradas com os dados especificados")
-                context = {"form": form, "message": message, "check": True}
+                context = {"form": form, "check": True}
         else:
-            messages.error(request, "Não foram encontradas quaisquer entradas com a matrícula especificada")
-            context = {"form": form, "message": message, "check": True}
+            context = {"form": form, "check": True}
         render(request, "entrarParque.html", context)
     return render(request, "entrarParque.html", context)
 
@@ -86,8 +81,7 @@ def entrar_parque(request):
 @permission_required('main.sair_parque')
 def sair_parque(request):
     form = SairForm()
-    message = ""
-    context = {"form": form, "message": message}
+    context = {"form": form}
     if request.method == 'POST':
         matricula = request.POST['matricula']
         saida = request.POST['saida']
@@ -123,15 +117,12 @@ def sair_parque(request):
             new_saida2 = int(new_saida.timestamp())
             request.session['this_saida'] = new_saida2
             if reservasEncontradas or contratosEncontrados:
-                messages.success(request, "Foram encontradas ocupações com os dados especificados")
-                context = {"form": form, "message": message, "reservas": reservasArr, "contratos": contratosArr,
+                context = {"form": form, "reservas": reservasArr, "contratos": contratosArr,
                            "saida": timeSaida, "saida2": new_saida}
             else:
-                messages.error(request, "Não existem quaisquer ocupações com os dados especificados")
-                context = {"form": form, "message": message, "check": True}
+                context = {"form": form, "check": True}
         else:
-            messages.error(request, "Não existem quaisquer ocupações com a matrícula especificada")
-            context = {"form": form, "message": message, "check": True}
+            context = {"form": form, "check": True}
         render(request, "sairParque.html", context)
     return render(request, "sairParque.html", context)
 
@@ -218,9 +209,8 @@ def libertar_lugar(request, id, lugarid):
 
 @permission_required('main.associar_lugar')
 def associar_lugar(request, id):
-    message = ""
     lugar = ParkingSpot.objects.get(id=id)
-    context = {"message": message, "lugar": lugar}
+    context = {"lugar": lugar}
     if request.method == 'POST':
         matricula = request.POST['matricula']
         entrada = request.POST['entrada']
@@ -262,9 +252,8 @@ def listar_lugares(request):
 
 @permission_required('main.desassociar_lugar')
 def desassociar_lugar(request, id):
-    message = ""
     lugar = ParkingSpot.objects.get(id=id)
-    context = {"message": message, "lugar": lugar}
+    context = {"lugar": lugar}
     if request.method == 'POST':
         saida = request.POST['saida']
         visita = Visit.objects.filter(lugarid=lugar).order_by('-criadoem').first()
@@ -281,7 +270,6 @@ def desassociar_lugar(request, id):
 
 @permission_required('main.pagamento')
 def pagamento(request, id):
-    message = ""
     reserva = Reserva.objects.get(id=id)
     validadeReserva = reserva.periocidadeid.end
     new_entrada2 = request.session.get('this_entrada')

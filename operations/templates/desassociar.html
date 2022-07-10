@@ -1,12 +1,18 @@
-{% extends "baseContainer.html" %}
+{% extends "base.html" %}
 {% load static %}
     {% block title %}
         Desassociar manualmente viatura ao lugar
     {% endblock %}
-    {% block containerTitle %}
-        Desassociar manualmente viatura ao lugar  <b>{{ lugar.nome }}</b>
-    {% endblock %}
-    {% block containerContent %}
+    {% block main %}
+
+    <div class="container my-4">
+        <div class="row rounded bg-light pt-3">
+            <div class="col">
+                <div class="jumbotron border p-3 mb-3">
+                    <h1 class="text-center">Desassociar manualmente viatura ao lugar  <b>{{ lugar.nome }}</h1>
+                    <hr>
+
+
         <form action="{% url 'desassociarLugar' lugar.id %}" method="post">
             {% csrf_token %}
             <div class="form-row">

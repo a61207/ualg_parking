@@ -1,14 +1,17 @@
-{% extends "baseContainer.html" %}
+{% extends "base.html" %}
 {% load static %}
 
     {% block title %}
         Saída
     {% endblock %}
-    {% block containerTitle %}
-        Registar saída
-    {% endblock %}
+    {% block main %}
 
-    {% block containerContent %}
+    <div class="container my-4">
+        <div class="row rounded bg-light pt-3">
+            <div class="col">
+                <div class="jumbotron border p-3 mb-3">
+                    <h1 class="text-center">Registar saída</h1>
+                    <hr>
         <form action="{% url 'sairParque' %}" method="post">
             {% csrf_token %}
             <div class="form-row">
@@ -37,7 +40,6 @@
         </form>
         <br>
         <br>
-        {% include 'messages.html' %}
         <br>
         <!-- Ocupações encontradas -->
         {% if reservas or contratos %}

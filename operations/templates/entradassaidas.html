@@ -1,12 +1,16 @@
-{% extends "baseContainer.html" %}
+{% extends "base.html" %}
 {% load static %}
     {% block title %}
       Histórico de ocupações
     {% endblock %}
-    {% block containerTitle %}
-      Histórico de ocupações
-    {% endblock %}
-    {% block containerContent %}
+    {% block main %}
+
+    <div class="container my-4">
+        <div class="row rounded bg-light pt-3">
+            <div class="col">
+                <div class="jumbotron border p-3 mb-3">
+                    <h1 class="text-center">Histórico de ocupações</h1>
+                    <hr>
         <!-- Reserva encontrada -->
         {% if entradassaidas %}
         <table class="table table-light table-hover">

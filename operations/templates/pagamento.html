@@ -1,12 +1,16 @@
-{% extends "baseContainer.html" %}
+{% extends "base.html" %}
 {% load static %}
     {% block title %}
         Pagamento
     {% endblock %}
-    {% block containerTitle %}
-        Pagamento
-    {% endblock %}
-    {% block containerContent %}
+{% block main %}
+
+    <div class="container my-4">
+        <div class="row rounded bg-light pt-3">
+            <div class="col">
+                <div class="jumbotron border p-3 mb-3">
+                    <h1 class="text-center">Pagamento</h1>
+                    <hr>
         <!-- Pagamento -->
         <br>
         <table class="table table-light table-hover">

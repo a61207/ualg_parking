@@ -23,3 +23,5 @@ venv
 /main/templatetags/__init__.py
 /main/static/__pycache__
 /main/templatetags/__pycache__
+main/static/__pycache__/postal_codes.cpython-310.pyc
+main/templatetags/__pycache__/group_tags.cpython-310.pyc

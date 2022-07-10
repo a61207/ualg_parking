@@ -136,7 +136,7 @@ def editar_contrato(request, id):
                 dataI = request.POST['datainicio']
                 dataF = request.POST['datafim']
                 matricula = request.POST['matricula']
-                viatura = Viatura.objects.get(matricula=matricula) 
+                viatura = Car.objects.get(registration=matricula) 
                 Reserva.objects.filter(id=id).update(userid=request.user, parqueid=parque, lugarid=lugar, estadoreservaid=estado, datainicio=dataI, datafim=dataF, matricula=viatura)
                 messages.add_message(request, messages.SUCCESS, "Contrato in park '" + parque.name + "' updated")
                 return HttpResponseRedirect(reverse('listarContratos'))
@@ -146,10 +146,10 @@ def editar_contrato(request, id):
                 estado_old = request.POST['estadoreservaid']
                 return render(request, 'contratos/editarContrato.html',
                               {'estados': estados, 'parques': parques, 'erros': form.non_field_errors().as_text,
-                               'parque_old': parque_old, 'lugar_old': lugar_old, 'estado_old': int(estado_old), 'id': reserva.id})
+                               'parque_old': parque_old, 'lugar_old': lugar_old, 'estado_old': int(estado_old), 'id': id})
         else:
             return render(request, 'contratos/editarContrato.html',
-                          {'estados': estados, 'parques': parques})
+                          {'estados': estados, 'parques': parques, 'id': id})
     return HttpResponseNotFound()
 
 

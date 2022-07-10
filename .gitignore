@@ -19,6 +19,10 @@ venv
 /parks/migrations
 /reserves/migrations
 /main/migrations
+/main/static/__init__.py
+/main/templatetags/__init__.py
+/main/static/__pycache__
+/main/templatetags/__pycache__
 
 
 

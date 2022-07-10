@@ -143,6 +143,21 @@ def editar_contrato(request, id):
     return HttpResponseNotFound()
 
 
+def estender_contrato(request, id):
+    contrato = Contrato.objects.get(id=id)
+    parques = ParkingSpot.objects.get(id=id).zone.park.name
+    client = Client.objects.get(user=request.user)
+    end = contrato.datafim.strftime("%Y-%m-%d").__str__()
+    if parques:
+        if request.method == 'POST':                
+                dataF = request.POST['datafim']
+                Contrato.objects.filter(id=id).update(userid=request.user, datafim=dataF)
+                messages.add_message(request, messages.SUCCESS, "Contrato extended")
+                return HttpResponseRedirect(reverse('listarContratos'))
+        return render(request, 'contratos/estenderContrato.html', {'id': id, 'end': end})
+    return HttpResponseNotFound()
+
+
 def listar_pagamentos_contratos(request):
     faturas = FacturaRecibo.objects.all()
     return render(request, 'paymentAndContractsManagement/listarPagamentosContratos.html',

@@ -28,6 +28,7 @@
                                 <th scope="col">User</th>
                                 <th scope="col">Matricula</th>
                                 <th scope="col">Parque</th>
+                                <th scope="col">Zona</th>
                                 <th scope="col">Lugar</th>
                                 <th scope="col">Data Entrada</th>
                                 <th scope="col">Data Saida</th>
@@ -43,6 +44,7 @@
                                     </th>
                                     <td>{{ reserva.matricula }}</td>
                                     <td>{{ reserva.lugarid.zone.park.name }}</td>
+                                    <td>{{ reserva.lugarid.zone.name }}</td>
                                     <td>{{ reserva.lugarid.number }}</td>
                                     <td>{{ reserva.periocidadeid.start.date }}</td>
                                     <td>{{ reserva.periocidadeid.end.date }}</td>

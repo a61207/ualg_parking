@@ -30,6 +30,7 @@ urlpatterns = [
     path('contracts/', views.listar_contratos, name='listarContratos'),
     path('contracts/<int:id>', views.visualizar_contrato, name='visualizarContrato'),
     path('contracts/update/<int:id>', views.editar_contrato, name='editarContrato'),
+    path('contracts/extend/<int:id>', views.estender_contrato, name='estenderContrato'),
     path('contracts/delete/<int:id>', views.cancelar_contrato, name='cancelarContrato'),
 
     path('fatura/<int:contrato_id>', views.listar_fatura, name='fatura'),

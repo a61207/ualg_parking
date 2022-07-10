@@ -18,7 +18,8 @@ venv
 /operations/migrations
 /parks/migrations
 /reserves/migrations
-/main/migrations
+/main/migrations/__pycache__
+/main/migrations/__init__.py
 
 
 

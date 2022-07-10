@@ -547,9 +547,9 @@ class Contrato(models.Model):
                                               null=True)  # Field name made lowercase.
     valorcontrato = models.FloatField(db_column='ValorContrato', blank=True,
                                       null=True)  # Field name made lowercase.
-    datainicio = models.DateField(db_column='DataInicio')  # Field name made lowercase.
-    datafim = models.DateField(db_column='DataFim', blank=True,
-                               null=True)  # Field name made lowercase.
+    periocidadeid = models.ForeignKey(Periocidade, models.CASCADE,
+                                      db_column='PeriocidadeID', blank=True,
+                                      null=True)  # Field name made lowercase.
     matricula = models.ForeignKey(Car, models.CASCADE, db_column='matricula',
                                   null=True)  # Field name made lowercase.
     criadoem = models.DateTimeField(db_column='CriadoEm', default=timezone.now)  # Field name made lowercase.

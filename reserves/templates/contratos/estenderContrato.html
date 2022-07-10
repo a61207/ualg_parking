@@ -15,6 +15,16 @@
             {% csrf_token %}
             
             <div class="form-row">
+            
+            <!-- Data inicio Input -->
+            <div class="form-group col">
+                <label for="date">Data Inicio</label>
+                <input type="date" class="form-control {% if erros %}is-invalid{% endif %}"
+                       id="datainicio" name="datainicio" value="{{ start }}" readonly>
+                <div class="invalid-feedback">
+                    {{ erros }}
+                </div>
+            </div>
 
             <!-- Data fim Input -->
             <div class="form-group col">

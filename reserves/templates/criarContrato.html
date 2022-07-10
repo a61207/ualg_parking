@@ -82,8 +82,8 @@
                         <!-- Data inicio Input -->
                         <div class="form-group col">
                             <label for="date">Data Inicio</label>
-                            <input type="text" class="form-control {% if erros %}is-invalid{% endif %}"
-                                   id="datainicio" name="datainicio" placeholder="(YYYY/MM/DD)"
+                            <input type="date" class="form-control {% if erros %}is-invalid{% endif %}"
+                                   id="datainicio" name="datainicio" placeholder="Enter date"
                                    {% if datainicio %}value="{{ datainicio }}"{% endif %}>
                             <div class="invalid-feedback">
                                 {{ erros }}
@@ -92,9 +92,9 @@
 
                         <!-- Data fim Input -->
                         <div class="form-group col">
-                            <label for="date">Data Inicio</label>
-                            <input type="text" class="form-control {% if erros %}is-invalid{% endif %}"
-                                   id="datafim" name="datafim" placeholder="(YYYY/MM/DD)"
+                            <label for="date">Data Fim</label>
+                            <input type="date" class="form-control {% if erros %}is-invalid{% endif %}"
+                                   id="datafim" name="datafim" placeholder="Enter date"
                                    {% if datafim %}value="{{ datafim }}"{% endif %}>
                             <div class="invalid-feedback">
                                 {{ erros }}
@@ -107,8 +107,7 @@
                             <label for="estadoreservaid">State</label>
                             <select id="estadoreservaid" name="estadoreservaid" class="form-control">
                                 {% for estado in estados %}
-                                    <option {% if estado_old == estado.id %} selected {% endif %}
-                                                                             value="{{ estado.id }}">{{ estado.nome }}</option>
+                                    <option value="{{ estado.id }}">{{ estado.nome }}</option>
                                 {% endfor %}
                             </select>
                         </div>

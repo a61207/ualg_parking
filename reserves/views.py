@@ -63,7 +63,7 @@ def editar_reserva(request, id):
             lugar = ParkingSpot.objects.get(id=id)
 
             Reserva.objects.filter(id=id).update(userid=client, lugarid=lugar, parqueid=lugar.zone.park,
-                                                 periocidadeid=period, matricula=matricula)
+                                                 periocidadeid=period, matricula=matricula).order_by('-editadoem')
             messages.add_message(request, messages.SUCCESS, "Reserva in park '" + parque + "' updated")
             return HttpResponseRedirect(reverse('listarReservas'))
         return render(request, 'reservas/editarReserva.html',

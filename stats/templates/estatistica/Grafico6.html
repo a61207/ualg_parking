@@ -51,9 +51,9 @@
                                     {% for utilizador in utilizadores %}
 
                                         {% if utilizador_id == utilizador.id %}
-                                            <option selected="true" value="{{ utilizador.id }}">{{ utilizador.user.get_full_name }}</option>
+                                            <option selected="true" value="{{ utilizador.id }}">{{ utilizador.get_full_name }}</option>
                                         {% else %}
-                                            <option value="{{ utilizador.id }}">{{ utilizador.user.get_full_name }}</option>
+                                            <option value="{{ utilizador.id }}">{{ utilizador.get_full_name }}</option>
                                         {% endif %}
                                     {% endfor %}
                                 </select></td>

@@ -207,7 +207,7 @@ def associar_lugar(request, id):
             new_entrada = datetime.strptime(entrada, "%Y-%m-%dT%H:%M")
             final_entrada = Periocidade(start=new_entrada)
             final_entrada.save()
-            new_visit = Visit(lugarid=lugar, matricula=carro.first(), periocidadeid=final_entrada)
+            new_visit = Visit(lugarid=lugar, matriculaviatura=carro.first(), periocidadeid=final_entrada)
             new_visit.save()
             entsaid1 = EntradasSaidas(matriculaviatura=carro.first(), periocidadeid=final_entrada, lugarid=lugar, in_spot=True)
             tipoMan = "Manual"

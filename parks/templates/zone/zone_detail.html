@@ -43,7 +43,7 @@
                                 <tr>
                                     <th scope="row" class="align-middle">
                                         {% if not request.user|is_client %}
-                                            <a href="{% url 'visualizarLugar' row.zone.park.id row.zone.id row.id %}">{{ row.number }}</a>
+                                            <a href="{% url 'visualizarLugar' row.id %}">{{ row.number }}</a>
                                         {% else %}
                                             {{ row.number }}
                                         {% endif %}

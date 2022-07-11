@@ -22,5 +22,5 @@ urlpatterns = [
     path('pagamento/<int:id>', views.pagamento, name='pagamento'),
     path('recibo/<int:id>', views.recibo, name='recibo'),
     path('parking_spots/', views.listar_lugares, name='listarLugares'),
-    path('parks/<park>/zones/<zone>/spot/<int:id>', views.visualizar_lugar, name='visualizarLugar'),
+    path('spot/<int:id>', views.visualizar_lugar, name='visualizarLugar'),
 ]

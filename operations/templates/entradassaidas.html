@@ -34,7 +34,7 @@
                                     <td>{{ dados.lugarid.zone.park.name }}</td>
                                     <td>{{ dados.lugarid.zone.name }}</td>
                                     <td>
-                                        <a href="{% url 'visualizarLugar' dados.lugarid.zone.park.id dados.lugarid.zone.id dados.lugarid.id %}">{{ dados.lugarid.number }}</a>
+                                        <a href="{% url 'visualizarLugar' dados.lugarid.id %}">{{ dados.lugarid.number }}</a>
                                     </td>
                                     {% if dados.periocidadeid.start and not dados.in_spot and not dados.periocidadeid.end and dados.tipo.id != 7 %}
                                         <td style="color: blue;"><strong>{{ dados.periocidadeid.start }}</strong></td>

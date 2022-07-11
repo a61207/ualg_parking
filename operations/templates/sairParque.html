@@ -76,7 +76,7 @@
                 {% endif %}
                 {% endfor %}
                 {% for contrato in contratos %}
-                {% if contrato.entradassaidasid.periocidadeid.start and not contrato.entradassaidasid.periocidadeid.end %}
+                {% if not contrato.entradassaidasid.periocidadeid.end %}
                 <tr>  
                   <td>Contrato</td>
                   <td>{{ contrato.matricula.registration}}</td>

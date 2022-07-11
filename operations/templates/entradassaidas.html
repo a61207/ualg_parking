@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% load static %}
-    {% block title %}
-      Histórico de ocupações
-    {% endblock %}
-    {% block main %}
+{% block title %}
+    Histórico de ocupações
+{% endblock %}
+{% block main %}
 
     <div class="container my-4">
         <div class="row rounded bg-light pt-3">
@@ -11,60 +11,67 @@
                 <div class="jumbotron border p-3 mb-3">
                     <h1 class="text-center">Histórico de ocupações</h1>
                     <hr>
-        <!-- Reserva encontrada -->
-        {% if entradassaidas %}
-        <table class="table table-light table-hover">
-            <thead>
-              <tr>
-                <th scope="col">Tipo</th>
-                <th scope="col">Matrícula</th>
-                <th scope="col">Parque</th>
-                <th scope="col">Zona</th>
-                <th scope="col">Lugar</th>
-                <th scope="col">Entrada</th>
-                <th scope="col">Saída</th>
-                <th scope="col"></th>                  
-              </tr>
-            </thead>
-            <tbody>
-                {% for dados in entradassaidas %}
-              <tr>
-                <td>{{ dados.tipo.nome }}</td>
-                <td>{{ dados.matriculaviatura.registration }}</td>
-                <td>{{ dados.lugarid.zone.park.name }}</td>
-                <td>{{ dados.lugarid.zone.name }}</td>
-                <td><a href="{% url 'visualizarLugar' id=dados.lugarid.id %}">{{ dados.lugarid.nome }}</a></td>
-                {% if dados.periocidadeid.start and dados.lugarid.get_state_id == 1 and not dados.periocidadeid.end and dados.tipo.id != 7 %}
-                  <td style="color: blue;"><strong>{{ dados.periocidadeid.start }}</strong></td>
-                {% else %}
-                  <td>{{ dados.periocidadeid.start }}</td>
-                {% endif %}
-                {% if dados.periocidadeid.start and dados.periocidadeid.end and dados.lugarid.get_state_id == 3 and dados.tipo.id != 7 %}
-                  <td style="color: blue;"><strong>{{ dados.periocidadeid.end }}</strong></td>
-                {% else %}
-                  <td>{{ dados.periocidadeid.end }}</td>
-                {% endif %}
-                {% if dados.periocidadeid.start and dados.lugarid.get_state_id == 1 and not dados.periocidadeid.end %}
-                  <td><a class="btn btn-primary" href="{% url 'ocuparLugar' lugarid=dados.lugarid.id %}">Ocupar lugar</a></td>
-                {% elif dados.periocidadeid.start and dados.periocidadeid.end and dados.lugarid.get_state_id == 3 and not dados.tipo.id == 7 %}
-                  <td><a class="btn btn-primary" href="{% url 'libertarLugar' id=dados.id lugarid=dados.lugarid.id  %}">Libertar lugar</a></td>
-                {% elif dados.periocidadeid.start and dados.lugarid.get_state_id == 3 and not dados.periocidadeid.end %}
-                  <td><a>Estacionado</a></td>
-                {% elif dados.periocidadeid.start and dados.periocidadeid.end and dados.lugarid.get_state_id == 1 %}
-                  <td><a>Concluído</a></td>
-                <td></td>
-                {% endif %}
-              </tr>
-                {% endfor %}
-            </tbody>
-          </table>
-          {% else %}
-          <br>
-          <div class="text-center"> Não há quaisquer registos de ocupações</div>
-          <br>
-        {% endif %}
-        <br>
-        <div class="row justify-content-center">
-          <p><a class="btn btn-success" href="{% url "entrarParque" %}">Entrar no Parque</a></p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<p><a class="btn btn-danger" href="{% url "sairParque" %}">Sair do Parque</a></p>
-        </div>
-    {% endblock %}
+                    <!-- Reserva encontrada -->
+                    {% if entradassaidas %}
+                        <table class="table table-light table-hover">
+                            <thead>
+                            <tr>
+                                <th scope="col">Tipo</th>
+                                <th scope="col">Matrícula</th>
+                                <th scope="col">Parque</th>
+                                <th scope="col">Zona</th>
+                                <th scope="col">Lugar</th>
+                                <th scope="col">Entrada</th>
+                                <th scope="col">Saída</th>
+                                <th scope="col"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for dados in entradassaidas %}
+                                <tr>
+                                    <td>{{ dados.tipo }}</td>
+                                    <td>{{ dados.matriculaviatura }}</td>
+                                    <td>{{ dados.lugarid.zone.park.name }}</td>
+                                    <td>{{ dados.lugarid.zone.name }}</td>
+                                    <td>
+                                        <a href="{% url 'visualizarLugar' dados.lugarid.zone.park.id dados.lugarid.zone.id dados.lugarid.id %}">{{ dados.lugarid.number }}</a>
+                                    </td>
+                                    {% if dados.periocidadeid.start and dados.lugarid.get_state_id == 1 and not dados.periocidadeid.end and dados.tipo.id != 7 %}
+                                        <td style="color: blue;"><strong>{{ dados.periocidadeid.start }}</strong></td>
+                                    {% else %}
+                                        <td>{{ dados.periocidadeid.start }}</td>
+                                    {% endif %}
+                                    {% if dados.periocidadeid.start and dados.periocidadeid.end and dados.lugarid.get_state_id == 3 and dados.tipo.id != 7 %}
+                                        <td style="color: blue;"><strong>{{ dados.periocidadeid.end }}</strong></td>
+                                    {% else %}
+                                        <td>{{ dados.periocidadeid.end }}</td>
+                                    {% endif %}
+                                    {% if dados.periocidadeid.start and not dados.in_spot and not dados.periocidadeid.end %}
+                                        <td><a class="btn btn-primary"
+                                               href="{% url 'ocuparLugar' dados.id %}">Ocupar lugar</a>
+                                        </td>
+                                    {% elif dados.periocidadeid.start and dados.periocidadeid.end and dados.in_spot %}
+                                        <td><a class="btn btn-primary"
+                                               href="{% url 'libertarLugar' id=dados.id lugarid=dados.lugarid.id %}">Libertar
+                                            lugar</a></td>
+                                    {% elif dados.periocidadeid.start and dados.in_spot and not dados.periocidadeid.end %}
+                                        <td><a>Estacionado</a></td>
+                                    {% elif dados.periocidadeid.start and dados.periocidadeid.end and dados.in_spot %}
+                                        <td><a>Concluído</a></td>
+                                        <td></td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <br>
+                        <div class="text-center"> Não há quaisquer registos de ocupações</div>
+                        <br>
+                    {% endif %}
+                    <br>
+                    <div class="row justify-content-center">
+                        <p><a class="btn btn-success" href="{% url "entrarParque" %}">Entrar no Parque</a></p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<p>
+                        <a class="btn btn-danger" href="{% url "sairParque" %}">Sair do Parque</a></p>
+                    </div>
+{% endblock %}

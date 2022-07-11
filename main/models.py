@@ -563,10 +563,11 @@ class Contrato(models.Model):
 
 class EntradasSaidas(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-    periocidadeid = models.ForeignKey('Periocidade', models.CASCADE,
+    periocidadeid = models.ForeignKey(Periocidade, models.CASCADE,
                                       db_column='PeriocidadeID')  # Field name made lowercase.
     matriculaviatura = models.CharField(db_column='MatriculaViatura', verbose_name='MatriculaViatura', max_length=8)
     lugarid = models.ForeignKey(ParkingSpot, models.CASCADE, db_column='LugarID')
+    in_spot = models.BooleanField(verbose_name='In Spot', db_column='In Spot', default=False)
     tipo = models.CharField(db_column='EstadoRecursoID', verbose_name='EstadoRecursoID', max_length=15)
     criadoem = models.DateTimeField(db_column='CriadoEm', default=timezone.now)  # Field name made lowercase.
     editadoem = models.DateTimeField(db_column='EditadoEm', default=timezone.now)  # Field name made lowercase.

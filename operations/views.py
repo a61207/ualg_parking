@@ -109,7 +109,7 @@ def sair_parque(request):
                 start2 = datetime.combine(start, datetime.min.time())
                 timeStart = int(start2.timestamp())
                 if timeSaida >= timeStart:
-                    end = contrato.periocidadeid.end           
+                    end = contrato.periocidadeid.end
                     end2 = datetime.combine(end, datetime.min.time())
                     timeEnd = int(end2.timestamp())
                     contratosEncontrados = True
@@ -184,23 +184,14 @@ def registar_saida_con(request, id, saida):
 
 
 @permission_required('main.ocupar_lugar')
-def ocupar_lugar(request, lugarid):
-    lugar = ParkingSpot.objects.get(id=lugarid)
-    ocupado = Estadorecurso.objects.get(id=3)
-    lugar.estadorecursoid = ocupado
-    lugar.save()
-    idlugar = lugar.id
+def ocupar_lugar(request, id):
+    EntradasSaidas.objects.filter(id=id).update(in_spot=True)
     return redirect(entradassaidas)
 
 
 @permission_required('main.libertar_lugar')
 def libertar_lugar(request, id, lugarid):
-    lugar = ParkingSpot.objects.get(id=lugarid)
-    libertado = Estadorecurso.objects.get(id=1)
-    lugar.estadorecursoid = libertado
-    lugar.save()
-    entsaid = EntradasSaidas.objects.get(id=id)
-    idlugar = lugar.id
+    EntradasSaidas.objects.filter(id=id).update(in_spot=False)
     return redirect(entradassaidas)
 
 

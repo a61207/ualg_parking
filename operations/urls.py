@@ -14,7 +14,7 @@ urlpatterns = [
          name='registarSaidaReserva'),
     path('registarSaidaContrato/<int:id>/<int:saida>', views.registar_saida_con,
          name='registarSaidaContrato'),
-    path('ocuparLugar/<int:lugarid>', views.ocupar_lugar, name='ocuparLugar'),
+    path('ocuparLugar/<int:id>', views.ocupar_lugar, name='ocuparLugar'),
     path('libertarLugar/<int:id>/<int:lugarid>', views.libertar_lugar, name='libertarLugar'),
     path('associar/<int:id>', views.associar_lugar, name='associarLugar'),
     path('desassociar/<int:id>', views.desassociar_lugar, name='desassociarLugar'),

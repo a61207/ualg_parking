@@ -209,9 +209,6 @@ def associar_lugar(request, id):
             final_entrada.save()
             new_visit = Visit(lugarid=lugar, matricula=carro.first(), periocidadeid=final_entrada)
             new_visit.save()
-            ocupado = Estadorecurso.objects.get(id=3)
-            lugar.estadorecursoid = ocupado
-            lugar.save()
             entsaid1 = EntradasSaidas(matriculaviatura=carro.first(), periocidadeid=final_entrada, lugarid=lugar)
             tipoMan = "Manual"
             entsaid1.tipo = tipoMan
@@ -249,8 +246,6 @@ def desassociar_lugar(request, id):
         new_saida = datetime.strptime(saida, "%Y-%m-%dT%H:%M")
         periocidade.end = new_saida
         periocidade.save()
-        libertado = Estadorecurso.objects.get(id=2)
-        lugar.estadorecursoid = libertado
         lugar.save()
         return redirect(visualizar_lugar, id=id)
     return render(request, "desassociar.html", context)

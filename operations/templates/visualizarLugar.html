@@ -9,7 +9,7 @@
         <div class="row rounded bg-light pt-3">
             <div class="col">
                 <div class="jumbotron border p-3 mb-3">
-                    <h1 class="text-center">Visualizar lugar <b>{{ lugar.nome }}</h1>
+                    <h1 class="text-center">Visualizar lugar <b>{{ lugar.nome }}</b></h1>
                     <hr>
 
                     <!-- Div de Info da zona -->
@@ -35,7 +35,7 @@
                     <br>
                     {% if perms.main.add_parque %}
                         <div class="row">
-                            {% if lugar.estadorecursoid.id == 2 %}
+                            {% if lugar.get_state_id == 1 %}
                                 <!-- Botão de Apagar -->
                                 <div class="col">
                                     <div class="d-flex justify-content-center">

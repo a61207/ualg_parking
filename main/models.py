@@ -468,9 +468,9 @@ class ParkingSpot(models.Model):
 
     def get_state(self, start, end):
         if EntradasSaidas.objects.filter(lugarid=self.id, periocidadeid__start__gte=start,
-                                         periocidadeid__end__gte=start) and \
+                                         periocidadeid__end__gte=start, in_spot=True) and \
                 EntradasSaidas.objects.filter(lugarid=self.id, periocidadeid__start__lte=end,
-                                              periocidadeid__end__lte=end):
+                                              periocidadeid__end__lte=end, in_spot=True):
             return ParkingSpot.OCCUPIED
         elif Reserva.objects.filter(lugarid=self.id, periocidadeid__start__gte=start,
                                     periocidadeid__end__gte=start) and \
@@ -483,10 +483,10 @@ class ParkingSpot(models.Model):
     def get_state_now(self):
         time = timezone.now()
         if EntradasSaidas.objects.filter(lugarid=self.id, periocidadeid__start__lte=time,
-                                         periocidadeid__end__gte=time):
+                                         periocidadeid__end__gte=time, in_spot=True):
             return "Occupied"
         elif Reserva.objects.filter(lugarid=self.id, periocidadeid__start__lte=time,
-                                    periocidadeid__end__gte=time):
+                                    periocidadeid__end__gte=time, in_spot=True):
             return "Reserved"
         else:
             return "Free"
@@ -494,7 +494,7 @@ class ParkingSpot(models.Model):
     def get_state_id(self):
         time = timezone.now()
         if EntradasSaidas.objects.filter(lugarid=self.id, periocidadeid__start__lte=time,
-                                         periocidadeid__end__gte=time):
+                                         periocidadeid__end__gte=time, in_spot=True):
             return 3
         else:
             return 1

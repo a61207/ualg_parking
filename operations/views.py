@@ -89,8 +89,8 @@ def sair_parque(request):
         if carro.exists():
             reservasArr = []
             contratosArr = []
-            reservas = Reserva.objects.filter(matricula=matricula)
-            contratos = Contrato.objects.filter(matricula=matricula)
+            reservas = Reserva.objects.filter(matricula=carro.first())
+            contratos = Contrato.objects.filter(matricula=carro.first())
             new_saida = datetime.strptime(saida, "%Y-%m-%dT%H:%M")
             timeSaida = int(new_saida.timestamp()) + 3600
             reservasEncontradas = False

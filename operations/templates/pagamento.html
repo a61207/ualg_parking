@@ -31,7 +31,7 @@
                 <td>{{ reserva.matricula }}</td>
                 <td>{{ reserva.lugarid.zone.park.name }}</td>
                 <td>{{ reserva.lugarid.zone.name }}</td>
-                <td>{{ reserva.lugarid.name }}</td>
+                <td>{{ reserva.lugarid.number }}</td>
                 <td>{{ reserva.periocidadeid.start }} - {{ reserva.periocidadeid.end }}</td>
                 <td>{{ entrada }}</td>
                 <td>{{ saida }}</td>
@@ -55,7 +55,7 @@
                     <a><strong>Multa:</strong> {{ multa }}€</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a><strong>Total:</strong> {{ preco }}€</a>
                 </div>
                 <div class="col">
-                    <a href="{% url 'recibo' id=reserva.id %}"><strong>Emitir recibo</strong></a>
+                    <a href="{% url 'emitirrecibo' id=reserva.id %}"><strong>Emitir recibo</strong></a>
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <a href="{% url 'registarSaidaReserva' id=reserva.id saida=fim %}"><strong>Pagar<strong></a>
                 </div>

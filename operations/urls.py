@@ -20,7 +20,7 @@ urlpatterns = [
     path('desassociar/<int:id>', views.desassociar_lugar, name='desassociarLugar'),
     path('entradassaidas', views.entradassaidas, name='entradassaidas'),
     path('pagamento/<int:id>', views.pagamento, name='pagamento'),
-    path('recibo/<int:id>', views.recibo, name='recibo'),
+    path('emitirrecibo/<int:id>', views.emitirrecibo, name='emitirrecibo'),
     path('parking_spots/', views.listar_lugares, name='listarLugares'),
     path('spot/<int:id>', views.visualizar_lugar, name='visualizarLugar'),
 ]

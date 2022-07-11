@@ -32,46 +32,41 @@ def entrar_parque(request):
     if request.method == 'POST':
         matricula = request.POST['matricula']
         entrada = request.POST['entrada']
-        print(matricula)
         carro = Car.objects.filter(registration=matricula)
-        print(carro)
-        if carro.exists():
-            reservasArr = []
-            contratosArr = []
-            reservas = Reserva.objects.filter(matricula=carro.first())
-            contratos = Contrato.objects.filter(matricula=carro.first())
-            new_entrada = datetime.strptime(entrada, "%Y-%m-%dT%H:%M")
-            timeEntrada = int(new_entrada.timestamp()) + 3600
-            reservasEncontradas = False
-            contratosEncontrados = False
-            for reserva in reservas:
-                lugar = reserva.lugarid
-                periocidade = reserva.periocidadeid
-                start = periocidade.start
-                timeStart = int(start.timestamp())
-                if timeEntrada >= timeStart:
-                    end = periocidade.end
-                    timeEnd = int(end.timestamp())
-                    if timeEntrada <= timeEnd:
-                        reservasEncontradas = True
-                        reservasArr.append(reserva)
-            for contrato in contratos:
-                lugar = contrato.lugarid
-                start = contrato.periocidadeid.start
-                start2 = datetime.combine(start, datetime.min.time())
-                timeStart = int(start2.timestamp())
-                if timeEntrada >= timeStart:
-                    end = contrato.periocidadeid.end
-                    end2 = datetime.combine(end, datetime.min.time())
-                    timeEnd = int(end2.timestamp())
-                    if timeEntrada <= timeEnd:
-                        contratosEncontrados = True
-                        contratosArr.append(contrato)
-            if reservasEncontradas or contratosEncontrados:
-                context = {"form": form, "reservas": reservasArr, "contratos": contratosArr,
-                           "entrada": timeEntrada}
-            else:
-                context = {"form": form, "check": True}
+        reservasArr = []
+        contratosArr = []
+        reservas = Reserva.objects.filter(matricula=request.POST['matricula'])
+        contratos = Contrato.objects.filter(matricula=carro.first())
+        new_entrada = datetime.strptime(entrada, "%Y-%m-%dT%H:%M")
+        timeEntrada = int(new_entrada.timestamp()) + 3600
+        reservasEncontradas = False
+        contratosEncontrados = False
+        for reserva in reservas:
+            lugar = reserva.lugarid
+            periocidade = reserva.periocidadeid
+            start = periocidade.start
+            timeStart = int(start.timestamp())
+            if timeEntrada >= timeStart:
+                end = periocidade.end
+                timeEnd = int(end.timestamp())
+                if timeEntrada <= timeEnd:
+                    reservasEncontradas = True
+                    reservasArr.append(reserva)
+        for contrato in contratos:
+            lugar = contrato.lugarid
+            start = contrato.periocidadeid.start
+            start2 = datetime.combine(start, datetime.min.time())
+            timeStart = int(start2.timestamp())
+            if timeEntrada >= timeStart:
+                end = contrato.periocidadeid.end
+                end2 = datetime.combine(end, datetime.min.time())
+                timeEnd = int(end2.timestamp())
+                if timeEntrada <= timeEnd:
+                    contratosEncontrados = True
+                    contratosArr.append(contrato)
+        if reservasEncontradas or contratosEncontrados:
+            context = {"form": form, "reservas": reservasArr, "contratos": contratosArr,
+                        "entrada": timeEntrada}
         else:
             context = {"form": form, "check": True}
         render(request, "entrarParque.html", context)
@@ -86,41 +81,38 @@ def sair_parque(request):
         matricula = request.POST['matricula']
         saida = request.POST['saida']
         carro = Car.objects.filter(registration=matricula)
-        if carro.exists():
-            reservasArr = []
-            contratosArr = []
-            reservas = Reserva.objects.filter(matricula=carro.first())
-            contratos = Contrato.objects.filter(matricula=carro.first())
-            new_saida = datetime.strptime(saida, "%Y-%m-%dT%H:%M")
-            timeSaida = int(new_saida.timestamp()) + 3600
-            reservasEncontradas = False
-            contratosEncontrados = False
-            for reserva in reservas:
-                periocidade = reserva.periocidadeid
-                start = periocidade.start
-                timeStart = int(start.timestamp())
-                if timeSaida >= timeStart:
-                    end = periocidade.end
-                    timeEnd = int(end.timestamp())
-                    reservasEncontradas = True
-                    reservasArr.append(reserva)
-            for contrato in contratos:
-                start = contrato.periocidadeid.start
-                start2 = datetime.combine(start, datetime.min.time())
-                timeStart = int(start2.timestamp())
-                if timeSaida >= timeStart:
-                    end = contrato.periocidadeid.end
-                    end2 = datetime.combine(end, datetime.min.time())
-                    timeEnd = int(end2.timestamp())
-                    contratosEncontrados = True
-                    contratosArr.append(contrato)
-            new_saida2 = int(new_saida.timestamp())
-            request.session['this_saida'] = new_saida2
-            if reservasEncontradas or contratosEncontrados:
-                context = {"form": form, "reservas": reservasArr, "contratos": contratosArr,
-                           "saida": timeSaida, "saida2": new_saida}
-            else:
-                context = {"form": form, "check": True}
+        reservasArr = []
+        contratosArr = []
+        reservas = Reserva.objects.filter(matricula=request.POST['matricula'])
+        contratos = Contrato.objects.filter(matricula=carro.first())
+        new_saida = datetime.strptime(saida, "%Y-%m-%dT%H:%M")
+        timeSaida = int(new_saida.timestamp()) + 3600
+        reservasEncontradas = False
+        contratosEncontrados = False
+        for reserva in reservas:
+            periocidade = reserva.periocidadeid
+            start = periocidade.start
+            timeStart = int(start.timestamp())
+            if timeSaida >= timeStart:
+                end = periocidade.end
+                timeEnd = int(end.timestamp())
+                reservasEncontradas = True
+                reservasArr.append(reserva)
+        for contrato in contratos:
+            start = contrato.periocidadeid.start
+            start2 = datetime.combine(start, datetime.min.time())
+            timeStart = int(start2.timestamp())
+            if timeSaida >= timeStart:
+                end = contrato.periocidadeid.end
+                end2 = datetime.combine(end, datetime.min.time())
+                timeEnd = int(end2.timestamp())
+                contratosEncontrados = True
+                contratosArr.append(contrato)
+        new_saida2 = int(new_saida.timestamp())
+        request.session['this_saida'] = new_saida2
+        if reservasEncontradas or contratosEncontrados:
+            context = {"form": form, "reservas": reservasArr, "contratos": contratosArr,
+                        "saida": timeSaida, "saida2": new_saida}
         else:
             context = {"form": form, "check": True}
         render(request, "sairParque.html", context)
@@ -214,7 +206,7 @@ def associar_lugar(request, id):
             entsaid1.tipo = tipoMan
             entsaid1.save()
             return redirect(visualizar_lugar, id=id)
-    return render(request, "associar.html", context)
+    return redirect(entradassaidas)
 
 
 # Função para visualizar o lugar com o id especifico
@@ -283,8 +275,8 @@ def pagamento(request, id):
     return render(request, "pagamento.html", context)
 
 
-@permission_required('main.recibo')
-def recibo(request, id):
+@permission_required('main.emitirrecibo')
+def emitirrecibo(request, id):
     buf = io.BytesIO()
     c = canvas.Canvas(buf, pagesize=letter, bottomup=0)
     textob = c.beginText()
@@ -301,6 +293,7 @@ def recibo(request, id):
     multa = request.session.get('this_multa')
     strMulta = (str)(multa)
     strMontante = (str)(precoFinal)
+    lugaar = (str)(reserva.lugarid.number)
 
     lines = []
 
@@ -335,11 +328,11 @@ def recibo(request, id):
     lines.append(L2)
     lines.append(L3)
     lines.append(L4)
-    lines.append(L5 + reserva.matricula.matricula)
+    lines.append(L5 + reserva.matricula)
     lines.append(L6)
-    lines.append(L7 + reserva.lugarid.zonaid.parqueid.nome)
-    lines.append(L8 + reserva.lugarid.zonaid.nome)
-    lines.append(L9 + reserva.lugarid.nome)
+    lines.append(L7 + reserva.lugarid.zone.park.name)
+    lines.append(L8 + reserva.lugarid.zone.name)
+    lines.append(L9 + lugaar)
     lines.append(L10)
     lines.append(L11 + new_entrada)
     lines.append(L12 + new_saida)

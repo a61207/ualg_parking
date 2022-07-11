@@ -565,22 +565,14 @@ class Contrato(models.Model):
     periocidadeid = models.ForeignKey(Periocidade, models.CASCADE,
                                       db_column='PeriocidadeID', blank=True,
                                       null=True)  # Field name made lowercase.
-<<<<<<< HEAD
     entradassaidasid = models.ForeignKey(EntradasSaidas, models.CASCADE, db_column='entradassaidasID', blank=True,
                                          null=True)
-=======
->>>>>>> 27acc6098cd9238494fed6d3e4bab512f97b0508
     matricula = models.ForeignKey(Car, models.CASCADE, db_column='matricula',
                                   null=True)  # Field name made lowercase.
     criadoem = models.DateTimeField(db_column='CriadoEm', default=timezone.now)  # Field name made lowercase.
     editadoem = models.DateTimeField(db_column='EditadoEm', default=timezone.now)  # Field name made lowercase.
     estadoreservaid = models.ForeignKey(Estadoreserva, models.DO_NOTHING,
                                         db_column='EstadoReservaID', default=1)
-<<<<<<< HEAD
-=======
-    entradassaidasid = models.ForeignKey(EntradasSaidas, models.CASCADE, db_column='entradassaidasID', blank=True,
-                                         null=True)
->>>>>>> 27acc6098cd9238494fed6d3e4bab512f97b0508
 
     class Meta:
         db_table = 'Contrato'

@@ -1,60 +1,68 @@
-{% extends "baseContainer.html" %}
+{% extends "base.html" %}
 
 {% load static %}
 
-    {% block title %}
-        Escolher Modalidade
-    {% endblock %}
+{% block title %}
+    Escolher Modalidade
+{% endblock %}
 
-    {% block containerTitle %}
-       Pagamento do Contrato
-    {% endblock %}
+{% block main %}
+    <div class="container my-4">
+        <div class="row rounded bg-light pt-3">
+            <div class="col">
+                <div class="jumbotron border p-3 mb-3">
+                    <h1 class="text-center">Pagamento do Contrato</h1>
+                    <hr>
+                    <!-- Tabela de Parques -->
+                    <table class="table table-light table-hover">
+                        <thead>
+                        <tr>
+                            <th scope="col">Cliente</th>
+                            <th scope="col">Contrato ID</th>
+                            <th scope="col">Modalidade de Pagamento</th>
+                            <th scope="col">Data de Validade</th>
+                            <th scope="col">Valor Total</th>
+                            <th scope="col">Data de Incício</th>
+                            <th scope="col">Criado em:</th>
+                            <th scope="col">Editado em:</th>
+                            <th scope="col">Estado</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for contrato in contratos %}
+                            <tr>
+                            {% if contrato.estadocontratoid.nome == "Aguardar Pagamento" %}
+                                <th scope="row"><a href=""></a>{{ contrato.userid.username }}</th>
+                                <td>{{ contrato.id }}</td>
+                                <td>{{ contrato.modalidadepagamentoid.nome }}</td>
+                                <td>{{ contrato.datavalidade }}</td>
+                                <td>{{ contrato.valorcontrato }}€</td>
+                                <td>{{ contrato.datainicio }}</td>
+                                <td>{{ contrato.criadoem }}</td>
+                                <td>{{ contrato.editadoem }}</td>
+                                <td>{{ contrato.estadocontratoid.nome }}</td>
+                                <td>
+                                    <!-- Botão de Criar -->
+                                    <div class="d-flex justify-content-center">
+                                        <a class="btn btn-secondary"
+                                           href="http://127.0.0.1:8000/fatura/{{ contrato.id }}">Listar Pagamentos do
+                                            Contrato</a>
+                                    </div>
+                                </td>
+                            {% endif %}
+                        {% endfor %}
+                        <th>
+                        </th>
+                        </tbody>
+                    </table>
 
-    {% block containerContent %}
-        <!-- Tabela de Parques -->
-        <table class="table table-light table-hover">
-          <thead>
-            <tr>
-              <th scope="col">Cliente</th>
-              <th scope="col">Contrato ID</th>
-              <th scope="col">Modalidade de Pagamento</th>
-              <th scope="col">Data de Validade</th>
-              <th scope="col">Valor Total</th>
-              <th scope="col">Data de Incício</th>
-              <th scope="col">Criado em:</th>
-              <th scope="col">Editado em:</th>
-              <th scope="col">Estado</th>
-              <th></th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for contrato in contratos %}
-            <tr>
-              {% if contrato.estadocontratoid.nome == "Aguardar Pagamento" %}
-              <th scope="row"><a href=""></a>{{ contrato.userid.username }}</th>
-              <td>{{ contrato.id }}</td>
-              <td>{{ contrato.modalidadepagamentoid.nome }}</td>
-              <td>{{ contrato.datavalidade }}</td>
-              <td>{{ contrato.valorcontrato }}€</td>
-              <td>{{ contrato.datainicio }}</td>
-              <td>{{ contrato.criadoem }}</td>
-              <td>{{ contrato.editadoem }}</td>
-              <td>{{ contrato.estadocontratoid.nome }}</td>
-              <td>
-                    <!-- Botão de Criar -->
-        <div class="d-flex justify-content-center">
-          <a class="btn btn-secondary" href="http://127.0.0.1:8000/fatura/{{contrato.id}}">Listar Pagamentos do Contrato</a>
+                    <hr>
+                </div>
+            </div>
         </div>
-              </td>
-            {% endif %}
-            {% endfor %}
-          <th>
-          </th>
-          </tbody>
-        </table>
+    </div>
 
-        <hr>
 
-        
-    {% endblock %}
+{% endblock %}

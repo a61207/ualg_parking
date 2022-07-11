@@ -33,6 +33,7 @@ urlpatterns = [
     path('contracts/extend/<int:id>', views.estender_contrato, name='estenderContrato'),
     path('contracts/delete/<int:id>', views.cancelar_contrato, name='cancelarContrato'),
 
+
     path('fatura/<int:contrato_id>', views.listar_fatura, name='fatura'),
     path('consultar_fatura/<int:id>', views.consultar_fatura,
          name='consultar_fatura_especifica'),
@@ -46,4 +47,6 @@ urlpatterns = [
          name='emitir_recibo'),
     path('cancelarfatura/<int:id>', views.cancelar_fatura,
          name='cancelar_fatura'),
+    path('detalhesfatura/<int:id>', views.detalhes_fatura,
+         name='detalhes_fatura'),
 ]

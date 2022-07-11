@@ -48,6 +48,8 @@
                                     <td>{{ contrato.editadoem }}</td>
                                     <td>
                                         <a class="btn btn-info btn-sm" href="{% url 'visualizarContrato' contrato.id %}">View</a>
+                                        <a class="btn btn-secondary" href="{% url 'fatura' contrato.id %}">Listar Faturas</a>
+                                        <a href="{% url 'modalidade_pagamento' contrato.userid.id %}">Modalidade</a>
                                     </td>
                                 </tr>
                             {% endfor %}

@@ -539,18 +539,23 @@ class UpdateZone(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     # noinspection PyArgumentList
     def post(self, request, *args, **kwargs):
         zone = Zone.objects.get(id=self.kwargs['pk'])
+        print(zone.name)
         form = ZoneForm(request.POST, instance=zone)
+        print(zone.name)
         SpotFormSet = modelformset_factory(ParkingSpot, form=SpotForm, extra=0, can_delete=True, can_delete_extra=True)
+        print(zone.name)
         formset = SpotFormSet(request.POST, queryset=ParkingSpot.objects.filter(
             zone=zone, is_archived=False))
-        print(zone.name, form.instance.name)
-        print(zone.name != form.instance.name)
+        print(zone.name)
+        form.instance.park = zone.park
         if all([form.is_valid(), formset.is_valid()]):
+            print(form.is_valid())
             if check_empty_spots(formset):
                 errors = form.errors.setdefault("__all__", ErrorList())
                 errors.append("At Least one Spot must be incerted.")
             elif Zone.objects.filter(park=Park.objects.get(id=self.kwargs['park']),
-                                     name=form.cleaned_data['name']).exists() and zone.name == form.instance.name:
+                                     name=form.cleaned_data['name']).exists() \
+                    and Zone.objects.get(id=self.kwargs['pk']).name != form.cleaned_data['name']:
                 errors = form.errors.setdefault("__all__", ErrorList())
                 errors.append("Name Zone already exists.")
             else:
@@ -571,7 +576,8 @@ class UpdateZone(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
                             filterSpot.update(is_archived=True)
                 return HttpResponseRedirect(parent.get_absolute_url())
 
-        return render(request, "zone/zone_update.html", {"form": form, "formset": formset, "zone": zone})
+        return render(request, "zone/zone_update.html", {"form": form, "formset": formset,
+                                                         "zone": Zone.objects.get(id=self.kwargs['pk'])})
 
 
 class ArchiveZone(LoginRequiredMixin, UserPassesTestMixin, TemplateView):

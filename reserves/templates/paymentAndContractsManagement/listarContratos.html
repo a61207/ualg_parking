@@ -16,12 +16,11 @@
         {% else %}
 
         <!-- Tabela de Reservas -->
-        <!-- Tabela de Reservas -->
         <table class="table table-light table-hover">
           <thead>
             <tr>
               <th scope="col">User</th>
-              <th scope="col">Payment Method</th>
+             <!-- <th scope="col">Payment Method</th>-->
               <th scope="col">Expiration Date</th>
               <th scope="col">Contract Value</th>
               <th scope="col">Start Date</th>
@@ -33,8 +32,9 @@
           <tbody>
           {% for contrato in contratos %}
             <tr>
-              <th scope="row"><a href="http://127.0.0.1:8000/modalidadepagamento/{{contrato.userid.id}}">{{ contrato.userid.username }}</a></th>
-              <td>{{ contrato.modalidadepagamentoid.nome }}</td>
+              <th scope="row">
+                  <a href="http://127.0.0.1:8000/modalidadepagamento/{{contrato.userid.id}}">{{ contrato.userid.username }}</a></th>
+             <!-- <td>{{ contrato.modalidadepagamentoid.nome }}</td>-->
               <td>{{ contrato.datavalidade }}</td>
               <td>{{ contrato.valorcontrato }}</td>
               <td>{{ contrato.datainicio }}</td>

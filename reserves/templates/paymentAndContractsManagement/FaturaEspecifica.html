@@ -11,9 +11,9 @@
         <div class="row rounded bg-light pt-3">
             <div class="col">
                 <div class="jumbotron border p-3 mb-3">
-                    <h1 class="text-center">Detalhes da fatura</h1>
+                    <h1 class="text-center">Consultar fatura</h1>
                     <hr>
-                    {% if not fatura %}
+                    {% if not faturas %}
                         <h4 class="text-center">Nenhuma fatura criada</h4>
                     {% else %}
 
@@ -23,24 +23,24 @@
                             <tr>
                                 <th scope="col">Início do Contrato</th>
                                 <th scope="col">Fim do Contrato</th>
-                                <th scope="col">Multa</th>
                                 <th scope="col">Emissão</th>
                                 <th scope="col">Método de pagamento</th>
                                 <th scope="col">Total</th>
                                 <th scope="col">Estado</th>
+                                <th scope="col">Anexos</th>
                                 <th></th>
                                 <th></th>
                             </tr>
                             </thead>
                             <tbody>
                             <tr>
-                                <td>{{ fatura.periocidadeid.start }}</td>
-                                <td>{{ fatura.periocidadeid.end }}</td>
-                                <td>{{ fatura.multa }}</td>
-                                <td>{{ fatura.emitidaem }}</td>
-                                <td>{{ fatura.contratoid.modalidadepagamentoid.nome }}</td>
-                                <td>{{ fatura.precores }} €</td>
-                                <td>{{ fatura.estadofaturaid.nome }}</td>
+                                <td>{{ faturas.periocidadeid.start }}</td>
+                                <td>{{ faturas.periocidadeid.end }}</td>
+                                <td>{{ faturas.emitidaem }}</td>
+                                <td>{{ faturas.contratoid.modalidadepagamentoid.nome }}</td>
+                                <td>{{ faturas.precores }} €</td>
+                                <td>{{ faturas.estadofaturaid.nome }}</td>
+                                <td>{{ faturas.comprovativopagamento }}</td>
                             </tr>
                             </tbody>
                         </table>
@@ -50,16 +50,25 @@
                     <div class="row justify-content-center text-center">
                         <!-- Botão de Criar -->
                         <div class="col ">
-                            <a class="btn btn-secondary" href="">Reclamar Fatura </a>
+                            <a class="btn btn-secondary" href="{% url 'fazer_reclamacao_especifica' reclamacao.id %}">Reclamar
+                                Fatura </a>
                         </div>
-                        {% if fatura.estadofaturaid.nome == "Aguardar comprovativo" %}
                         <div class="col ">
-                            <a class="btn btn-secondary" href="{% url 'comprovativo_pagamento' fatura.contratoid.id %}">Anexar Comprovativo</a>
+                            <a class="btn btn-secondary" href="{% url 'detalhes_fatura' faturas.id %}">Detalhes da
+                                Fatura </a>
                         </div>
+                        {% if estado %}
+                            <div class="col ">
+                                <a class="btn btn-secondary" href="{% url 'comprovativo_pagamento' faturas.id %}">Anexar
+                                    Comprovativo</a>
+                            </div>
                         {% endif %}
-                        <div class=" col ">
-                            <a class="btn btn-secondary" href="">Cancelar Fatura</a>
-                        </div>
+                        {% if estadofaturaid != 4 %}
+                            <div class=" col ">
+                                <a class="btn btn-secondary" href="{% url 'cancelar_fatura' faturas.id %}"
+                                   onclick="return confirm('Tem a certeza que deseja eliminar?')">Cancelar Fatura</a>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>

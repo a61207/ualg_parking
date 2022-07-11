@@ -1,32 +1,33 @@
-{% extends "baseContainer.html" %}
+{% extends "base.html" %}
 
 {% load static %}
 
-    {% block title %}
-        Emissão do Recibo
-    {% endblock %}
+{% block title %}
+    Comprovar Pagamento
+{% endblock %}
 
-    {% block containerTitle %}
-       Emitir Recibo
-    {% endblock %}
+{% block main %}
+    <div class="container my-4">
+        <div class="row rounded bg-light pt-3">
+            <div class="col">
+                <div class="jumbotron border p-3 mb-3">
+                    <h1 class="text-center">Comprovar Pagamentos</h1>
+                    <hr>
+                    <h3>Anexe o Comprovativo</h3>
 
-    {% block containerContent %}
-      <h3>
-          Quer Confirmar a Emissão deste Recibo? 
-      </h3>
-      <div class="row">
-          <div class="col-4">
-                    <!-- Botão de Criar -->
-        <div class="d-flex justify-content-center">
-          <a class="btn btn-secondary" href="#">Sim</a>
-      </div>
-      </div>
-      <div class="col-9">      
-            <!-- Botão de Criar -->
-            <div class="d-flex justify-content-center">
-                <a class="btn btn-secondary" href="#">Não</a>
+                    <div class="container my-4" style="text-align:center">
+                        <form enctype="multipart/form-data" name="complaint-form" accept-charset="utf-8" action=""
+                              method="POST">
+                            {{ form.as_p }}
+
+                            <button type="submit" class="btn btn-secondary">Confirmar</button>
+                        </form>
+                    </div>
+
+                    <hr>
+                </div>
             </div>
         </div>
     </div>
-        
-    {% endblock %}
+
+{% endblock %}

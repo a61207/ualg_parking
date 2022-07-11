@@ -1,32 +1,38 @@
-{% extends "baseContainer.html" %}
+{% extends "base.html" %}
 
 {% load static %}
 
-    {% block title %}
-        Emissão do Recibo
-    {% endblock %}
+{% block title %}
+    Cancelamento da Fatura
+{% endblock %}
 
-    {% block containerTitle %}
-       Emitir Recibo
-    {% endblock %}
-
-    {% block containerContent %}
-      <h3>
-          Quer Confirmar o cancelamento desta Fatura? 
-      </h3>
-      <div class="row">
-          <div class="col-4">
-                    <!-- Botão de Criar -->
-        <div class="d-flex justify-content-center">
-          <a class="btn btn-secondary" href="#">Sim</a>
-      </div>
-      </div>
-      <div class="col-9">      
-            <!-- Botão de Criar -->
-            <div class="d-flex justify-content-center">
-                <a class="btn btn-secondary" href="#">Não</a>
+{% block main %}
+    <div class="container my-4">
+        <div class="row rounded bg-light pt-3">
+            <div class="col">
+                <div class="jumbotron border p-3 mb-3">
+                    <h1 class="text-center">Cancelar Fatura</h1>
+                    <hr>
+                    <h3>
+                        Quer Confirmar o cancelamento desta Fatura?
+                    </h3>
+                    <div class="row">
+                        <div class="col-4">
+                            <!-- Botão de Criar -->
+                            <div class="d-flex justify-content-center">
+                                <a class="btn btn-secondary" href="#">Sim</a>
+                            </div>
+                        </div>
+                        <div class="col-9">
+                            <!-- Botão de Criar -->
+                            <div class="d-flex justify-content-center">
+                                <a class="btn btn-secondary" href="#">Não</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-        
-    {% endblock %}
+
+{% endblock %}

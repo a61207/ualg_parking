@@ -28,10 +28,10 @@
             <tbody>
             {% if reserva %}
               <tr>
-                <td>{{ reserva.matricula.matricula }}</td>
-                <td>{{ reserva.lugarid.zonaid.parqueid.nome }}</td>
-                <td>{{ reserva.lugarid.zonaid.nome }}</td>
-                <td>{{ reserva.lugarid.nome }}</td>
+                <td>{{ reserva.matricula }}</td>
+                <td>{{ reserva.lugarid.zone.park.name }}</td>
+                <td>{{ reserva.lugarid.zone.name }}</td>
+                <td>{{ reserva.lugarid.name }}</td>
                 <td>{{ reserva.periocidadeid.start }} - {{ reserva.periocidadeid.end }}</td>
                 <td>{{ entrada }}</td>
                 <td>{{ saida }}</td>

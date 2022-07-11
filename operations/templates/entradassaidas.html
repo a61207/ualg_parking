@@ -30,31 +30,27 @@
                 {% for dados in entradassaidas %}
               <tr>
                 <td>{{ dados.tipo.nome }}</td>
-                <td>{{ dados.matriculaviatura.matricula }}</td>
-                <td><a href="{% url 'visualizarParque' id=dados.lugarid.zonaid.parqueid.id %}">{{ dados.lugarid.zonaid.parqueid.nome }}</a></td>
-                <td><a href="{% url 'visualizarZona' id=dados.lugarid.zonaid.id %}">{{ dados.lugarid.zonaid.nome }}</a></td>
+                <td>{{ dados.matriculaviatura.registration }}</td>
+                <td>{{ dados.lugarid.zone.park.name }}</td>
+                <td>{{ dados.lugarid.zone.name }}</td>
                 <td><a href="{% url 'visualizarLugar' id=dados.lugarid.id %}">{{ dados.lugarid.nome }}</a></td>
-                {% if dados.periocidadeid.start and dados.lugarid.estadorecursoid.id == 1 and not dados.periocidadeid.end and dados.tipo.id != 7 %}
+                {% if dados.periocidadeid.start and dados.lugarid.get_state_id == 1 and not dados.periocidadeid.end and dados.tipo.id != 7 %}
                   <td style="color: blue;"><strong>{{ dados.periocidadeid.start }}</strong></td>
                 {% else %}
                   <td>{{ dados.periocidadeid.start }}</td>
                 {% endif %}
-                {% if dados.periocidadeid.start and dados.periocidadeid.end and dados.lugarid.estadorecursoid.id == 3 and dados.tipo.id != 7 %}
+                {% if dados.periocidadeid.start and dados.periocidadeid.end and dados.lugarid.get_state_id == 3 and dados.tipo.id != 7 %}
                   <td style="color: blue;"><strong>{{ dados.periocidadeid.end }}</strong></td>
                 {% else %}
                   <td>{{ dados.periocidadeid.end }}</td>
                 {% endif %}
-                {% if dados.periocidadeid.start and dados.lugarid.estadorecursoid.id == 1 and not dados.periocidadeid.end %}
+                {% if dados.periocidadeid.start and dados.lugarid.get_state_id == 1 and not dados.periocidadeid.end %}
                   <td><a class="btn btn-primary" href="{% url 'ocuparLugar' lugarid=dados.lugarid.id %}">Ocupar lugar</a></td>
-                {% elif dados.periocidadeid.start and dados.periocidadeid.end and dados.lugarid.estadorecursoid.id == 3 and not dados.tipo.id == 7 %}
+                {% elif dados.periocidadeid.start and dados.periocidadeid.end and dados.lugarid.get_state_id == 3 and not dados.tipo.id == 7 %}
                   <td><a class="btn btn-primary" href="{% url 'libertarLugar' id=dados.id lugarid=dados.lugarid.id  %}">Libertar lugar</a></td>
-                {% elif dados.periocidadeid.start and dados.lugarid.estadorecursoid.id == 3 and not dados.periocidadeid.end %}
+                {% elif dados.periocidadeid.start and dados.lugarid.get_state_id == 3 and not dados.periocidadeid.end %}
                   <td><a>Estacionado</a></td>
-                {% elif dados.periocidadeid.start and dados.periocidadeid.end and dados.lugarid.estadorecursoid.id == 1 %}
-                  <td><a>Concluído</a></td>
-                {% elif dados.tipo.id == 7 %}
-                  <td><a>Concluído</a></td>
-                {% elif dados.tipo.id == 6 %}
+                {% elif dados.periocidadeid.start and dados.periocidadeid.end and dados.lugarid.get_state_id == 1 %}
                   <td><a>Concluído</a></td>
                 <td></td>
                 {% endif %}

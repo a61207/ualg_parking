@@ -491,6 +491,14 @@ class ParkingSpot(models.Model):
         else:
             return "Free"
 
+    def get_state_id(self):
+        time = timezone.now()
+        if EntradasSaidas.objects.filter(lugarid=self.id, periocidadeid__start__lte=time,
+                                         periocidadeid__end__gte=time):
+            return 3
+        else:
+            return 1
+
     def get_reserves(self):
         return Reserva.objects.filter(lugarid=self.id)
 
@@ -502,14 +510,6 @@ class ParkingSpot(models.Model):
 
     def get_next_occupies(self):
         return EntradasSaidas.objects.filter(lugarid=self.id, periocidadeid__start__gte=timezone.now().date())
-
-
-class Estadorecurso(models.Model):
-    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-    nome = models.CharField(db_column='Nome', unique=True, max_length=15)  # Field name made lowercase.
-
-    class Meta:
-        db_table = 'EstadoRecurso'
 
 
 class Estadoreserva(models.Model):
@@ -547,9 +547,9 @@ class Contrato(models.Model):
                                               null=True)  # Field name made lowercase.
     valorcontrato = models.FloatField(db_column='ValorContrato', blank=True,
                                       null=True)  # Field name made lowercase.
-    datainicio = models.DateField(db_column='DataInicio')  # Field name made lowercase.
-    datafim = models.DateField(db_column='DataFim', blank=True,
-                               null=True)  # Field name made lowercase.
+    periocidadeid = models.ForeignKey(Periocidade, models.CASCADE,
+                                      db_column='PeriocidadeID', blank=True,
+                                      null=True)  # Field name made lowercase.
     matricula = models.ForeignKey(Car, models.CASCADE, db_column='matricula',
                                   null=True)  # Field name made lowercase.
     criadoem = models.DateTimeField(db_column='CriadoEm', default=timezone.now)  # Field name made lowercase.
@@ -565,11 +565,9 @@ class EntradasSaidas(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     periocidadeid = models.ForeignKey('Periocidade', models.CASCADE,
                                       db_column='PeriocidadeID')  # Field name made lowercase.
-    matriculaviatura = models.ForeignKey(Car, models.CASCADE,
-                                         db_column='MatriculaViatura')
+    matriculaviatura = models.CharField(db_column='MatriculaViatura', verbose_name='MatriculaViatura', max_length=8)
     lugarid = models.ForeignKey(ParkingSpot, models.CASCADE, db_column='LugarID')
-    tipo = models.ForeignKey(Estadorecurso, models.CASCADE,
-                             db_column='EstadoRecursoID')  # Field name made lowercase.
+    tipo = models.CharField(db_column='EstadoRecursoID', verbose_name='EstadoRecursoID', max_length=15)
     criadoem = models.DateTimeField(db_column='CriadoEm', default=timezone.now)  # Field name made lowercase.
     editadoem = models.DateTimeField(db_column='EditadoEm', default=timezone.now)  # Field name made lowercase.
 
@@ -579,7 +577,6 @@ class EntradasSaidas(models.Model):
 
 class Reserva(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-    parqueid = models.ForeignKey(Park, models.DO_NOTHING, db_column='ParqueID', blank=True, null=True)
     contratoid = models.ForeignKey(Contrato, models.CASCADE, db_column='ContratoID', blank=True,
                                    null=True)  # Field name made lowercase.
     userid = models.ForeignKey(Client, models.CASCADE,
@@ -648,7 +645,7 @@ class Reclamacao(models.Model):
 
 class Visit(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-    matricula = models.ForeignKey(Car, models.DO_NOTHING, db_column='matricula')  # Field name made lowercase.
+    matriculaviatura = models.CharField(db_column='matricula', verbose_name='matricula', max_length=8)
     lugarid = models.ForeignKey(ParkingSpot, models.DO_NOTHING, db_column='LugarID')  # Field name made lowercase.
     preco = models.FloatField(db_column='Preco', blank=True, null=True)
     periocidadeid = models.ForeignKey(Periocidade, models.DO_NOTHING,

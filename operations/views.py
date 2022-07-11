@@ -39,7 +39,7 @@ def entrar_parque(request):
             reservasArr = []
             contratosArr = []
             reservas = Reserva.objects.filter(matricula=carro.first())
-            contratos = Contrato.objects.filter(matricula=carro)
+            contratos = Contrato.objects.filter(matricula=carro.first())
             new_entrada = datetime.strptime(entrada, "%Y-%m-%dT%H:%M")
             timeEntrada = int(new_entrada.timestamp()) + 3600
             reservasEncontradas = False
@@ -57,11 +57,11 @@ def entrar_parque(request):
                         reservasArr.append(reserva)
             for contrato in contratos:
                 lugar = contrato.lugarid
-                start = contrato.datainicio
+                start = contrato.periocidadeid.start
                 start2 = datetime.combine(start, datetime.min.time())
                 timeStart = int(start2.timestamp())
                 if timeEntrada >= timeStart:
-                    end = contrato.datavalidade
+                    end = contrato.periocidadeid.end
                     end2 = datetime.combine(end, datetime.min.time())
                     timeEnd = int(end2.timestamp())
                     if timeEntrada <= timeEnd:
@@ -105,11 +105,11 @@ def sair_parque(request):
                     reservasEncontradas = True
                     reservasArr.append(reserva)
             for contrato in contratos:
-                start = contrato.datainicio
+                start = contrato.periocidadeid.start
                 start2 = datetime.combine(start, datetime.min.time())
                 timeStart = int(start2.timestamp())
                 if timeSaida >= timeStart:
-                    end = contrato.datavalidade
+                    end = contrato.periocidadeid.end           
                     end2 = datetime.combine(end, datetime.min.time())
                     timeEnd = int(end2.timestamp())
                     contratosEncontrados = True
@@ -137,7 +137,7 @@ def registar_entrada_res(request, id, entrada):
     reserva = Reserva.objects.get(id=id)
     lugar = reserva.lugarid
     entsaid = EntradasSaidas(matriculaviatura=reserva.matricula, periocidadeid=periodo, lugarid=lugar)
-    tipoRes = Estadorecurso.objects.get(id=4)
+    tipoRes = "Reserva"
     entsaid.tipo = tipoRes
     entsaid.save()
     reserva.entradassaidasid = entsaid
@@ -153,7 +153,7 @@ def registar_entrada_con(request, id, entrada):
     contrato = Contrato.objects.get(id=id)
     lugar = contrato.lugarid
     entsaid = EntradasSaidas(matriculaviatura=contrato.matricula, periocidadeid=periodo, lugarid=lugar)
-    tipoCon = Estadorecurso.objects.get(id=5)
+    tipoCon = "Contrato"
     entsaid.tipo = tipoCon
     entsaid.save()
     contrato.entradassaidasid = entsaid
@@ -200,9 +200,6 @@ def libertar_lugar(request, id, lugarid):
     lugar.estadorecursoid = libertado
     lugar.save()
     entsaid = EntradasSaidas.objects.get(id=id)
-    tipoNew = Estadorecurso.objects.get(id=7)
-    entsaid.tipo = tipoNew
-    entsaid.save()
     idlugar = lugar.id
     return redirect(entradassaidas)
 
@@ -225,8 +222,8 @@ def associar_lugar(request, id):
             lugar.estadorecursoid = ocupado
             lugar.save()
             entsaid1 = EntradasSaidas(matriculaviatura=carro.first(), periocidadeid=final_entrada, lugarid=lugar)
-            tipoRes = Estadorecurso.objects.get(id=6)
-            entsaid1.tipo = tipoRes
+            tipoMan = "Manual"
+            entsaid1.tipo = tipoMan
             entsaid1.save()
             return redirect(visualizar_lugar, id=id)
     return render(request, "associar.html", context)

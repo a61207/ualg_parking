@@ -13,6 +13,11 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'list_parks' %}">Parks</a>
                     </li>
+                    {% if not request.user|is_client %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'portaria' %}">Entrance</a>
+                    </li>
+                    {% endif %}
 
                     {% if request.user|is_admin %}
                         <li class="nav-item">

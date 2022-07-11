@@ -64,13 +64,13 @@
                 {% if reserva.entradassaidasid.periocidadeid.start and not reserva.entradassaidasid.periocidadeid.end %}
                 <tr>  
                   <td>Reserva</td>
-                  <td>{{ reserva.matricula.matricula }}</td>
+                  <td>{{ reserva.matricula }}</td>
                   <td>{{ reserva.entradassaidasid.periocidadeid.start }}</td>
                   <td style="color: blue;"><strong>{{ saida2 }}</strong></td>
                   <td>{{ reserva.periocidadeid.start }} - {{ reserva.periocidadeid.end }}</td>
-                  <td>{{ reserva.lugarid.zonaid.parqueid.nome }}</td>
-                  <td>{{ reserva.lugarid.zonaid.nome }}</td>
-                  <td>{{ reserva.lugarid.nome }}</td>
+                  <td>{{ reserva.lugarid.zone.park.name }}</td>
+                  <td>{{ reserva.lugarid.zone.name }}</td>
+                  <td>{{ reserva.lugarid.number }}</td>
                   <td><a class="btn btn-primary" href="{% url 'pagamento' id=reserva.id %}">Efetuar pagamento</a></td>
                 </tr>
                 {% endif %}
@@ -79,13 +79,13 @@
                 {% if contrato.entradassaidasid.periocidadeid.start and not contrato.entradassaidasid.periocidadeid.end %}
                 <tr>  
                   <td>Contrato</td>
-                  <td>{{ contrato.matricula.matricula }}</td>
+                  <td>{{ contrato.matricula.registration}}</td>
                   <td>{{ contrato.entradassaidasid.periocidadeid.start }}</td>
                   <td style="color: blue;"><strong>{{ saida2 }}</strong></td>
-                  <td>{{ contrato.datainicio }} - {{ contrato.datavalidade }}</td>
-                  <td>{{ contrato.lugarid.zonaid.parqueid.nome }}</td>
-                  <td>{{ contrato.lugarid.zonaid.nome }}</td>
-                  <td>{{ contrato.lugarid.nome }}</td>
+                  <td>{{ contrato.periocidadeid.start }} - {{ contrato.periocidadeid.end }}</td>
+                  <td>{{ contrato.lugarid.zone.park.name }}</td>
+                                    <td>{{ contrato.lugarid.zone.name }}</td>
+                                    <td>{{ contrato.lugarid.number }}</td>
                   <td><a class="btn btn-primary" href="{% url 'registarSaidaContrato' id=contrato.id saida=saida %}">Registar saída</a></td>
                 </tr>
                 {% endif %}

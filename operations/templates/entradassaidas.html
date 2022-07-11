@@ -36,12 +36,12 @@
                                     <td>
                                         <a href="{% url 'visualizarLugar' dados.lugarid.zone.park.id dados.lugarid.zone.id dados.lugarid.id %}">{{ dados.lugarid.number }}</a>
                                     </td>
-                                    {% if dados.periocidadeid.start and dados.lugarid.get_state_id == 1 and not dados.periocidadeid.end and dados.tipo.id != 7 %}
+                                    {% if dados.periocidadeid.start and not dados.in_spot and not dados.periocidadeid.end and dados.tipo.id != 7 %}
                                         <td style="color: blue;"><strong>{{ dados.periocidadeid.start }}</strong></td>
                                     {% else %}
                                         <td>{{ dados.periocidadeid.start }}</td>
                                     {% endif %}
-                                    {% if dados.periocidadeid.start and dados.periocidadeid.end and dados.lugarid.get_state_id == 3 and dados.tipo.id != 7 %}
+                                    {% if dados.periocidadeid.start and dados.periocidadeid.end and dados.in_spot and dados.tipo.id != 7 %}
                                         <td style="color: blue;"><strong>{{ dados.periocidadeid.end }}</strong></td>
                                     {% else %}
                                         <td>{{ dados.periocidadeid.end }}</td>
@@ -74,4 +74,8 @@
                         <p><a class="btn btn-success" href="{% url "entrarParque" %}">Entrar no Parque</a></p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<p>
                         <a class="btn btn-danger" href="{% url "sairParque" %}">Sair do Parque</a></p>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

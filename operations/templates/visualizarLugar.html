@@ -3,13 +3,15 @@
 {% block title %}
     Visualizar lugar
 {% endblock %}
-{% block main %}
+                    {% block main %}
+
     <div class="container my-4">
         <div class="row rounded bg-light pt-3">
             <div class="col">
                 <div class="jumbotron border p-3 mb-3">
-                    <h1 class="text-center">Visualizar lugar <b>{{ lugar.nome }}</b></h1>
+                    <h1 class="text-center">Visualizar lugar <b>{{ lugar.nome }}</h1>
                     <hr>
+
                     <!-- Div de Info da zona -->
                     <div class="p-3 mb-2 bg-light text-dark">
                         <div class="row">
@@ -63,30 +65,21 @@
                                 <thead>
                                 <tr>
                                     <th scope="col">Matrícula</th>
-                                    <th scope="col">País</th>
-                                    <th scope="col">Modelo</th>
-                                    <th scope="col">Cor</th>
-                                    <th scope="col">Início</th>
+                                    <th scope="col">Ocupação</th>
                                     <th scope="col"></th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 {% if entsaid and reservas %}
                                     <tr>
-                                        <td>{{ entsaid.matriculaviatura.matricula }}</td>
-                                        <td>{{ entsaid.matriculaviatura.pais }}</td>
-                                        <td>{{ entsaid.matriculaviatura.modelo }}</td>
-                                        <td>{{ entsaid.matriculaviatura.cor }}</td>
+                                        <td>{{ entsaid.matriculaviatura }}</td>
                                         <td>{{ entsaid.periocidadeid.start }}</td>
                                         <td></td>
                                     </tr>
                                 {% endif %}
                                 {% if visitas %}
                                     <tr>
-                                        <td>{{ visitas.matricula.matricula }}</td>
-                                        <td>{{ visitas.matricula.pais }}</td>
-                                        <td>{{ visitas.matricula.modelo }}</td>
-                                        <td>{{ visitas.matricula.cor }}</td>
+                                        <td>{{ visitas.matricula }}</td>
                                         <td>{{ visitas.periocidadeid.start }}</td>
                                         <td><a class="btn btn-primary" href="{% url 'desassociarLugar' id=lugar.id %}">Desassociar
                                             viatura</a></td>

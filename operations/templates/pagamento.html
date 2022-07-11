@@ -1,12 +1,16 @@
-{% extends "baseContainer.html" %}
+{% extends "base.html" %}
 {% load static %}
     {% block title %}
         Pagamento
     {% endblock %}
-    {% block containerTitle %}
-        Pagamento
-    {% endblock %}
-    {% block containerContent %}
+{% block main %}
+
+    <div class="container my-4">
+        <div class="row rounded bg-light pt-3">
+            <div class="col">
+                <div class="jumbotron border p-3 mb-3">
+                    <h1 class="text-center">Pagamento</h1>
+                    <hr>
         <!-- Pagamento -->
         <br>
         <table class="table table-light table-hover">
@@ -24,10 +28,10 @@
             <tbody>
             {% if reserva %}
               <tr>
-                <td>{{ reserva.matricula.matricula }}</td>
-                <td>{{ reserva.lugarid.zonaid.parqueid.nome }}</td>
-                <td>{{ reserva.lugarid.zonaid.nome }}</td>
-                <td>{{ reserva.lugarid.nome }}</td>
+                <td>{{ reserva.matricula }}</td>
+                <td>{{ reserva.lugarid.zone.park.name }}</td>
+                <td>{{ reserva.lugarid.zone.name }}</td>
+                <td>{{ reserva.lugarid.name }}</td>
                 <td>{{ reserva.periocidadeid.start }} - {{ reserva.periocidadeid.end }}</td>
                 <td>{{ entrada }}</td>
                 <td>{{ saida }}</td>

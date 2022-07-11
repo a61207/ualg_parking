@@ -40,11 +40,6 @@
                     </form>
                     <br>
                     <br>
-                    <div class="container my-4">
-                        <div class="alert alert-{{ type }}" role="alert">
-                            <h4 class="alert-heading text-center">{{ message }}</h4>
-                        </div>
-                    </div>
                     <br>
                     <!-- Reserva encontrada -->
                     {% if reservas or contratos %}
@@ -67,11 +62,11 @@
                             {% for reserva in reservas %}
                                 <tr>
                                     <td>Reserva</td>
-                                    <td>{{ reserva.matricula.matricula }}</td>
+                                    <td>{{ reserva.matricula }}</td>
                                     <td>{{ reserva.periocidadeid.start }} - {{ reserva.periocidadeid.end }}</td>
-                                    <td>{{ reserva.lugarid.zonaid.parqueid.nome }}</td>
-                                    <td>{{ reserva.lugarid.zonaid.nome }}</td>
-                                    <td>{{ reserva.lugarid.nome }}</td>
+                                    <td>{{ reserva.lugarid.zone.park.name }}</td>
+                                    <td>{{ reserva.lugarid.zone.name }}</td>
+                                    <td>{{ reserva.lugarid.number }}</td>
                                     <td><a class="btn btn-primary"
                                            href="{% url 'registarEntradaReserva' id=reserva.id entrada=entrada %}">Registar
                                         entrada</a></td>
@@ -80,11 +75,11 @@
                             {% for contrato in contratos %}
                                 <tr>
                                     <td>Contrato</td>
-                                    <td>{{ contrato.matricula.matricula }}</td>
-                                    <td>{{ contrato.datainicio }} - {{ contrato.datavalidade }}</td>
-                                    <td>{{ contrato.lugarid.zonaid.parqueid.nome }}</td>
-                                    <td>{{ contrato.lugarid.zonaid.nome }}</td>
-                                    <td>{{ contrato.lugarid.nome }}</td>
+                                    <td>{{ contrato.matricula.registration }}</td>
+                                    <td>{{ contrato.periocidadeid.start }} - {{ contrato.periocidadeid.end }}</td>
+                                    <td>{{ contrato.lugarid.zone.park.name }}</td>
+                                    <td>{{ contrato.lugarid.zone.name }}</td>
+                                    <td>{{ contrato.lugarid.number }}</td>
                                     <td><a class="btn btn-primary"
                                            href="{% url 'registarEntradaContrato' id=contrato.id entrada=entrada %}">Registar
                                         entrada</a></td>

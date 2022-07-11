@@ -2,7 +2,6 @@ from django.contrib.auth.decorators import permission_required
 from django.http import FileResponse
 from django.shortcuts import render, redirect
 from datetime import datetime
-from django.contrib import messages
 
 from .forms import EntrarForm, SairForm
 from main.models import *
@@ -29,8 +28,7 @@ def entradassaidas(request):
 @permission_required('main.entrar_parque')
 def entrar_parque(request):
     form = EntrarForm()
-    message = ""
-    context = {"form": form, "message": message}
+    context = {"form": form}
     if request.method == 'POST':
         matricula = request.POST['matricula']
         entrada = request.POST['entrada']
@@ -41,7 +39,7 @@ def entrar_parque(request):
             reservasArr = []
             contratosArr = []
             reservas = Reserva.objects.filter(matricula=carro.first())
-            contratos = Contrato.objects.filter(matricula=carro)
+            contratos = Contrato.objects.filter(matricula=carro.first())
             new_entrada = datetime.strptime(entrada, "%Y-%m-%dT%H:%M")
             timeEntrada = int(new_entrada.timestamp()) + 3600
             reservasEncontradas = False
@@ -59,26 +57,23 @@ def entrar_parque(request):
                         reservasArr.append(reserva)
             for contrato in contratos:
                 lugar = contrato.lugarid
-                start = contrato.datainicio
+                start = contrato.periocidadeid.start
                 start2 = datetime.combine(start, datetime.min.time())
                 timeStart = int(start2.timestamp())
                 if timeEntrada >= timeStart:
-                    end = contrato.datavalidade
+                    end = contrato.periocidadeid.end
                     end2 = datetime.combine(end, datetime.min.time())
                     timeEnd = int(end2.timestamp())
                     if timeEntrada <= timeEnd:
                         contratosEncontrados = True
                         contratosArr.append(contrato)
             if reservasEncontradas or contratosEncontrados:
-                messages.success(request, "Foram encontradas entradas com os dados especificados")
-                context = {"form": form, "message": message, "reservas": reservasArr, "contratos": contratosArr,
+                context = {"form": form, "reservas": reservasArr, "contratos": contratosArr,
                            "entrada": timeEntrada}
             else:
-                messages.error(request, "Não foram encontradas quaisquer entradas com os dados especificados")
-                context = {"form": form, "message": message, "check": True}
+                context = {"form": form, "check": True}
         else:
-            messages.error(request, "Não foram encontradas quaisquer entradas com a matrícula especificada")
-            context = {"form": form, "message": message, "check": True}
+            context = {"form": form, "check": True}
         render(request, "entrarParque.html", context)
     return render(request, "entrarParque.html", context)
 
@@ -86,8 +81,7 @@ def entrar_parque(request):
 @permission_required('main.sair_parque')
 def sair_parque(request):
     form = SairForm()
-    message = ""
-    context = {"form": form, "message": message}
+    context = {"form": form}
     if request.method == 'POST':
         matricula = request.POST['matricula']
         saida = request.POST['saida']
@@ -111,11 +105,11 @@ def sair_parque(request):
                     reservasEncontradas = True
                     reservasArr.append(reserva)
             for contrato in contratos:
-                start = contrato.datainicio
+                start = contrato.periocidadeid.start
                 start2 = datetime.combine(start, datetime.min.time())
                 timeStart = int(start2.timestamp())
                 if timeSaida >= timeStart:
-                    end = contrato.datavalidade
+                    end = contrato.periocidadeid.end
                     end2 = datetime.combine(end, datetime.min.time())
                     timeEnd = int(end2.timestamp())
                     contratosEncontrados = True
@@ -123,15 +117,12 @@ def sair_parque(request):
             new_saida2 = int(new_saida.timestamp())
             request.session['this_saida'] = new_saida2
             if reservasEncontradas or contratosEncontrados:
-                messages.success(request, "Foram encontradas ocupações com os dados especificados")
-                context = {"form": form, "message": message, "reservas": reservasArr, "contratos": contratosArr,
+                context = {"form": form, "reservas": reservasArr, "contratos": contratosArr,
                            "saida": timeSaida, "saida2": new_saida}
             else:
-                messages.error(request, "Não existem quaisquer ocupações com os dados especificados")
-                context = {"form": form, "message": message, "check": True}
+                context = {"form": form, "check": True}
         else:
-            messages.error(request, "Não existem quaisquer ocupações com a matrícula especificada")
-            context = {"form": form, "message": message, "check": True}
+            context = {"form": form, "check": True}
         render(request, "sairParque.html", context)
     return render(request, "sairParque.html", context)
 
@@ -146,7 +137,7 @@ def registar_entrada_res(request, id, entrada):
     reserva = Reserva.objects.get(id=id)
     lugar = reserva.lugarid
     entsaid = EntradasSaidas(matriculaviatura=reserva.matricula, periocidadeid=periodo, lugarid=lugar)
-    tipoRes = Estadorecurso.objects.get(id=4)
+    tipoRes = "Reserva"
     entsaid.tipo = tipoRes
     entsaid.save()
     reserva.entradassaidasid = entsaid
@@ -162,7 +153,7 @@ def registar_entrada_con(request, id, entrada):
     contrato = Contrato.objects.get(id=id)
     lugar = contrato.lugarid
     entsaid = EntradasSaidas(matriculaviatura=contrato.matricula, periocidadeid=periodo, lugarid=lugar)
-    tipoCon = Estadorecurso.objects.get(id=5)
+    tipoCon = "Contrato"
     entsaid.tipo = tipoCon
     entsaid.save()
     contrato.entradassaidasid = entsaid
@@ -193,34 +184,21 @@ def registar_saida_con(request, id, saida):
 
 
 @permission_required('main.ocupar_lugar')
-def ocupar_lugar(request, lugarid):
-    lugar = ParkingSpot.objects.get(id=lugarid)
-    ocupado = Estadorecurso.objects.get(id=3)
-    lugar.estadorecursoid = ocupado
-    lugar.save()
-    idlugar = lugar.id
+def ocupar_lugar(request, id):
+    EntradasSaidas.objects.filter(id=id).update(in_spot=True)
     return redirect(entradassaidas)
 
 
 @permission_required('main.libertar_lugar')
 def libertar_lugar(request, id, lugarid):
-    lugar = ParkingSpot.objects.get(id=lugarid)
-    libertado = Estadorecurso.objects.get(id=1)
-    lugar.estadorecursoid = libertado
-    lugar.save()
-    entsaid = EntradasSaidas.objects.get(id=id)
-    tipoNew = Estadorecurso.objects.get(id=7)
-    entsaid.tipo = tipoNew
-    entsaid.save()
-    idlugar = lugar.id
+    EntradasSaidas.objects.filter(id=id).update(in_spot=False)
     return redirect(entradassaidas)
 
 
 @permission_required('main.associar_lugar')
 def associar_lugar(request, id):
-    message = ""
     lugar = ParkingSpot.objects.get(id=id)
-    context = {"message": message, "lugar": lugar}
+    context = {"lugar": lugar}
     if request.method == 'POST':
         matricula = request.POST['matricula']
         entrada = request.POST['entrada']
@@ -235,8 +213,8 @@ def associar_lugar(request, id):
             lugar.estadorecursoid = ocupado
             lugar.save()
             entsaid1 = EntradasSaidas(matriculaviatura=carro.first(), periocidadeid=final_entrada, lugarid=lugar)
-            tipoRes = Estadorecurso.objects.get(id=6)
-            entsaid1.tipo = tipoRes
+            tipoMan = "Manual"
+            entsaid1.tipo = tipoMan
             entsaid1.save()
             return redirect(visualizar_lugar, id=id)
     return render(request, "associar.html", context)
@@ -262,9 +240,8 @@ def listar_lugares(request):
 
 @permission_required('main.desassociar_lugar')
 def desassociar_lugar(request, id):
-    message = ""
     lugar = ParkingSpot.objects.get(id=id)
-    context = {"message": message, "lugar": lugar}
+    context = {"lugar": lugar}
     if request.method == 'POST':
         saida = request.POST['saida']
         visita = Visit.objects.filter(lugarid=lugar).order_by('-criadoem').first()
@@ -281,7 +258,6 @@ def desassociar_lugar(request, id):
 
 @permission_required('main.pagamento')
 def pagamento(request, id):
-    message = ""
     reserva = Reserva.objects.get(id=id)
     validadeReserva = reserva.periocidadeid.end
     new_entrada2 = request.session.get('this_entrada')

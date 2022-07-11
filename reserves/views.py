@@ -163,7 +163,7 @@ def estender_contrato(request, id):
             dataI = request.POST['datainicio']
             dataF = request.POST['datafim']
             period = Periocidade.objects.create(start=dataI, end=dataF)
-            Contrato.objects.filter(id=id).update(userid=request.user, periocidadeid=period)
+            Contrato.objects.filter(id=id).update(userid=client, periocidadeid=period)
             messages.add_message(request, messages.SUCCESS, "Contrato in park extended")
             return HttpResponseRedirect(reverse('listarContratos'))
         return render(request, 'contratos/estenderContrato.html', {'id': id, 'start': start, 'end': end})

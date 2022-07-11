@@ -41,7 +41,13 @@
                         {% for row in object.spots %}
                             {% if request.user|is_admin or not row.is_archived %}
                                 <tr>
-                                    <th scope="row" class="align-middle">{{ row.number }}</th>
+                                    <th scope="row" class="align-middle">
+                                        {% if not request.user|is_client %}
+                                            <a href="{% url 'visualizarLugar' row.zone.park.id row.zone.id row.id %}">{{ row.number }}</a>
+                                        {% else %}
+                                            {{ row.number }}
+                                        {% endif %}
+                                    </th>
                                     {% if not row.is_archived %}
                                         <td class="align-middle">{{ row.get_state_now }}</td>
                                     {% else %}
@@ -51,7 +57,8 @@
                                         {% if row.get_state_now != "Reserved" and row.get_state_now != "Occupied" %}
                                             {% if request.user|is_admin %}
                                                 {% if not row.is_archived and not row.get_next_occupies and not row.get_next_reserves %}
-                                                    <a class="btn btn-danger btn-sm mt-1" href="{% url 'archive_spot' object.park.id object.id row.id %}">Archive</a>
+                                                    <a class="btn btn-danger btn-sm mt-1"
+                                                       href="{% url 'archive_spot' object.park.id object.id row.id %}">Archive</a>
                                                 {% endif %}
                                             {% elif row.zone.is_open and request.user|is_client %}
                                                 <a class="btn btn-secondary btn-sm mt-1"

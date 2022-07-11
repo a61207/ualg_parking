@@ -56,7 +56,7 @@
                                             lugar</a></td>
                                     {% elif dados.periocidadeid.start and dados.in_spot and not dados.periocidadeid.end %}
                                         <td><a>Estacionado</a></td>
-                                    {% elif dados.periocidadeid.start and dados.periocidadeid.end and dados.in_spot %}
+                                    {% elif dados.periocidadeid.start and dados.periocidadeid.end and not dados.in_spot %}
                                         <td><a>Concluído</a></td>
                                         <td></td>
                                     {% endif %}

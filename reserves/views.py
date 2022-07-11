@@ -37,7 +37,7 @@ def criar_reserva(request, id):
 
 
 def listar_reservas(request):
-    reservas = Reserva.objects.filter(userid=Client.objects.get(user=request.user))
+    reservas = Reserva.objects.filter(userid=Client.objects.get(user=request.user)).order_by('-editadoem')
     return render(request, 'listarReservas.html', {'reservas': reservas})
 
 

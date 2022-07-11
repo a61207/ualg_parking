@@ -468,9 +468,9 @@ class ParkingSpot(models.Model):
 
     def get_state(self, start, end):
         if EntradasSaidas.objects.filter(lugarid=self.id, periocidadeid__start__gte=start,
-                                         periocidadeid__end__gte=start) and \
+                                         periocidadeid__end__gte=start, in_spot=True) and \
                 EntradasSaidas.objects.filter(lugarid=self.id, periocidadeid__start__lte=end,
-                                              periocidadeid__end__lte=end):
+                                              periocidadeid__end__lte=end, in_spot=True):
             return ParkingSpot.OCCUPIED
         elif Reserva.objects.filter(lugarid=self.id, periocidadeid__start__gte=start,
                                     periocidadeid__end__gte=start) and \
@@ -483,7 +483,7 @@ class ParkingSpot(models.Model):
     def get_state_now(self):
         time = timezone.now()
         if EntradasSaidas.objects.filter(lugarid=self.id, periocidadeid__start__lte=time,
-                                         periocidadeid__end__gte=time):
+                                         periocidadeid__end__gte=time, in_spot=True):
             return "Occupied"
         elif Reserva.objects.filter(lugarid=self.id, periocidadeid__start__lte=time,
                                     periocidadeid__end__gte=time):
@@ -494,7 +494,7 @@ class ParkingSpot(models.Model):
     def get_state_id(self):
         time = timezone.now()
         if EntradasSaidas.objects.filter(lugarid=self.id, periocidadeid__start__lte=time,
-                                         periocidadeid__end__gte=time):
+                                         periocidadeid__end__gte=time, in_spot=True):
             return 3
         else:
             return 1
@@ -537,6 +537,21 @@ class Periocidade(models.Model):
         db_table = 'Periocidade'
 
 
+class EntradasSaidas(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    periocidadeid = models.ForeignKey(Periocidade, models.CASCADE,
+                                      db_column='PeriocidadeID')  # Field name made lowercase.
+    matriculaviatura = models.CharField(db_column='MatriculaViatura', verbose_name='MatriculaViatura', max_length=8)
+    lugarid = models.ForeignKey(ParkingSpot, models.CASCADE, db_column='LugarID')
+    in_spot = models.BooleanField(verbose_name='In Spot', db_column='In Spot', default=False)
+    tipo = models.CharField(db_column='EstadoRecursoID', verbose_name='EstadoRecursoID', max_length=15)
+    criadoem = models.DateTimeField(db_column='CriadoEm', default=timezone.now)  # Field name made lowercase.
+    editadoem = models.DateTimeField(db_column='EditadoEm', default=timezone.now)  # Field name made lowercase.
+
+    class Meta:
+        db_table = 'Entradas/Saidas'
+
+
 class Contrato(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     userid = models.ForeignKey(Client, models.CASCADE,
@@ -556,24 +571,11 @@ class Contrato(models.Model):
     editadoem = models.DateTimeField(db_column='EditadoEm', default=timezone.now)  # Field name made lowercase.
     estadoreservaid = models.ForeignKey(Estadoreserva, models.DO_NOTHING,
                                         db_column='EstadoReservaID', default=1)
+    entradassaidasid = models.ForeignKey(EntradasSaidas, models.CASCADE, db_column='entradassaidasID', blank=True,
+                                         null=True)
 
     class Meta:
         db_table = 'Contrato'
-
-
-class EntradasSaidas(models.Model):
-    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-    periocidadeid = models.ForeignKey(Periocidade, models.CASCADE,
-                                      db_column='PeriocidadeID')  # Field name made lowercase.
-    matriculaviatura = models.CharField(db_column='MatriculaViatura', verbose_name='MatriculaViatura', max_length=8)
-    lugarid = models.ForeignKey(ParkingSpot, models.CASCADE, db_column='LugarID')
-    in_spot = models.BooleanField(verbose_name='In Spot', db_column='In Spot', default=False)
-    tipo = models.CharField(db_column='EstadoRecursoID', verbose_name='EstadoRecursoID', max_length=15)
-    criadoem = models.DateTimeField(db_column='CriadoEm', default=timezone.now)  # Field name made lowercase.
-    editadoem = models.DateTimeField(db_column='EditadoEm', default=timezone.now)  # Field name made lowercase.
-
-    class Meta:
-        db_table = 'Entradas/Saidas'
 
 
 class Reserva(models.Model):

@@ -37,7 +37,7 @@ def criar_reserva(request, id):
 
 
 def listar_reservas(request):
-    reservas = Reserva.objects.filter(userid=Client.objects.get(user=request.user))
+    reservas = Reserva.objects.filter(userid=Client.objects.get(user=request.user)).order_by('-editadoem')
     return render(request, 'listarReservas.html', {'reservas': reservas})
 
 
@@ -63,7 +63,7 @@ def editar_reserva(request, id):
             lugar = ParkingSpot.objects.get(id=id)
 
             Reserva.objects.filter(id=id).update(userid=client, lugarid=lugar, parqueid=lugar.zone.park,
-                                                 periocidadeid=period, matricula=matricula)
+                                                 periocidadeid=period, matricula=matricula).order_by('-editadoem')
             messages.add_message(request, messages.SUCCESS, "Reserva in park '" + parque + "' updated")
             return HttpResponseRedirect(reverse('listarReservas'))
         return render(request, 'reservas/editarReserva.html',
@@ -163,7 +163,7 @@ def estender_contrato(request, id):
             dataI = request.POST['datainicio']
             dataF = request.POST['datafim']
             period = Periocidade.objects.create(start=dataI, end=dataF)
-            Contrato.objects.filter(id=id).update(userid=request.user, periocidadeid=period)
+            Contrato.objects.filter(id=id).update(userid=client, periocidadeid=period)
             messages.add_message(request, messages.SUCCESS, "Contrato in park extended")
             return HttpResponseRedirect(reverse('listarContratos'))
         return render(request, 'contratos/estenderContrato.html', {'id': id, 'start': start, 'end': end})

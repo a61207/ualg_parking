@@ -209,7 +209,7 @@ def associar_lugar(request, id):
             final_entrada.save()
             new_visit = Visit(lugarid=lugar, matricula=carro.first(), periocidadeid=final_entrada)
             new_visit.save()
-            entsaid1 = EntradasSaidas(matriculaviatura=carro.first(), periocidadeid=final_entrada, lugarid=lugar)
+            entsaid1 = EntradasSaidas(matriculaviatura=carro.first(), periocidadeid=final_entrada, lugarid=lugar, in_spot=True)
             tipoMan = "Manual"
             entsaid1.tipo = tipoMan
             entsaid1.save()

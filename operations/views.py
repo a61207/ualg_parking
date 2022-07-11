@@ -246,7 +246,8 @@ def desassociar_lugar(request, id):
         new_saida = datetime.strptime(saida, "%Y-%m-%dT%H:%M")
         periocidade.end = new_saida
         periocidade.save()
-        lugar.save()
+        entradasaida = request.session.get('this_entradasaida')
+        EntradasSaidas.objects.filter(id=entradasaida).update(in_spot=False)
         return redirect(visualizar_lugar, id=id)
     return render(request, "desassociar.html", context)
 

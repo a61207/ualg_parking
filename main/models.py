@@ -580,6 +580,7 @@ class Reserva(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     contratoid = models.ForeignKey(Contrato, models.CASCADE, db_column='ContratoID', blank=True,
                                    null=True)  # Field name made lowercase.
+    parqueid = models.ForeignKey(Park, models.DO_NOTHING, db_column='ParqueID', blank=True, null=True)
     userid = models.ForeignKey(Client, models.CASCADE,
                                db_column='UserID')  # Field name made lowercase.
     matricula = models.CharField(db_column='Matricula', verbose_name='Matricula', max_length=8)

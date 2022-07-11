@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% load static %}
-    {% block title %}
-        Pagamento
-    {% endblock %}
+{% block title %}
+    Pagamento
+{% endblock %}
 {% block main %}
 
     <div class="container my-4">
@@ -11,53 +11,57 @@
                 <div class="jumbotron border p-3 mb-3">
                     <h1 class="text-center">Pagamento</h1>
                     <hr>
-        <!-- Pagamento -->
-        <br>
-        <table class="table table-light table-hover">
-            <thead>
-              <tr>
-                <th scope="col">Matrícula</th>
-                <th scope="col">Parque</th>
-                <th scope="col">Zona</th>
-                <th scope="col">Lugar</th>
-                <th scope="col">Validade</th>
-                <th scope="col">Entrada</th>
-                <th scope="col">Saída</th>
-              </tr>
-            </thead>
-            <tbody>
-            {% if reserva %}
-              <tr>
-                <td>{{ reserva.matricula }}</td>
-                <td>{{ reserva.lugarid.zone.park.name }}</td>
-                <td>{{ reserva.lugarid.zone.name }}</td>
-                <td>{{ reserva.lugarid.number }}</td>
-                <td>{{ reserva.periocidadeid.start }} - {{ reserva.periocidadeid.end }}</td>
-                <td>{{ entrada }}</td>
-                <td>{{ saida }}</td>
-              </tr>
-            {% endif %}
-            </table>
-            <hr>
-            <br>
-            <div class="row">
-                <div class="col">
-                    <form action="">
-                        <label for="metodospagamento"><strong>Método de pagamento:</strong></label>
-                        <select name="metodospagamento" id="metodospagamento">
-                          <option value="1">MB Way</option>
-                          <option value="2">Cartão</option>
-                          <option value="3">Numerário</option>
-                        </select>
-                      </form>
-                </div>
-                <div class="col">
-                    <a><strong>Multa:</strong> {{ multa }}€</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a><strong>Total:</strong> {{ preco }}€</a>
-                </div>
-                <div class="col">
-                    <a href="{% url 'emitirrecibo' id=reserva.id %}"><strong>Emitir recibo</strong></a>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <a href="{% url 'registarSaidaReserva' id=reserva.id saida=fim %}"><strong>Pagar<strong></a>
+                    <!-- Pagamento -->
+                    <br>
+                    <table class="table table-light table-hover">
+                        <thead>
+                        <tr>
+                            <th scope="col">Matrícula</th>
+                            <th scope="col">Parque</th>
+                            <th scope="col">Zona</th>
+                            <th scope="col">Lugar</th>
+                            <th scope="col">Validade</th>
+                            <th scope="col">Entrada</th>
+                            <th scope="col">Saída</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% if reserva %}
+                            <tr>
+                                <td>{{ reserva.matricula }}</td>
+                                <td>{{ reserva.lugarid.zone.park.name }}</td>
+                                <td>{{ reserva.lugarid.zone.name }}</td>
+                                <td>{{ reserva.lugarid.number }}</td>
+                                <td>{{ reserva.periocidadeid.start }} - {{ reserva.periocidadeid.end }}</td>
+                                <td>{{ entrada }}</td>
+                                <td>{{ saida }}</td>
+                            </tr>
+                        {% endif %}
+                    </table>
+                    <hr>
+                    <br>
+                    <div class="row">
+                        <div class="col">
+                            <form action="">
+                                <label for="metodospagamento"><strong>Método de pagamento:</strong></label>
+                                <select name="metodospagamento" id="metodospagamento">
+                                    <option value="1">MB Way</option>
+                                    <option value="2">Cartão</option>
+                                    <option value="3">Numerário</option>
+                                </select>
+                            </form>
+                        </div>
+                        <div class="col">
+                            <a><strong>Multa:</strong> {{ multa }}€</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a><strong>Total:</strong> {{ preco }}€</a>
+                        </div>
+                        <div class="col">
+                            <a href="{% url 'emitirrecibo' id=reserva.id %}"><strong>Emitir recibo</strong></a>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href="{% url 'registarSaidaReserva' id=reserva.id saida=fim %}"><strong>Pagar</strong></a>
+                        </div>
+                    </div>
                 </div>
             </div>
-    {% endblock %}
+        </div>
+    </div>
+{% endblock %}

@@ -482,8 +482,7 @@ class ParkingSpot(models.Model):
 
     def get_state_now(self):
         time = timezone.now()
-        if EntradasSaidas.objects.filter(lugarid=self.id, periocidadeid__start__lte=time,
-                                         periocidadeid__end__gte=time, in_spot=True):
+        if EntradasSaidas.objects.filter(lugarid=self.id, periocidadeid__start__lte=time, in_spot=True):
             return "Occupied"
         elif Reserva.objects.filter(lugarid=self.id, periocidadeid__start__lte=time,
                                     periocidadeid__end__gte=time):
@@ -510,6 +509,10 @@ class ParkingSpot(models.Model):
 
     def get_next_occupies(self):
         return EntradasSaidas.objects.filter(lugarid=self.id, periocidadeid__start__gte=timezone.now().date())
+
+    def is_occupied(self):
+        ent = EntradasSaidas.objects.get(lugarid=self.id)
+        return ent.in_spot
 
 
 class Estadoreserva(models.Model):

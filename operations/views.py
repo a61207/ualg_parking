@@ -206,7 +206,7 @@ def associar_lugar(request, id):
             entsaid1.tipo = tipoMan
             entsaid1.save()
             return redirect(visualizar_lugar, id=id)
-    return redirect(entradassaidas)
+    return render(request, "associar.html", context)
 
 
 # Função para visualizar o lugar com o id especifico

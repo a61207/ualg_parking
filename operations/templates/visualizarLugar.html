@@ -22,8 +22,13 @@
                                 <p><b>Zona: </b><br>{{ lugar.zone.name }}</p>
                             </div>
                             <div class="col">
+                                {% if lugar.is_occupied %}
+                                <p><b>Estado: </b><br>Occupied</p>
+                                {% else%}
                                 <p><b>Estado: </b><br>{{ lugar.get_state_now }}</p>
+                                {% endif %}
                             </div>
+
                             <div class="col">
                                 <p><b>Criado em: </b><br>{{ lugar.zone.park.created }}</p>
                             </div>
@@ -35,7 +40,7 @@
                     <br>
                     {% if perms.main.add_parque %}
                         <div class="row">
-                            {% if lugar.get_state_id == 1 %}
+                            {% if not lugar.is_occupied %}
                                 <!-- Botão de Apagar -->
                                 <div class="col">
                                     <div class="d-flex justify-content-center">
@@ -57,8 +62,9 @@
                     <br>
                     <hr>
                     <br>
+
                     {% if perms.main.add_parque %}
-                        {% if lugar.estadorecursoid.id == 3 %}
+                        {% if lugar.is_occupied %}
                             <p class="text-center font-weight-bold">Viatura a ocupar atualmente este lugar</p>
                             <br>
                             <table class="table table-light table-hover">
@@ -79,7 +85,7 @@
                                 {% endif %}
                                 {% if visitas %}
                                     <tr>
-                                        <td>{{ visitas.matricula }}</td>
+                                        <td>{{ visitas.matriculaviatura }}</td>
                                         <td>{{ visitas.periocidadeid.start }}</td>
                                         <td><a class="btn btn-primary" href="{% url 'desassociarLugar' id=lugar.id %}">Desassociar
                                             viatura</a></td>
